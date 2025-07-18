@@ -40,3 +40,8 @@ bin/
 
 ### Mac OS ###
 .DS_Store
+
+# application 설정 파일 무시
+*.properties
+/src/main/resources/application.properties
+application.properties
