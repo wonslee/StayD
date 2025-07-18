@@ -23,7 +23,7 @@ tasks.withType(JavaCompile) {
 
 application {
   mainModule = 'org.example.stayd'
-  mainClass = 'org.example.stayd.HelloApplication'
+  mainClass = 'org.example.stayd.MainApplication'
 }
 
 java {
