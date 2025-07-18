@@ -6,14 +6,14 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1024" prefWidth="768" style="-fx-background-color: #FFFFFF;" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.stayd.domain.user.controller.LoginController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="768" prefWidth="1024" style="-fx-background-color: #FFFFFF;" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.stayd.domain.user.controller.LoginController">
    <children>
-      <TextField fx:id="usernameTextField" layoutX="219.0" layoutY="155.0" text="ID" />
-      <PasswordField fx:id="password" layoutX="219.0" layoutY="194.0" text="PWRD" />
-      <Button fx:id="loginButton" layoutX="273.0" layoutY="235.0" mnemonicParsing="false" style="-fx-background-color: #4CAF4F;" text="로그인" textFill="WHITE" />
-      <Label fx:id="loginMessageLabel" layoutX="194.0" layoutY="250.0" text="아이디 찾기" />
-      <Label fx:id="findIdLabel" layoutX="194.0" layoutY="275.0" text="아이디 찾기" />
-      <Label fx:id="findPwLabel" layoutX="263.0" layoutY="275.0" text="비밀번호 찾기" />
-      <Label fx:id="signUpLabel" layoutX="344.0" layoutY="275.0" text="회원가입" />
+      <TextField fx:id="usernameTextField" layoutX="440.0" layoutY="316.0" text="ID" />
+      <PasswordField fx:id="password" layoutX="440.0" layoutY="355.0" text="PWRD" />
+      <Button fx:id="loginButton" layoutX="494.0" layoutY="396.0" mnemonicParsing="false" style="-fx-background-color: #4CAF4F;" text="로그인" textFill="WHITE" />
+      <Label fx:id="loginMessageLabel" layoutX="415.0" layoutY="411.0" text="로그인 여부" />
+      <Label fx:id="findIdLabel" layoutX="415.0" layoutY="436.0" text="아이디 찾기" />
+      <Label fx:id="findPwLabel" layoutX="484.0" layoutY="436.0" text="비밀번호 찾기" />
+      <Label fx:id="signUpLabel" layoutX="565.0" layoutY="436.0" text="회원가입" />
    </children>
 </AnchorPane>
