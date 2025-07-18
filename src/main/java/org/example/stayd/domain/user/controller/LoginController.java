@@ -42,20 +42,8 @@ public class LoginController implements Initializable {
     @FXML
     private Label loginMessageLabel;
 
-    @FXML
-    private StackPane headerContainer;
-
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        try {
-            // Header.fxml을 로드하여 StackPane에 추가
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/stayd/common/header.fxml"));
-            Parent header = loader.load();
-            headerContainer.getChildren().add(header);
-        } catch (IOException e) {
-            e.printStackTrace();
-            // 예외 발생 시 처리 코드 추가 (예: 사용자에게 에러 메시지 표시)
-        }
 
         setupHoverEffect(findIdLabel);
         setupHoverEffect(findPwLabel);
