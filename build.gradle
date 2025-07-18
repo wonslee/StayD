@@ -17,9 +17,6 @@ ext {
   junitVersion = '5.10.2'
 }
 
-sourceCompatibility = '21'
-targetCompatibility = '21'
-
 tasks.withType(JavaCompile) {
   options.encoding = 'UTF-8'
 }
@@ -29,14 +26,18 @@ application {
   mainClass = 'org.example.stayd.HelloApplication'
 }
 
+java {
+  toolchain {
+    languageVersion = JavaLanguageVersion.of(21)
+  }
+}
+
 javafx {
   version = '21'
   modules = ['javafx.controls', 'javafx.fxml']
 }
 
 dependencies {
-  implementation 'org.openjfx:javafx-controls:21'
-  implementation 'org.openjfx:javafx-fxml:21'
   implementation 'com.oracle.database.jdbc:ojdbc11:21.7.0.0'
 
   testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
