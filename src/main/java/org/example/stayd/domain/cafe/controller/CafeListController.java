@@ -1,7 +1,9 @@
 package org.example.stayd.domain.cafe.controller;
 
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -11,8 +13,8 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 import javafx.event.ActionEvent;
-
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,48 +23,32 @@ import java.util.ResourceBundle;
 public class CafeListController implements Initializable {
 
     // 검색 관련
-    @FXML
-    private TextField searchField;
-    @FXML
-    private Button searchButton;
-    @FXML
-    private Button sortButton;
+    @FXML private TextField searchField;
+    @FXML private Button searchButton;
+    @FXML private Button sortButton;
 
     // 카페 카드들 (8개)
-    @FXML
-    private VBox cafeCard0, cafeCard1, cafeCard2, cafeCard3;
-    @FXML
-    private VBox cafeCard4, cafeCard5, cafeCard6, cafeCard7;
+    @FXML private VBox cafeCard0, cafeCard1, cafeCard2, cafeCard3;
+    @FXML private VBox cafeCard4, cafeCard5, cafeCard6, cafeCard7;
 
     // 카페 이미지들
-    @FXML
-    private ImageView cafeImage0, cafeImage1, cafeImage2, cafeImage3;
-    @FXML
-    private ImageView cafeImage4, cafeImage5, cafeImage6, cafeImage7;
+    @FXML private ImageView cafeImage0, cafeImage1, cafeImage2, cafeImage3;
+    @FXML private ImageView cafeImage4, cafeImage5, cafeImage6, cafeImage7;
 
     // 카페 정보 레이블들
-    @FXML
-    private Label cafeName0, cafeName1, cafeName2, cafeName3;
-    @FXML
-    private Label cafeName4, cafeName5, cafeName6, cafeName7;
-    @FXML
-    private Label cafeRating0, cafeRating1, cafeRating2, cafeRating3;
-    @FXML
-    private Label cafeRating4, cafeRating5, cafeRating6, cafeRating7;
-    @FXML
-    private Label cafeReviewCount0, cafeReviewCount1, cafeReviewCount2, cafeReviewCount3;
-    @FXML
-    private Label cafeReviewCount4, cafeReviewCount5, cafeReviewCount6, cafeReviewCount7;
+    @FXML private Label cafeName0, cafeName1, cafeName2, cafeName3;
+    @FXML private Label cafeName4, cafeName5, cafeName6, cafeName7;
+    @FXML private Label cafeRating0, cafeRating1, cafeRating2, cafeRating3;
+    @FXML private Label cafeRating4, cafeRating5, cafeRating6, cafeRating7;
+    @FXML private Label cafeReviewCount0, cafeReviewCount1, cafeReviewCount2, cafeReviewCount3;
+    @FXML private Label cafeReviewCount4, cafeReviewCount5, cafeReviewCount6, cafeReviewCount7;
 
     // 찜하기 버튼들
-    @FXML
-    private Button favoriteBtn0, favoriteBtn1, favoriteBtn2, favoriteBtn3;
-    @FXML
-    private Button favoriteBtn4, favoriteBtn5, favoriteBtn6, favoriteBtn7;
+    @FXML private Button favoriteBtn0, favoriteBtn1, favoriteBtn2, favoriteBtn3;
+    @FXML private Button favoriteBtn4, favoriteBtn5, favoriteBtn6, favoriteBtn7;
 
     // 페이지네이션 버튼들
-    @FXML
-    private Button page1Button, page2Button, page3Button, page4Button, page5Button;
+    @FXML private Button page1Button, page2Button, page3Button, page4Button, page5Button;
 
     // 상태 변수들
     private boolean isSortByLatest = true; // true: 최신순, false: 평점순
@@ -91,53 +77,18 @@ public class CafeListController implements Initializable {
         }
 
         // Getters and Setters
-        public String getName() {
-            return name;
-        }
-
-        public void setName(String name) {
-            this.name = name;
-        }
-
-        public double getRating() {
-            return rating;
-        }
-
-        public void setRating(double rating) {
-            this.rating = rating;
-        }
-
-        public int getReviewCount() {
-            return reviewCount;
-        }
-
-        public void setReviewCount(int reviewCount) {
-            this.reviewCount = reviewCount;
-        }
-
-        public String getImageUrl() {
-            return imageUrl;
-        }
-
-        public void setImageUrl(String imageUrl) {
-            this.imageUrl = imageUrl;
-        }
-
-        public boolean isFavorite() {
-            return isFavorite;
-        }
-
-        public void setFavorite(boolean favorite) {
-            isFavorite = favorite;
-        }
-
-        public int getCafeId() {
-            return cafeId;
-        }
-
-        public void setCafeId(int cafeId) {
-            this.cafeId = cafeId;
-        }
+        public String getName() { return name; }
+        public void setName(String name) { this.name = name; }
+        public double getRating() { return rating; }
+        public void setRating(double rating) { this.rating = rating; }
+        public int getReviewCount() { return reviewCount; }
+        public void setReviewCount(int reviewCount) { this.reviewCount = reviewCount; }
+        public String getImageUrl() { return imageUrl; }
+        public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
+        public boolean isFavorite() { return isFavorite; }
+        public void setFavorite(boolean favorite) { isFavorite = favorite; }
+        public int getCafeId() { return cafeId; }
+        public void setCafeId(int cafeId) { this.cafeId = cafeId; }
     }
 
     @Override
@@ -162,12 +113,18 @@ public class CafeListController implements Initializable {
         allCafes.clear();
 
         // 더미 카페 데이터 생성 (40개 - 5페이지 분량)
+        String[] cafeNames = {
+                "작심 스터디카페 해치점", "조용한 공부방", "집중 스터디룸", "편안한 카페",
+                "북카페 스터디", "24시간 스터디", "깔끔한 독서실", "모던 스터디카페"
+        };
+
         for (int i = 1; i <= 40; i++) {
+            String cafeName = cafeNames[(i-1) % cafeNames.length] + " " + i;
             allCafes.add(new CafeData(
                     i,
-                    "작심 스터디카페 해치점 " + i,
+                    cafeName,
                     4.0 + (Math.random() * 1.0), // 4.0 ~ 5.0 사이 랜덤 평점
-                    (int) (50 + Math.random() * 200), // 50 ~ 250 사이 랜덤 리뷰 수
+                    (int)(50 + Math.random() * 200), // 50 ~ 250 사이 랜덤 리뷰 수
                     "https://pimg.daara.co.kr/kidd/photo/2018/01/09/1515480765_11.jpg",
                     false
             ));
@@ -468,8 +425,54 @@ public class CafeListController implements Initializable {
      * 카페 상세 페이지로 이동
      */
     private void navigateToCafeDetail(int cafeId) {
-        // TODO: 카페 상세 페이지로 네비게이션
-        System.out.println("카페 ID " + cafeId + " 상세 페이지로 이동");
+        try {
+            // 현재 Stage 가져오기
+            Stage currentStage = (Stage) searchField.getScene().getWindow();
+
+            // 상세 페이지 FXML 로드
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/org/example/stayd/cafe/cafeDetailView.fxml"));
+            Scene scene = new Scene(fxmlLoader.load(), 1024, 768);
+
+            // Controller 가져와서 카페 데이터 설정
+            CafeDetailController detailController = fxmlLoader.getController();
+
+            // 선택된 카페 데이터 찾기
+            CafeData selectedCafe = null;
+            for (CafeData cafe : filteredCafes) {
+                if (cafe.getCafeId() == cafeId) {
+                    selectedCafe = cafe;
+                    break;
+                }
+            }
+
+            if (selectedCafe != null) {
+                // 카페 데이터를 상세 페이지에 전달
+                detailController.setCafeData(
+                        selectedCafe.getName(),
+                        "서울특별시 종로구 창경궁로 254", // 위치 (실제로는 DB에서)
+                        "월, 화, 수, 목, 금", // 영업일 (실제로는 DB에서)
+                        "09:00 - 18:00", // 운영시간 (실제로는 DB에서)
+                        10000, // 시간당 가격 (실제로는 DB에서)
+                        "02-123-4567", // 전화번호 (실제로는 DB에서)
+                        "조용하고 깨끗한 환경에서 집중해서 공부할 수 있는 스터디 카페입니다.", // 설명 (실제로는 DB에서)
+                        selectedCafe.getImageUrl(),
+                        selectedCafe.getRating()
+                );
+
+                // 찜하기 상태 설정
+                detailController.setFavorite(selectedCafe.isFavorite());
+            }
+
+            // 화면 전환
+            currentStage.setTitle("StayD - 카페 상세");
+            currentStage.setScene(scene);
+
+            System.out.println("카페 ID " + cafeId + " 상세 페이지로 이동 완료");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("상세 페이지 이동 중 오류 발생: " + e.getMessage());
+        }
     }
 
     /**

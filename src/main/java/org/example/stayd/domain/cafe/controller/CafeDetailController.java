@@ -1,13 +1,17 @@
 package org.example.stayd.domain.cafe.controller;
 
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
 import javafx.event.ActionEvent;
+import javafx.stage.Stage;
+
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -23,6 +27,9 @@ public class CafeDetailController implements Initializable {
     @FXML private Button detailButton;
     @FXML private Button reservationButton;
     @FXML private Button reviewButton;
+
+    // 목록 페이지 버튼
+    @FXML private Button backButton;
 
     // 상세 정보 요소들
     @FXML private ImageView mainImageView;
@@ -60,6 +67,31 @@ public class CafeDetailController implements Initializable {
 
         // 기본적으로 상세 탭이 활성화
         showDetailTab(null);
+    }
+
+    /**
+     * 목록 페이지로 돌아가기
+     */
+    @FXML
+    private void goBackToList(ActionEvent event) {
+        try {
+            // 현재 Stage 가져오기
+            Stage currentStage = (Stage) backButton.getScene().getWindow();
+
+            // 목록 페이지 FXML 로드
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/org/example/stayd/cafe/cafeListView.fxml"));
+            Scene scene = new Scene(fxmlLoader.load(), 1024, 768);
+
+            // 목록 페이지로 화면 전환
+            currentStage.setTitle("StayD - 카페 목록");
+            currentStage.setScene(scene);
+
+            System.out.println("목록 페이지로 돌아가기 완료");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("목록 페이지로 돌아가기 중 오류 발생: " + e.getMessage());
+        }
     }
 
     /**
