@@ -65,11 +65,14 @@
                 <Label fx:id="useTime" style="-fx-font-weight:bold;" text="15:00 - 19:00" />
             </HBox>
             <!-- 좌석 -->
+            <!--
             <HBox alignment="CENTER_LEFT" spacing="10">
                 <Label style="-fx-font-size:14;" text="💺" />
                 <Label text="좌석" />
                 <Label fx:id="seat" style="-fx-font-weight:bold;" text="15G" />
             </HBox>
+            -->
+
         </VBox>
          <Label fx:id="avgScore" layoutX="580.0" layoutY="15.0" style="-fx-font-size:18;" text="4.7" />
          <Label layoutX="556.0" layoutY="15.0" style="-fx-font-size:18; -fx-text-fill:#f1c40f;" text="★" />
