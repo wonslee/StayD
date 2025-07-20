@@ -1,0 +1,27 @@
+.star-btn {
+    -fx-font-size: 24px;
+    -fx-background-color: transparent;
+    -fx-text-fill: #cfcfcf;
+}
+.star-btn:selected {
+    -fx-text-fill: #ffc107;      /* 노란색 */
+}
+.star-btn:hover {
+    -fx-font-size: 26px;
+}
+
+/* review.css 에 추가 */
+.review-list .list-cell:empty {
+    -fx-background-color: white;
+    -fx-border-width: 0;        /* 구분선도 안 보이게 */
+}
+.pagination {
+    -fx-padding: 0 0 20 0;  /* 아래 여백 조금 */
+}
+
+.button {
+    -fx-font-size: 11px;
+    -fx-cursor: hand;
+}
+
+
