@@ -4,6 +4,7 @@ module org.example.stayd {
     requires javafx.graphics;
     requires java.sql;
     requires java.base;
+    requires static lombok;
 
     opens org.example.stayd.domain.user.controller to javafx.fxml;
     opens org.example.stayd.domain.cafe.controller to javafx.fxml;

@@ -23,7 +23,7 @@ tasks.withType(JavaCompile) {
 
 application {
   mainModule = 'org.example.stayd'
-  mainClass = 'org.example.stayd.HelloApplication'
+  mainClass = 'org.example.stayd.MainApplication'
 }
 
 java {
@@ -38,10 +38,16 @@ javafx {
 }
 
 dependencies {
-  implementation 'com.oracle.database.jdbc:ojdbc11:21.7.0.0'
+  implementation 'com.oracle.database.jdbc:ojdbc11:21.3.0.0' // 자기 버전
 
   testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
   testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
+
+  implementation 'org.projectlombok:lombok:1.18.32'
+  annotationProcessor 'org.projectlombok:lombok:1.18.32'
+
+  testImplementation 'org.projectlombok:lombok:1.18.32'
+  testAnnotationProcessor 'org.projectlombok:lombok:1.18.32'
 }
 
 test {
