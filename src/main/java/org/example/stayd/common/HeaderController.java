@@ -37,7 +37,6 @@ public class HeaderController {
         if (userService.isUserLoggedIn()) {
             // 로그인 되어있으면 마이페이지로 이동
             try {
-                // MouseEvent에서 Stage 객체 가져오기
                 Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
                 switchScene(stage, SceneConfig.MY_PAGE_FXML);  // 마이페이지로 이동
             } catch (IOException e) {
@@ -47,7 +46,6 @@ public class HeaderController {
         } else {
             // 로그인 되어있지 않으면 로그인 페이지로 이동
             try {
-                // MouseEvent에서 Stage 객체 가져오기
                 Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
                 switchScene(stage, SceneConfig.LOGIN_FXML);  // 로그인 페이지로 이동
             } catch (IOException e) {
