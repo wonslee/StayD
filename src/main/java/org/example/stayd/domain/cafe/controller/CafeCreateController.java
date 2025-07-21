@@ -57,6 +57,7 @@ public class CafeCreateController implements Initializable {
         this.cafeService = cafeService;
     }
 
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         // 초기 설정

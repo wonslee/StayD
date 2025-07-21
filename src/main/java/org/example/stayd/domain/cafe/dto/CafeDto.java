@@ -214,4 +214,118 @@ public class CafeDto {
                     '}';
         }
     }
+
+    public static class DetailResponse {
+        private Long cafeId;
+        private String name;
+        private String address;
+        private Integer pricePerHour;
+        private String description;
+        private String phoneNumber;
+        private String imageUrl;
+
+        public Long getCafeId() {
+            return cafeId;
+        }
+
+        public void setCafeId(Long cafeId) {
+            this.cafeId = cafeId;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public String getAddress() {
+            return address;
+        }
+
+        public void setAddress(String address) {
+            this.address = address;
+        }
+
+        public Integer getPricePerHour() {
+            return pricePerHour;
+        }
+
+        public void setPricePerHour(Integer pricePerHour) {
+            this.pricePerHour = pricePerHour;
+        }
+
+        public String getDescription() {
+            return description;
+        }
+
+        public void setDescription(String description) {
+            this.description = description;
+        }
+
+        public String getPhoneNumber() {
+            return phoneNumber;
+        }
+
+        public void setPhoneNumber(String phoneNumber) {
+            this.phoneNumber = phoneNumber;
+        }
+
+        public String getImageUrl() {
+            return imageUrl;
+        }
+
+        public void setImageUrl(String imageUrl) {
+            this.imageUrl = imageUrl;
+        }
+
+        public List<String> getOperatingDays() {
+            return operatingDays;
+        }
+
+        public void setOperatingDays(List<String> operatingDays) {
+            this.operatingDays = operatingDays;
+        }
+
+        public Integer getOperatingStartHour() {
+            return operatingStartHour;
+        }
+
+        public void setOperatingStartHour(Integer operatingStartHour) {
+            this.operatingStartHour = operatingStartHour;
+        }
+
+        public Integer getOperatingEndHour() {
+            return operatingEndHour;
+        }
+
+        public void setOperatingEndHour(Integer operatingEndHour) {
+            this.operatingEndHour = operatingEndHour;
+        }
+
+        private List<String> operatingDays;
+        private Integer operatingStartHour;
+        private Integer operatingEndHour;
+
+        public DetailResponse() {}
+
+        public DetailResponse(Long cafeId, String name, String address, Integer pricePerHour,
+                              String description, String phoneNumber, String imageUrl,
+                              List<String> operatingDays, Integer operatingStartHour, Integer operatingEndHour) {
+            this.cafeId = cafeId;
+            this.name = name;
+            this.address = address;
+            this.pricePerHour = pricePerHour;
+            this.description = description;
+            this.phoneNumber = phoneNumber;
+            this.imageUrl = imageUrl;
+            this.operatingDays = operatingDays;
+            this.operatingStartHour = operatingStartHour;
+            this.operatingEndHour = operatingEndHour;
+        }
+
+        // Getters & Setters 생략
+    }
+
 }

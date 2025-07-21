@@ -197,4 +197,19 @@ public class CafeService {
         //     throw new IllegalArgumentException("카페 생성 권한이 없습니다. CAFE_OWNER 권한이 필요합니다.");
         // }
     }
+
+    /**
+     * 카페 ID로 단건 조회
+     * @param cafeId 조회할 카페 ID
+     * @return CafeModel (없으면 null)
+     */
+    public CafeDto.DetailResponse getCafeDetail(Long cafeId) {
+        try {
+            return cafeDao.findById(cafeId);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException("카페 상세 정보 조회 중 오류 발생: " + e.getMessage());
+        }
+    }
+
 }
