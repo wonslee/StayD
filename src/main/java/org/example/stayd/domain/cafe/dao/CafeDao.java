@@ -6,6 +6,7 @@ import org.example.stayd.domain.cafe.model.CafeModel;
 
 import java.sql.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -175,4 +176,52 @@ public class CafeDao {
 
         return dayMap.getOrDefault(dayInKorean, "");
     }
+
+    /**
+     * 카페 ID로 카페 단건 조회
+     * @param cafeId 조회할 카페 ID
+     * @return CafeModel 객체 (없으면 null)
+     */
+    public CafeDto.DetailResponse findById(Long cafeId) throws SQLException {
+        String cafeSql = "SELECT * FROM cafe WHERE cafe_id = ?";
+        String opSql = "SELECT * FROM operation_hours WHERE cafe_id = ?";
+
+        try (Connection conn = databaseConnection.getConnection();
+             PreparedStatement cafeStmt = conn.prepareStatement(cafeSql);
+             PreparedStatement opStmt = conn.prepareStatement(opSql)) {
+
+            cafeStmt.setLong(1, cafeId);
+            ResultSet cafeRs = cafeStmt.executeQuery();
+
+            if (!cafeRs.next()) {
+                throw new SQLException("해당 ID의 카페를 찾을 수 없습니다.");
+            }
+
+            // 카페 기본 정보 추출
+            String name = cafeRs.getString("name");
+            String address = cafeRs.getString("address");
+            Integer pricePerHour = cafeRs.getInt("price_per_hour");
+            String description = cafeRs.getString("description");
+            String phone = cafeRs.getString("phone_number");
+            String imageUrl = cafeRs.getString("image_url");
+
+            // 운영시간 추출
+            opStmt.setLong(1, cafeId);
+            ResultSet opRs = opStmt.executeQuery();
+
+            List<String> days = new ArrayList<>();
+            Integer start = null;
+            Integer end = null;
+
+            while (opRs.next()) {
+                days.add(opRs.getString("day_of_week"));
+                if (start == null) start = opRs.getInt("operation_start");
+                if (end == null) end = opRs.getInt("operation_end");
+            }
+
+            return new CafeDto.DetailResponse(cafeId, name, address, pricePerHour, description, phone, imageUrl, days, start, end);
+        }
+    }
+
+
 }
