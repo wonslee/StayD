@@ -1,97 +1,107 @@
 package org.example.stayd.domain.user.controller;
 
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.fxml.Initializable;
-import javafx.scene.Cursor;
-import javafx.scene.Parent;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
-import javafx.scene.layout.StackPane;
-import org.example.stayd.common.DatabaseConnection;
+import javafx.scene.control.*;
+import javafx.scene.input.MouseEvent;
+import javafx.stage.Stage;
+import org.example.stayd.common.FXUtils;
+import org.example.stayd.config.SceneConfig;
+import org.example.stayd.domain.user.dto.UserDTO;
+import org.example.stayd.domain.user.service.UserService;
 
 import java.io.IOException;
-import java.net.URL;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.Statement;
-import java.util.ResourceBundle;
 
-public class LoginController implements Initializable {
+public class LoginController {
 
     @FXML
-    private Label findIdLabel;
-
+    private TextField loginIdField;
     @FXML
-    private Label findPwLabel;
-
-    @FXML
-    private Label signUpLabel;
-
+    private PasswordField passwordField;
     @FXML
     private Button loginButton;
+    @FXML
+    private Label messageLabel;
+    @FXML
+    private Label findIdLabel;
+    @FXML
+    private Label findPwLabel;
+    @FXML
+    private Label signUpLabel;
+    private final UserService userService = new UserService();
 
     @FXML
-    private TextField usernameTextField;
-
-    @FXML
-    private PasswordField password;
-
-    @FXML
-    private Label loginMessageLabel;
-
-    @Override
-    public void initialize(URL location, ResourceBundle resources) {
-
-        setupHoverEffect(findIdLabel);
-        setupHoverEffect(findPwLabel);
-        setupHoverEffect(signUpLabel);
-
-        loginButton.setOnMouseClicked(mouseEvent -> {
-            validateLogin();
-        });
-
-        findIdLabel.setOnMouseClicked(event -> {
-            // 아이디 찾기
-        });
-
-        findPwLabel.setOnMouseClicked(event -> {
-            // 비밀번호 찾기
-        });
-
-        signUpLabel.setOnMouseClicked(event -> {
-            // 회원가입
-        });
+    private void onLinkHover(MouseEvent event) {
+        Label lbl = (Label) event.getSource();
+        lbl.setStyle("-fx-font-weight: bold; -fx-text-fill: black; -fx-underline: true;");
     }
 
-    private void validateLogin() {
-        DatabaseConnection connectNow = new DatabaseConnection();
-        Connection connectDB = connectNow.getConnection();
+    @FXML
+    private void onLinkExit(MouseEvent event) {
+        Label lbl = (Label) event.getSource();
+        lbl.setStyle("-fx-font-weight: normal; -fx-text-fill: black; -fx-underline: true;");
+    }
 
-        String verifyLogin = "SELECT count(1) FROM UserAccounts WHERE username = '" + usernameTextField.getText() + "' AND password = '" + password.getText() +"'";
+    @FXML
+    private void onLogin() {
+        String loginId = loginIdField.getText().trim();
+        String rawPw = passwordField.getText();
 
-        try{
-            Statement statement = connectDB.createStatement();
-            ResultSet queryResult = statement.executeQuery(verifyLogin);
+        // 입력 빈값 검증
+        if (loginId.isEmpty() || rawPw.isEmpty()) {
+            messageLabel.setText("아이디와 비밀번호를 모두 입력하세요.");
+            return;
+        }
 
-            while(queryResult.next()){
-                if (queryResult.getInt(1)==1){
-                    loginMessageLabel.setText("성공");
-                } else{
-                    loginMessageLabel.setText("실패");
-                }
+        // 버튼 비활성화, 메시지 초기화
+        loginButton.setDisable(true);
+        messageLabel.setText("로그인 중…");
+
+        Task<UserDTO> loginTask = new Task<>() {
+            @Override
+            protected UserDTO call() throws Exception {
+                return userService.authenticate(loginId, rawPw);
             }
-        } catch(Exception e){
+        };
+
+        loginTask.setOnSucceeded(evt -> {
+            goToSignup();
+        });
+
+        loginTask.setOnFailed(evt -> {
+            Throwable ex = loginTask.getException();
+            messageLabel.setText(ex.getMessage());
+            loginButton.setDisable(false);
+        });
+
+        new Thread(loginTask).start();
+    }
+
+    @FXML
+    private void onFindId() {
+    }
+
+    @FXML
+    private void onFindPw() {
+    }
+
+    @FXML
+    private void goToSignup() {
+        try {
+            Stage stage = (Stage) loginButton.getScene().getWindow();
+            FXUtils.switchScene(stage, SceneConfig.SIGNUP_FXML);
+        } catch (IOException e) {
             e.printStackTrace();
+            showAlert(Alert.AlertType.ERROR,
+                    "화면 전환 오류", "회원가입 화면을 불러오는 중 오류가 발생했습니다.");
         }
     }
 
-    private void setupHoverEffect(Label label) {
-        label.setCursor(Cursor.HAND);
-
-        label.setOnMouseEntered(e -> label.setStyle("-fx-text-fill: blue; -fx-underline: true;"));
-        label.setOnMouseExited(e -> label.setStyle("-fx-text-fill: black; -fx-underline: false;"));
+    private void showAlert(Alert.AlertType type, String title, String msg) {
+        Alert a = new Alert(type);
+        a.setTitle(title);
+        a.setHeaderText(null);
+        a.setContentText(msg);
+        a.showAndWait();
     }
 }
