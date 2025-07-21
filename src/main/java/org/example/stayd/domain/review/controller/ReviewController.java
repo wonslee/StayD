@@ -1,5 +1,5 @@
 // ===========================================
-// ReviewController.java  (fixed: userId 하드코딩 복구)
+// ReviewController.java  (fixed: userId 하드코딩 복구 + 예약당 리뷰 1개 제한 로직 추가)
 // 리뷰 작성 화면 컨트롤러 - 리뷰 작성 및 유효성 검증 포함
 // ===========================================
 package org.example.stayd.domain.review.controller;
@@ -32,7 +32,7 @@ public class ReviewController {
     private ToggleButton[] stars;
 
     /** 테스트용 사용자 ID (임시) */
-    private int userId = 1; // TODO: 나중에 제거 → 아래 SessionContext 방식으로 교체할 것
+    private int userId = 66; // TODO: 나중에 제거 → 아래 SessionContext 방식으로 교체할 것
 
     // private int userId = SessionContext.getCurrentUserId(); // TODO: 나중에 주석 해제 → 실제 로그인 사용자 연동
 
@@ -57,14 +57,17 @@ public class ReviewController {
 
     /** 최근 완료 예약 1건 로드 & 화면 바인딩 */
     private void loadReservation() {
+        // 👉 여기에 넣으면 됨
+        System.out.println("📌 리뷰용 예약 불러오는 중... userId=" + userId);
         resInfo = resSvc.latestFinished(userId);
+        if (resInfo != null) System.out.println("✅ 예약 ID: " + resInfo.getReservationId());
+        else System.out.println("❌ 예약 없음");
 
         if (resInfo == null) {
             alert("이용 완료된 예약이 없습니다. 리뷰를 작성할 수 없습니다.");
             disableForm();
             return;
         }
-
         cafeName.setText(resInfo.getCafeName());
         avgScore.setText(String.valueOf(resInfo.getAvgScore()));
 
@@ -99,10 +102,23 @@ public class ReviewController {
         if (getRating() == 0) { alert("별점을 선택해 주세요."); return; }
         if (reviewTextArea.getText().isBlank()) { alert("리뷰 내용을 입력해 주세요."); return; }
 
+        // ✅ 예약당 리뷰 1개 제한 체크
+        try {
+            if (((ReviewDaoImpl) reviewDao).existsByReservation(resInfo.getReservationId(), userId)) {
+                alert("이 예약에는 이미 리뷰를 작성하셨습니다.");
+                return;
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            alert("리뷰 중복 확인 중 오류 발생: " + ex.getMessage());
+            return;
+        }
+
         // DTO 구성
         ReviewDto dto = new ReviewDto();
         dto.setReviewerId(userId);
         dto.setCafeId(resInfo.getCafeId());
+        dto.setReservationId(resInfo.getReservationId());
         dto.setRating(getRating());
         dto.setContent(reviewTextArea.getText().trim());
 
@@ -114,7 +130,6 @@ public class ReviewController {
             } else alert("리뷰 저장 실패");
 
         } catch (java.sql.SQLException ex) {
-            // UNIQUE 제약조건 위반 (이미 작성한 리뷰)
             if (ex.getErrorCode() == 1) {
                 alert("리뷰는 한 카페당 한 번만 작성 가능합니다.");
             } else alert("DB 오류: " + ex.getMessage());

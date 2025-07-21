@@ -13,18 +13,27 @@
 
     <!-- 왼쪽: 리뷰 본문 영역 -->
     <VBox spacing="4" HBox.hgrow="ALWAYS">
-        <Label fx:id="nameLabel"    style="-fx-font-weight:bold;"/>
-        <Label fx:id="ratingLabel"  style="-fx-text-fill:#f1c40f;"/>
-        <Label fx:id="contentLabel" wrapText="true" maxWidth="600"/>
-        <Label fx:id="dateLabel"    style="-fx-font-size:10px; -fx-text-fill:#888888;"/>
+        <Label fx:id="nameLabel"    style="-fx-font-weight:bold;" />
+        <Label fx:id="ratingLabel"  style="-fx-text-fill:#f1c40f;" />
+        <Label fx:id="contentLabel" wrapText="true" maxWidth="600" />
+        <Label fx:id="dateLabel"    style="-fx-font-size:10px; -fx-text-fill:#888888;" />
     </VBox>
 
-    <!-- 오른쪽: 삭제 버튼 -->
-    <Button fx:id="deleteBtn"
-            text="삭제"
-            visible="false"
-            style="-fx-background-color: transparent;
-                   -fx-text-fill: red;
-                   -fx-font-size: 11px;"
-            alignment="CENTER_RIGHT"/>
+    <!-- 오른쪽: 버튼들 (삭제/수정) -->
+    <VBox spacing="6" alignment="TOP_RIGHT">
+        <Button fx:id="deleteBtn"
+                text="삭제"
+                visible="false"
+                style="-fx-background-color: transparent;
+                       -fx-text-fill: red;
+                       -fx-font-size: 11px;" />
+        <Button fx:id="editButton"
+                text="수정"
+                visible="false"
+                onAction="#handleEdit"
+                style="-fx-background-color: #e0e0e0;
+                       -fx-text-fill: black;
+                       -fx-font-size: 11px;
+                       -fx-background-radius: 6;" />
+    </VBox>
 </HBox>

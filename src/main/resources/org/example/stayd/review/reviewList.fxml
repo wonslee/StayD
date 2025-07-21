@@ -5,11 +5,16 @@
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.*?>
 
+<?import java.net.URL?>
 <AnchorPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="org.example.stayd.domain.review.controller.ReviewListController"
             prefWidth="1024.0" prefHeight="768.0"
             style="-fx-background-color:white;">
+
+    <stylesheets>
+        <URL value="@review.css" />
+    </stylesheets>
 
     <!-- ── 헤더 ─────────────────────────────────────────────── -->
     <AnchorPane fx:id="headerPane" prefHeight="130.0" AnchorPane.topAnchor="0.0" prefWidth="1024.0">

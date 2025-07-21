@@ -1,109 +1,153 @@
+// ===========================================
+// ReviewDaoImpl.java - 예약당 리뷰 1건만 작성 가능하도록 수정
+// ===========================================
 package org.example.stayd.domain.review.dao;
 
 import org.example.stayd.common.DatabaseConnection;
 import org.example.stayd.domain.review.dto.ReviewDto;
-// import org.example.stayd.global.SessionContext; // TODO: 나중에 주석 해제 - 세션에서 사용자 정보 연동할 경우
+// import org.example.stayd.global.SessionContext; // TODO: 통합 시 세션에서 userId 가져오기
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * ReviewDao 인터페이스의 구현 클래스
- * 리뷰 삽입, 삭제, 조회, 커밋 기능 담당
- */
 public class ReviewDaoImpl implements ReviewDao {
 
     private final DatabaseConnection db = new DatabaseConnection();
+    private Connection conn; // 수동 커밋용
 
-    // insert(), delete()와 commitIfNeeded()에서 공유할 커넥션
-    private Connection conn;
-
-    /**
-     * 리뷰 1건 저장 (INSERT)
-     * 수동 커밋 모드로 수행됨
-     */
+    // 리뷰 등록
     @Override
     public int insert(ReviewDto r) throws SQLException {
-        String sql = "INSERT INTO review (reviewer_id, cafe_id, rating, content) VALUES (?,?,?,?)";
+        String sql = """
+            UPDATE reservation
+            SET review_rating = ?, review_content = ?, review_created_at = SYSTIMESTAMP
+            WHERE reservation_id = ? AND user_id = ?
+        """;
 
         conn = db.getConnection();
-        conn.setAutoCommit(false);  // 수동 커밋 전환
+        conn.setAutoCommit(false);
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, r.getReviewerId()); // TODO: controller에서 SessionContext 기반으로 값 넘어와야 함
-            ps.setInt(2, r.getCafeId());
-            ps.setInt(3, r.getRating());
-            ps.setString(4, r.getContent());
-            return ps.executeUpdate();  // 1행 삽입 성공 시 1 반환
+            ps.setInt(1, r.getRating());
+            ps.setString(2, r.getContent());
+            ps.setInt(3, r.getReservationId());
+            ps.setInt(4, r.getReviewerId()); // TODO: 세션 기반으로 교체
+            return ps.executeUpdate();
         }
     }
 
-    /**
-     * 리뷰 1건 삭제 (DELETE)
-     * 수동 커밋 모드로 수행됨
-     */
+    // 리뷰 수정
     @Override
-    public int delete(int reviewId) throws SQLException {
-        String sql = "DELETE FROM review WHERE review_id = ?";
+    public int update(ReviewDto r) throws SQLException {
+        String sql = """
+            UPDATE reservation
+            SET review_rating = ?, review_content = ?
+            WHERE reservation_id = ? AND user_id = ?
+        """;
 
         conn = db.getConnection();
-        conn.setAutoCommit(false);  // 수동 커밋 전환
+        conn.setAutoCommit(false);
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, reviewId); // TODO: 삭제 전 '본인 리뷰인지' 검증은 controller 단에서 필요
-            return ps.executeUpdate();  // 1행 삭제 성공 시 1 반환
+            ps.setInt(1, r.getRating());
+            ps.setString(2, r.getContent());
+            ps.setInt(3, r.getReservationId());
+            ps.setInt(4, r.getReviewerId());
+            return ps.executeUpdate();
         }
     }
 
-    /**
-     * insert/delete 이후 수동 커밋 + 커넥션 종료
-     */
+    // 리뷰 삭제 (NULL 처리)
+    @Override
+    public int delete(int reservationId, int userId) throws SQLException {
+        String sql = """
+        UPDATE reservation
+        SET review_rating = NULL,
+            review_content = NULL,
+            review_created_at = NULL
+        WHERE reservation_id = ?
+          AND user_id = ?
+        """;
+        try (Connection conn = db.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, reservationId);
+            ps.setInt(2, userId);
+
+            return ps.executeUpdate(); // 성공 시 1 반환
+        }
+    }
+
+    // 수동 커밋
     @Override
     public void commitIfNeeded() throws SQLException {
         if (conn != null && !conn.getAutoCommit()) {
-            conn.commit();     // 명시적 커밋
-            conn.close();      // 커넥션 닫기
-            conn = null;       // 참조 해제
+            conn.commit();
+            conn.close();
+            conn = null;
         }
     }
 
-    /**
-     * 특정 카페의 모든 리뷰 조회
-     * @param cafeId 카페 ID
-     * @return 해당 카페의 ReviewDto 목록
-     */
+    // 카페별 리뷰 조회 (rating 있는 것만)
     @Override
     public List<ReviewDto> findByCafe(int cafeId) throws SQLException {
-        String sql = "SELECT * FROM review WHERE cafe_id = ?";
+        String sql = """
+            SELECT reservation_id, user_id, cafe_id,
+                   review_rating, review_content, review_created_at
+            FROM reservation
+            WHERE cafe_id = ? AND review_rating IS NOT NULL
+            ORDER BY review_created_at DESC
+        """;
+
         List<ReviewDto> list = new ArrayList<>();
 
         try (Connection c = db.getConnection();
              PreparedStatement ps = c.prepareStatement(sql)) {
 
-            ps.setInt(1, cafeId); // TODO: controller에서 cafeId 세션 또는 외부 주입
+            ps.setInt(1, cafeId);
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
                 ReviewDto dto = new ReviewDto();
-                dto.setId(rs.getInt("review_id"));
-                dto.setReviewerId(rs.getInt("reviewer_id"));
-                dto.setCafeId(cafeId);
-                dto.setRating(rs.getInt("rating"));
-                dto.setContent(rs.getString("content"));
-                dto.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
-
+                dto.setReservationId(rs.getInt("reservation_id"));
+                dto.setReviewerId(rs.getInt("user_id"));
+                dto.setCafeId(rs.getInt("cafe_id"));
+                dto.setRating(rs.getInt("review_rating"));
+                dto.setContent(rs.getString("review_content"));
+                dto.setCreatedAt(rs.getTimestamp("review_created_at").toLocalDateTime());
                 list.add(dto);
             }
         }
+
         return list;
     }
 
-    /*
-     TODO (통합 시)
-     1. insert(): controller가 세션 정보(SessionContext)를 통해 reviewerId, cafeId를 넘기도록 보장
-     2. delete(): controller에서 "본인 글인지 여부" 사전 검증 필요
-     3. findByCafe(): 현재 cafeId는 파라미터로 주입되므로 외부에서 세션 또는 선택값으로 설정해야 함
-     4. DB 연결 및 수동 커밋 방식은 유지하되 예외 발생 시 rollback 고려할지 판단
-    */
+    // 예약에 대해 이미 리뷰가 작성되었는지 확인
+    @Override
+    public boolean existsByReservation(int reservationId, int userId) throws SQLException {
+        String sql = """
+            SELECT COUNT(*) 
+            FROM reservation 
+            WHERE reservation_id = ? AND user_id = ? 
+                  AND review_rating IS NOT NULL
+        """;
+
+        try (Connection conn = db.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, reservationId);
+            ps.setInt(2, userId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0; // 리뷰가 이미 존재하면 true
+                }
+            }
+        }
+
+        return false;
+    }
+
+    // TODO: 통합 시 보완할 부분 주석 정리됨
 }

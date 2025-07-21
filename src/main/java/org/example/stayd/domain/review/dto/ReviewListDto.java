@@ -12,19 +12,23 @@ import java.time.LocalDateTime;
 @ToString
 public class ReviewListDto {
 
-    private final int id;               // 리뷰 ID (PK)
-    private final String reviewerName;  // 로그인 ID
+    private final int reservationId;
+    private final int reviewerId;        // ✅ 새로 추가
+    private final String reviewerName;
     private final int rating;
     private final String content;
     private final LocalDateTime createdAt;
+    private final int cafeId;
 
-    public ReviewListDto(int id, String reviewerName, int rating,
-                         String content, LocalDateTime createdAt) {
-        this.id = id;
+    public ReviewListDto(int reservationId, int reviewerId, String reviewerName, int rating,
+                         String content, LocalDateTime createdAt, int cafeId) {
+        this.reservationId = reservationId;
+        this.reviewerId = reviewerId;
         this.reviewerName = reviewerName;
         this.rating = rating;
         this.content = content;
         this.createdAt = createdAt;
+        this.cafeId = cafeId;
     }
 }
 

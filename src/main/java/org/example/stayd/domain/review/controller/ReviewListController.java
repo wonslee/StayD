@@ -38,7 +38,7 @@ public class ReviewListController implements Initializable {
     private static final int ROWS = 5;           // 페이지당 보여줄 리뷰 수
 
     /* ────── 현재 조회 중인 카페 ID ────── */
-    private int cafeId = 2;                      // ⚠ 테스트용 cafeId (임시)  // TODO: 나중에 제거
+    private int cafeId = 1;                      // ⚠ 테스트용 cafeId (임시)  // TODO: 나중에 제거
 
     // private int cafeId = SessionContext.getCurrentCafeId(); // TODO: 나중에 주석 해제 → 실제 로그인 연동 시 사용
 

@@ -14,15 +14,12 @@ import java.time.LocalDateTime;
 @Setter
 @ToString
 public class ReviewDto {
-    private int    id;           // PK, auto increment
 
-    /** 작성자 ID (SessionContext.getCurrentUserId() 등에서 주입) */
-    private int    reviewerId;   // TODO: 컨트롤러에서 세션 기반 값으로 설정해야 함
+    private int reservationId;   // 리뷰 대상 예약 ID
+    private int reviewerId;      // 작성자 ID (user_id)
+    private int cafeId;          // 카페 ID
 
-    /** 카페 ID (현재 선택된 카페 - 세션 or 외부 주입) */
-    private int    cafeId;       // TODO: 컨트롤러에서 주입, 테스트용으로 하드코딩 중일 수 있음
-
-    private int    rating;
-    private String content;
-    private LocalDateTime createdAt; // SELECT용으로 사용됨
+    private int rating;              // 별점 (1~5)
+    private String content;          // 리뷰 내용
+    private LocalDateTime createdAt; // 작성일시
 }

@@ -20,15 +20,18 @@ public class ReviewListDaoImpl implements ReviewListDao {
 
     // 리뷰 목록 조회 SQL (JOIN으로 작성자 login_id 가져옴)
     private static final String SQL = """
-        SELECT r.review_id,
+        SELECT r.reservation_id,
+               r.cafe_id,
+               r.user_id AS reviewer_id, 
                u.login_id AS reviewer_name,
-               r.rating,
-               r.content,
-               r.created_at
-        FROM   review r
-        JOIN   users u ON r.reviewer_id = u.user_id
+               r.review_rating AS rating,
+               r.review_content AS content,
+               r.review_created_at AS created_at
+        FROM   reservation r
+        JOIN   users u ON r.user_id = u.user_id
         WHERE  r.cafe_id = ?
-        ORDER  BY r.created_at DESC
+          AND  r.review_content IS NOT NULL
+        ORDER  BY r.review_created_at DESC
         """;
 
     /**
@@ -48,11 +51,13 @@ public class ReviewListDaoImpl implements ReviewListDao {
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     list.add(new ReviewListDto(
-                            rs.getInt("review_id"),                    // 리뷰 ID
-                            rs.getString("reviewer_name"),             // 작성자 login_id (JOIN)
-                            rs.getInt("rating"),                       // 별점
-                            rs.getString("content"),                   // 리뷰 내용
-                            rs.getTimestamp("created_at").toLocalDateTime() // 작성일시
+                            rs.getInt("reservation_id"),
+                            rs.getInt("reviewer_id"),            // ✅ 이 부분!
+                            rs.getString("reviewer_name"),
+                            rs.getInt("rating"),
+                            rs.getString("content"),
+                            rs.getTimestamp("created_at").toLocalDateTime(),
+                            rs.getInt("cafe_id")
                     ));
                 }
             }

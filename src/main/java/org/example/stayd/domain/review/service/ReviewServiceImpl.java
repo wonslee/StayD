@@ -3,28 +3,25 @@ package org.example.stayd.domain.review.service;
 import org.example.stayd.domain.review.dao.ReviewDao;
 import org.example.stayd.domain.review.dao.ReviewDaoImpl;
 import org.example.stayd.domain.review.dto.ReviewDto;
-// import org.example.stayd.global.SessionContext; // TODO: 나중에 주석 해제 - 세션 정보 연동 시 필요
+// import org.example.stayd.global.SessionContext; // TODO: 통합 시 주석 해제 – 세션 정보 활용
 
 /**
- * ReviewService 구현 클래스
- *  └ 작성(insert) · 삭제(delete) 기능 담당
- *
- *  작성 시: controller에서 SessionContext 기반 사용자 ID 주입 필요
- *  삭제 시: controller 또는 상위 로직에서 본인 글인지 검증 후 호출되어야 함
+ * ReviewService 구현 클래스 (reservation 테이블 기반)
+ *  - 리뷰 작성, 수정, 삭제 기능 담당
  */
 public class ReviewServiceImpl implements ReviewService {
 
     private final ReviewDao dao = new ReviewDaoImpl();
 
     /**
-     * 리뷰 작성
-     * @param dto 리뷰 정보 (작성자 ID 포함)
+     * 리뷰 작성 (reservation 테이블에 업데이트)
+     * @param dto 리뷰 정보 (userId, reservationId 포함)
      * @return 성공 여부
      */
     @Override
     public boolean writeReview(ReviewDto dto) {
         try {
-            int result = dao.insert(dto);        // TODO: dto.getReviewerId()는 세션 기반 값이어야 함
+            int result = dao.insert(dto);  // UPDATE reservation SET review_... WHERE reservation_id = ?
             dao.commitIfNeeded();
             return result == 1;
         } catch (Exception e) {
@@ -34,17 +31,29 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     /**
-     * 리뷰 삭제
-     * @param reviewId 삭제할 리뷰 ID
-     * @return 성공 여부
-     *
-     * 주의: 본인 글인지 여부는 이 서비스에서는 검사하지 않음
-     *       → controller 또는 ReviewListCell 등에서 사전 검증 필요
+     * 리뷰 수정 (내용 및 별점만 수정 가능)
      */
     @Override
-    public boolean deleteReview(int reviewId) {
+    public boolean updateReview(ReviewDto dto) {
         try {
-            int result = dao.delete(reviewId);   // TODO: 본인 글인지 여부는 상위 계층에서 확인해야 함
+            int result = dao.update(dto);  // UPDATE reservation SET review_rating = ?, ...
+            dao.commitIfNeeded();
+            return result == 1;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    /**
+     * 리뷰 삭제 (내용/별점 NULL 처리)
+     * @param reservationId 예약 ID (PK)
+     * @param userId        사용자 ID (작성자 본인인지 확인용)
+     */
+    @Override
+    public boolean deleteReview(int reservationId, int userId) {
+        try {
+            int result = dao.delete(reservationId, userId); // WHERE reservation_id = ? AND user_id = ?
             dao.commitIfNeeded();
             return result == 1;
         } catch (Exception e) {
@@ -54,9 +63,15 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     /*
-      TODO (통합 시)
-      1. writeReview() 호출 전에 dto.setReviewerId(SessionContext.getCurrentUserId()) 로 설정 필수
-      2. deleteReview()는 본인 글인지 확인 후 호출되어야 하므로
-         controller 또는 ReviewListCell 등에서 loginId 비교 필요
+     ✅ TODO (통합 시 주의사항)
+     ---------------------------------------
+     1. writeReview(), updateReview() 호출 전에
+        dto.setUserId(SessionContext.getCurrentUserId()) 설정 필요
+
+     2. deleteReview()는 본인 예약이 맞는지 검증이 controller에서 이뤄져야 함
+        - 현재는 reservation_id + user_id로 제한됨
+
+     3. 리뷰 등록은 reservation_id가 존재하는 경우에만 가능
+        - 즉, 예약한 사람만 작성 가능하게 이미 보장됨
     */
 }

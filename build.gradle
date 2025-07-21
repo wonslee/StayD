@@ -43,11 +43,11 @@ dependencies {
   testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
   testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
 
-  implementation 'org.projectlombok:lombok:1.18.32'
-  annotationProcessor 'org.projectlombok:lombok:1.18.32'
+  compileOnly 'org.projectlombok:lombok:1.18.30'
+  annotationProcessor 'org.projectlombok:lombok:1.18.30'
 
-  testImplementation 'org.projectlombok:lombok:1.18.32'
-  testAnnotationProcessor 'org.projectlombok:lombok:1.18.32'
+  testCompileOnly 'org.projectlombok:lombok:1.18.30'
+  testAnnotationProcessor 'org.projectlombok:lombok:1.18.30'
 }
 
 test {

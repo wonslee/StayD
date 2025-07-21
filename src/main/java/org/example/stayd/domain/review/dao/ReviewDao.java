@@ -6,29 +6,35 @@ import java.sql.SQLException;
 import java.util.List;
 
 /**
- * Review 테이블 관련 DAO 인터페이스
- * - 리뷰 저장, 조회, 삭제, 트랜잭션 커밋 등 정의
- * - 통합 시 SessionContext 기반 사용자 정보 활용 예정
+ * Reservation 테이블 내 리뷰 컬럼 관련 DAO 인터페이스
+ * - 예약 ID 기반 리뷰 저장, 수정, 삭제, 조회 기능 담당
+ * - 별도의 review 테이블은 존재하지 않음
  */
 public interface ReviewDao {
 
-    /** 리뷰 1건 저장 : 성공 시 1 반환 */
+    /** 리뷰 최초 등록 (UPDATE) : 성공 시 1 반환 */
     int insert(ReviewDto review) throws SQLException;
 
-    /** 특정 카페의 모든 리뷰 조회 */
+    /** 리뷰 수정 (UPDATE) : 성공 시 1 반환 */
+    int update(ReviewDto review) throws SQLException;
+
+    /** 리뷰 삭제 (NULL 처리) : 성공 시 1 반환 */
+    int delete(int reservationId, int userId) throws SQLException;
+
+    /** 특정 카페의 모든 리뷰 조회 (리뷰가 존재하는 예약만) */
     List<ReviewDto> findByCafe(int cafeId) throws SQLException;
 
-    /** 수동 커밋 (insert/delete 이후에 호출 필요) */
-    void commitIfNeeded() throws SQLException;
+    /**  예약에 대한 리뷰 존재 여부 확인 */
+    boolean existsByReservation(int reservationId, int userId) throws SQLException;
 
-    /** 리뷰 1건 삭제 */
-    int delete(int reviewId) throws SQLException;
+    /** 트랜잭션 커밋 (insert/update/delete 이후 호출 필수) */
+    void commitIfNeeded() throws SQLException;
 
     /*
      TODO (통합 시)
-     1. insert 시 review.getReviewerId()가 SessionContext 기반 값인지 확인 필요
-        - 현재는 Controller 단에서 userId 하드코딩 중 (→ 추후 SessionContext 연동)
-     2. findByCafe 메서드는 외부에서 cafeId 주입 → Controller 또는 Session에서 받아올 수 있음
-     3. 삭제 역시 본인 리뷰 여부 검증은 Controller에서 처리 중
-    */
+     1. insert/update/delete 모두 SessionContext를 통해 로그인 유저 정보 (userId) 주입 필요
+     2. reservationId는 사용자가 예약한 건인지 controller에서 사전 검증 권장
+     3. findByCafe()는 review_rating IS NOT NULL 조건으로 필터링
+     4. 예외 발생 시 rollback도 고려할 것
+     */
 }
