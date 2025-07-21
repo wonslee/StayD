@@ -13,7 +13,6 @@ public class DatabaseConnection {
         // 프로퍼티 파일 경로
         String propertiesFile = "src/main/resources/application.properties";
 
-        // 프로퍼티 객체 생성
         Properties properties = new Properties();
 
         try (FileInputStream fis = new FileInputStream(propertiesFile)) {
