@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane maxHeight="768.0" maxWidth="1028.0" prefHeight="768.0" prefWidth="1028.0" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.stayd.domain.cafe.controller.CafeDetailController">
+
+    <!-- 헤더: 빈 공간 -->
+    <top>
+        <Pane prefHeight="130.0" />
+    </top>
+
+    <center>
+        <ScrollPane fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED">
+            <VBox spacing="20.0">
+                <padding>
+                    <Insets bottom="50.0" left="50.0" right="50.0" top="30.0" />
+                </padding>
+
+                <!-- 상단 카페 정보 영역 -->
+                <VBox spacing="15.0">
+                    <!-- 뒤로가기 버튼과 카페 이름 -->
+                    <HBox alignment="CENTER_LEFT" spacing="15.0">
+                        <Button fx:id="backButton" onAction="#goBackToList" style="-fx-background-color: #A8D6AA; -fx-background-radius: 20; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 8 15 8 15;">
+                            <graphic>
+                                <HBox alignment="CENTER" spacing="5.0">
+                                    <Label style="-fx-text-fill: white; -fx-font-weight: bold;" text="목록으로" />
+                                </HBox>
+                            </graphic>
+                        </Button>
+                    </HBox>
+                    <!-- 카페 이름과 평점, 찜하기 -->
+                    <HBox alignment="CENTER_LEFT" spacing="20.0">
+                        <VBox spacing="5.0">
+                            <Label fx:id="cafeNameLabel" style="-fx-font-size: 28px; -fx-font-weight: bold;" text="작심 스터디카페 해치점" textFill="#4CAF4F">
+                                <font>
+                                    <Font name="System Bold" size="28.0" />
+                                </font>
+                            </Label>
+                            <HBox alignment="CENTER_LEFT" spacing="10.0">
+                                <ImageView fitHeight="20" fitWidth="20" preserveRatio="true">
+                                    <Image url="https://png.pngtree.com/png-clipart/20221206/ourmid/pngtree-yellow-star-3d-icon-png-image_6511591.png" />
+                                </ImageView>
+                                <Label fx:id="ratingLabel" style="-fx-font-size: 16px;" text="4.5" />
+                                <Label style="-fx-font-size: 14px; -fx-text-fill: #666666;" text="(리뷰 32개)" />
+                            </HBox>
+                        </VBox>
+                        <Pane HBox.hgrow="ALWAYS" />
+                        <Button fx:id="favoriteButton" onAction="#toggleFavorite" style="-fx-background-color: white; -fx-border-color: #4CAF4F; -fx-border-radius: 5; -fx-background-radius: 5;">
+                            <graphic>
+                                <ImageView fx:id="favoriteIcon" fitHeight="20" fitWidth="20" preserveRatio="true">
+                                    <Image url="https://m.yconcepts.co.kr/web/upload/icon_202302260647299800.png" />
+                                </ImageView>
+                            </graphic>
+                        </Button>
+                    </HBox>
+
+                    <!-- 네비게이션 버튼들 -->
+                    <HBox>
+                        <Button fx:id="detailButton" onAction="#showDetailTab" prefHeight="40.0" prefWidth="304.0" style="-fx-background-color: #4CAF4F; -fx-background-radius: 0; -fx-font-weight: bold;" text="상세" textFill="white">
+                            <font>
+                                <Font size="14.0" />
+                            </font>
+                        </Button>
+                        <Button fx:id="reservationButton" onAction="#showReservationTab" prefHeight="40.0" prefWidth="304.0" style="-fx-background-color: #A8D6AA; -fx-background-radius: 0; -fx-font-weight: bold;" text="예약" textFill="white">
+                            <font>
+                                <Font size="14.0" />
+                            </font>
+                        </Button>
+                        <Button fx:id="reviewButton" onAction="#showReviewTab" prefHeight="40.0" prefWidth="305.0" style="-fx-background-color: #A8D6AA; -fx-background-radius: 0; -fx-font-weight: bold;" text="리뷰" textFill="white">
+                            <font>
+                                <Font size="14.0" />
+                            </font>
+                        </Button>
+                    </HBox>
+                </VBox>
+
+                <!-- 상세 정보 탭 내용 -->
+                <VBox fx:id="detailTabContent" spacing="30.0">
+                    <!-- 메인 이미지와 정보 -->
+                    <HBox spacing="30.0">
+                        <!-- 왼쪽: 메인 이미지 -->
+                        <VBox spacing="10.0">
+                            <ImageView fx:id="mainImageView" fitHeight="250.0" fitWidth="350.0" preserveRatio="true" style="-fx-border-color: #E0E0E0; -fx-border-radius: 10;">
+                                <Image url="https://pimg.daara.co.kr/kidd/photo/2018/01/09/1515480765_11.jpg" />
+                            </ImageView>
+                            <Label style="-fx-font-size: 12px; -fx-text-fill: #666666;" text="대표 이미지" />
+                        </VBox>
+
+                        <!-- 오른쪽: 기본 정보 -->
+                        <VBox spacing="20.0" VBox.vgrow="ALWAYS">
+                            <!-- 위치 -->
+                            <VBox spacing="8.0">
+                                <HBox alignment="CENTER_LEFT" spacing="10.0">
+                                    <ImageView fitHeight="20" fitWidth="20" preserveRatio="true">
+                                        <Image url="@../../../../images/cafeImages/Mappin.png" />
+                                    </ImageView>
+                                    <Label style="-fx-font-weight: bold; -fx-font-size: 14px;" text="위치" />
+                                </HBox>
+                                <Label fx:id="locationLabel" style="-fx-font-size: 14px;" text="서울특별시 종로구 창경궁로 254" />
+                            </VBox>
+
+                            <!-- 영업일 -->
+                            <VBox spacing="8.0">
+                                <HBox alignment="CENTER_LEFT" spacing="10.0">
+                                    <ImageView fitHeight="20" fitWidth="20" preserveRatio="true">
+                                        <Image url="@../../../../images/cafeImages/Calendar.png" />
+                                    </ImageView>
+                                    <Label style="-fx-font-weight: bold; -fx-font-size: 14px;" text="영업일" />
+                                </HBox>
+                                <Label fx:id="businessDaysLabel" style="-fx-font-size: 14px;" text="월, 화, 수, 목, 금" />
+                            </VBox>
+
+                            <!-- 운영시간 -->
+                            <VBox spacing="8.0">
+                                <HBox alignment="CENTER_LEFT" spacing="10.0">
+                                    <ImageView fitHeight="20" fitWidth="20" preserveRatio="true">
+                                        <Image url="@../../../../images/cafeImages/Clock.png" />
+                                    </ImageView>
+                                    <Label style="-fx-font-weight: bold; -fx-font-size: 14px;" text="운영시간" />
+                                </HBox>
+                                <Label fx:id="operatingHoursLabel" style="-fx-font-size: 14px;" text="09:00 - 18:00" />
+                            </VBox>
+
+                            <!-- 시간당 가격 -->
+                            <VBox spacing="8.0">
+                                <HBox alignment="CENTER_LEFT" spacing="10.0">
+                                    <ImageView fitHeight="20" fitWidth="20" preserveRatio="true">
+                                        <Image url="@../../../../images/cafeImages/Dollarsign.png" />
+                                    </ImageView>
+                                    <Label style="-fx-font-weight: bold; -fx-font-size: 14px;" text="시간당 가격" />
+                                </HBox>
+                                <Label fx:id="priceLabel" style="-fx-font-size: 14px;" text="10,000원" />
+                            </VBox>
+
+                            <!-- 전화번호 -->
+                            <VBox spacing="8.0">
+                                <HBox alignment="CENTER_LEFT" spacing="10.0">
+                                    <ImageView fitHeight="20" fitWidth="20" preserveRatio="true">
+                                        <Image url="@../../../../images/cafeImages/Phone.png" />
+                                    </ImageView>
+                                    <Label style="-fx-font-weight: bold; -fx-font-size: 14px;" text="전화번호" />
+                                </HBox>
+                                <Label fx:id="phoneLabel" style="-fx-font-size: 14px;" text="02-123-4567" />
+                            </VBox>
+                        </VBox>
+                    </HBox>
+
+                    <!-- 구분선 -->
+                    <Separator />
+
+                    <!-- 설명 -->
+                    <VBox spacing="15.0">
+                        <HBox alignment="CENTER_LEFT" spacing="10.0">
+                            <ImageView fitHeight="20" fitWidth="20" preserveRatio="true">
+                                <Image url="@../../../../images/cafeImages/Pentool.png" />
+                            </ImageView>
+                            <Label style="-fx-font-weight: bold; -fx-font-size: 16px;" text="설명" />
+                        </HBox>
+                        <Label fx:id="descriptionLabel" style="-fx-font-size: 14px; -fx-line-spacing: 5px;" text="조용하고 깨끗한 환경에서 집중해서 공부할 수 있는 스터디 카페입니다. 다양한 음료와 간단한 간식도 제공하며, 무료 Wi-Fi와 콘센트가 모든 좌석에 구비되어 있습니다." wrapText="true" />
+                    </VBox>
+                </VBox>
+
+                <!-- 예약 탭 내용 (숨김) -->
+                <VBox fx:id="reservationTabContent" managed="false" spacing="30.0" visible="false">
+                    <Label style="-fx-font-size: 18px; -fx-font-weight: bold;" text="예약 기능" textFill="#4CAF4F" />
+                    <!-- 여기에 예약 관련 UI 추가 예정 -->
+                    <Label style="-fx-font-size: 14px;" text="예약 기능은 추후 구현 예정입니다." />
+                </VBox>
+
+                <!-- 리뷰 탭 내용 (숨김) -->
+                <VBox fx:id="reviewTabContent" managed="false" spacing="30.0" visible="false">
+                    <Label style="-fx-font-size: 18px; -fx-font-weight: bold;" text="리뷰" textFill="#4CAF4F" />
+                    <!-- 여기에 리뷰 관련 UI 추가 예정 -->
+                    <Label style="-fx-font-size: 14px;" text="리뷰 기능은 추후 구현 예정입니다." />
+                </VBox>
+
+            </VBox>
+        </ScrollPane>
+    </center>
+
+</BorderPane>
