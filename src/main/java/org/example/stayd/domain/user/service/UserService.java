@@ -4,7 +4,9 @@ import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
+import org.example.stayd.common.SessionManager;
 import org.example.stayd.domain.user.dao.UserDAO;
+import org.example.stayd.domain.user.dto.PasswordResetDTO;
 import org.example.stayd.domain.user.dto.UserDTO;
 import org.mindrot.jbcrypt.BCrypt;
 
@@ -19,6 +21,13 @@ public class UserService {
     public UserService() {
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         this.validator = factory.getValidator();
+    }
+
+    private final SessionManager sessionManager = SessionManager.getInstance();
+
+    // 로그인 상태 확인 메서드
+    public boolean isUserLoggedIn() {
+        return sessionManager.isUserLoggedIn();  // 세션에서 로그인 정보 확인
     }
 
     /**
@@ -133,6 +142,9 @@ public class UserService {
                 throw new AuthenticationException("아이디 또는 비밀번호가 틀립니다.");
             }
 
+            // 로그인 성공 시 세션에 사용자 정보 저장
+            SessionManager.getInstance().setLoggedInUser(user);
+
             // 인증 성공
             UserDTO result = new UserDTO();
             result.setLogin_id(user.getLogin_id());
@@ -178,6 +190,55 @@ public class UserService {
             }
         } catch (SQLException e) {
             throw new ValidationException("중복 확인 중 오류가 발생했습니다.");
+        }
+    }
+
+    /**
+     * 아이디 찾기
+     * @param email 조회할 이메일
+     * @return loginId (없으면 null)
+     * @throws ValidationException 조회 오류 시
+     */
+    public String findLoginIdByEmail(String email) throws ValidationException {
+        try {
+            return userDao.findLoginIdByEmail(email);
+        } catch (SQLException e) {
+            throw new ValidationException("아이디 조회 중 오류가 발생했습니다.");
+        }
+    }
+
+    /**
+     * 아이디 이메일 계정 일치 확인
+     */
+    public boolean checkUserEmail(String loginId, String email) throws ValidationException {
+        try {
+            Optional<UserDTO> userOpt = userDao.findByLoginId(loginId);
+            if (userOpt.isEmpty()) {
+                throw new ValidationException("아이디가 존재하지 않습니다.");
+            }
+
+            UserDTO user = userOpt.get();
+
+            // null 체크 후 비교
+            if (user.getEmail() == null || !user.getEmail().equals(email)) {
+                throw new ValidationException("아이디와 이메일이 일치하지 않습니다.");
+            }
+
+            return true; // 이메일이 일치함
+        } catch (SQLException e) {
+            throw new ValidationException("DB 오류 발생");
+        }
+    }
+
+    /**
+     * 새 비밀번호 설정
+     */
+    public void updatePassword(String loginId, String newPassword) throws ValidationException {
+        try {
+            String hashedPassword = BCrypt.hashpw(newPassword, BCrypt.gensalt());
+            userDao.updatePassword(loginId, hashedPassword);
+        } catch (SQLException e) {
+            throw new ValidationException("비밀번호 업데이트 중 오류 발생");
         }
     }
 

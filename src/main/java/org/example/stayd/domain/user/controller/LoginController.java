@@ -6,6 +6,7 @@ import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 import org.example.stayd.common.FXUtils;
+import org.example.stayd.common.SessionManager;
 import org.example.stayd.config.SceneConfig;
 import org.example.stayd.domain.user.dto.UserDTO;
 import org.example.stayd.domain.user.service.UserService;
@@ -65,7 +66,10 @@ public class LoginController {
         };
 
         loginTask.setOnSucceeded(evt -> {
-            goToSignup();
+            // 로그인 성공 시, 사용자 정보를 SessionManager에 저장
+            UserDTO user = loginTask.getValue();
+            SessionManager.getInstance().setLoggedInUser(user);  // 로그인 정보 저장
+            goToHome();  // 홈 화면으로 이동
         });
 
         loginTask.setOnFailed(evt -> {
@@ -78,11 +82,13 @@ public class LoginController {
     }
 
     @FXML
-    private void onFindId() {
-    }
-
-    @FXML
-    private void onFindPw() {
+    private void goToHome() {
+        try {
+            Stage stage = (Stage) loginButton.getScene().getWindow();
+            FXUtils.switchScene(stage, SceneConfig.HOME_FXML);
+        } catch (IOException e) {
+            showAlert(Alert.AlertType.ERROR, "화면 전환 오류", "홈 화면으로 이동하는 중 오류가 발생했습니다.");
+        }
     }
 
     @FXML
@@ -91,9 +97,27 @@ public class LoginController {
             Stage stage = (Stage) loginButton.getScene().getWindow();
             FXUtils.switchScene(stage, SceneConfig.SIGNUP_FXML);
         } catch (IOException e) {
-            e.printStackTrace();
-            showAlert(Alert.AlertType.ERROR,
-                    "화면 전환 오류", "회원가입 화면을 불러오는 중 오류가 발생했습니다.");
+            showAlert(Alert.AlertType.ERROR, "화면 전환 오류", "홈 화면으로 이동하는 중 오류가 발생했습니다.");
+        }
+    }
+
+    @FXML
+    private void onFindId(MouseEvent event) {
+        try {
+            Stage stage = (Stage) loginButton.getScene().getWindow();
+            FXUtils.switchScene(stage, SceneConfig.FIND_ID_FXML);
+        } catch (IOException e) {
+            showAlert(Alert.AlertType.ERROR, "화면 전환 오류", "아이디 찾기 화면을 불러오는 중 오류가 발생했습니다.");
+        }
+    }
+
+    @FXML
+    private void onFindPw(MouseEvent event) {
+        try {
+            Stage stage = (Stage) loginButton.getScene().getWindow();
+            FXUtils.switchScene(stage, SceneConfig.FIND_PW_FXML);
+        } catch (IOException e) {
+            showAlert(Alert.AlertType.ERROR, "화면 전환 오류", "비밀번호 찾기 화면을 불러오는 중 오류가 발생했습니다.");
         }
     }
 

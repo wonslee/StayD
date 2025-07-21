@@ -8,29 +8,31 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * 비밀번호 재설정 전용 DTO
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserDTO {
+public class PasswordResetDTO {
 
     @NotBlank(message = "아이디를 입력해주세요.")
-    private String login_id;
+    private String loginId;
 
     @NotBlank(message = "이메일을 입력해주세요.")
     @Email(message = "유효한 이메일을 입력해주세요.")
     private String email;
 
-    @NotBlank(message = "비밀번호를 입력해주세요.")
+    @NotBlank(message = "새 비밀번호를 입력해주세요.")
     @Size(min = 8, message = "비밀번호는 최소 8자 이상이어야 합니다.")
     @Pattern(
             regexp = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*\\W).+$",
             message = "영문·숫자·특수문자를 모두 포함해야 합니다."
     )
-    private String password;
+    private String newPassword;
 
-    @NotBlank(message = "동일한 비밀번호를 입력해주세요.")
-    private String passwordCheck;
-
-    @NotBlank(message="역할")
-    private String role;
+    public PasswordResetDTO(String loginId, String email) {
+        this.loginId  = loginId;
+        this.email    = email;
+    }
 }

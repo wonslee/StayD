@@ -55,10 +55,10 @@ dependencies {
 //  BCrypt 해시 라이브러리
   implementation 'org.mindrot:jbcrypt:0.4'
 
-//  Jakarta EL 구현체 (Eclipse Expressly)
+//  Jakarta EL 구현체
   implementation 'org.glassfish.expressly:expressly:6.0.0'
 
-  // JavaMail (Jakarta Mail) API
+  // JavaMail API
   implementation 'com.sun.mail:javax.mail:1.6.2'
 
   testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")

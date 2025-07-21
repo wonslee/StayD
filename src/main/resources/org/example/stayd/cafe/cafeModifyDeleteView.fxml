@@ -22,7 +22,7 @@
 
     <!-- 헤더: 빈 공간 -->
     <top>
-        <Pane prefHeight="130.0" />
+        <fx:include source="../common/header.fxml" />
     </top>
     <bottom>
         <VBox alignment="CENTER" spacing="30.0" BorderPane.alignment="CENTER">
