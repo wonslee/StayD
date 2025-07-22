@@ -17,7 +17,7 @@
 
     <!-- 헤더: 빈 공간 -->
     <top>
-        <Pane prefHeight="130.0" />
+        <fx:include source="../common/header.fxml" />
     </top>
 
     <center>
@@ -42,7 +42,7 @@
                     <!-- 카페 이름과 평점, 찜하기 -->
                     <HBox alignment="CENTER_LEFT" spacing="20.0">
                         <VBox spacing="5.0">
-                            <Label fx:id="cafeNameLabel" style="-fx-font-size: 28px; -fx-font-weight: bold;" text="작심 스터디카페 해치점" textFill="#4CAF4F">
+                            <Label fx:id="cafeNameLabel" style="-fx-font-size: 28px; -fx-font-weight: bold;" textFill="#4CAF4F">
                                 <font>
                                     <Font name="System Bold" size="28.0" />
                                 </font>
@@ -51,8 +51,8 @@
                                 <ImageView fitHeight="20" fitWidth="20" preserveRatio="true">
                                     <Image url="https://png.pngtree.com/png-clipart/20221206/ourmid/pngtree-yellow-star-3d-icon-png-image_6511591.png" />
                                 </ImageView>
-                                <Label fx:id="ratingLabel" style="-fx-font-size: 16px;" text="4.5" />
-                                <Label style="-fx-font-size: 14px; -fx-text-fill: #666666;" text="(리뷰 32개)" />
+                                <Label fx:id="ratingLabel" style="-fx-font-size: 16px;"  />
+                                <Label style="-fx-font-size: 14px; -fx-text-fill: #666666;"/>
                             </HBox>
                         </VBox>
                         <Pane HBox.hgrow="ALWAYS" />
@@ -92,7 +92,7 @@
                         <!-- 왼쪽: 메인 이미지 -->
                         <VBox spacing="10.0">
                             <ImageView fx:id="mainImageView" fitHeight="250.0" fitWidth="350.0" preserveRatio="true" style="-fx-border-color: #E0E0E0; -fx-border-radius: 10;">
-                                <Image url="https://pimg.daara.co.kr/kidd/photo/2018/01/09/1515480765_11.jpg" />
+<!--                                <Image url="https://pimg.daara.co.kr/kidd/photo/2018/01/09/1515480765_11.jpg" />-->
                             </ImageView>
                             <Label style="-fx-font-size: 12px; -fx-text-fill: #666666;" text="대표 이미지" />
                         </VBox>
@@ -107,7 +107,7 @@
                                     </ImageView>
                                     <Label style="-fx-font-weight: bold; -fx-font-size: 14px;" text="위치" />
                                 </HBox>
-                                <Label fx:id="locationLabel" style="-fx-font-size: 14px;" text="서울특별시 종로구 창경궁로 254" />
+                                <Label fx:id="locationLabel" style="-fx-font-size: 14px;" />
                             </VBox>
 
                             <!-- 영업일 -->
@@ -118,7 +118,7 @@
                                     </ImageView>
                                     <Label style="-fx-font-weight: bold; -fx-font-size: 14px;" text="영업일" />
                                 </HBox>
-                                <Label fx:id="businessDaysLabel" style="-fx-font-size: 14px;" text="월, 화, 수, 목, 금" />
+                                <Label fx:id="businessDaysLabel" style="-fx-font-size: 14px;"  />
                             </VBox>
 
                             <!-- 운영시간 -->
@@ -129,7 +129,7 @@
                                     </ImageView>
                                     <Label style="-fx-font-weight: bold; -fx-font-size: 14px;" text="운영시간" />
                                 </HBox>
-                                <Label fx:id="operatingHoursLabel" style="-fx-font-size: 14px;" text="09:00 - 18:00" />
+                                <Label fx:id="operatingHoursLabel" style="-fx-font-size: 14px;"  />
                             </VBox>
 
                             <!-- 시간당 가격 -->
@@ -140,7 +140,7 @@
                                     </ImageView>
                                     <Label style="-fx-font-weight: bold; -fx-font-size: 14px;" text="시간당 가격" />
                                 </HBox>
-                                <Label fx:id="priceLabel" style="-fx-font-size: 14px;" text="10,000원" />
+                                <Label fx:id="priceLabel" style="-fx-font-size: 14px;"/>
                             </VBox>
 
                             <!-- 전화번호 -->
@@ -151,7 +151,7 @@
                                     </ImageView>
                                     <Label style="-fx-font-weight: bold; -fx-font-size: 14px;" text="전화번호" />
                                 </HBox>
-                                <Label fx:id="phoneLabel" style="-fx-font-size: 14px;" text="02-123-4567" />
+                                <Label fx:id="phoneLabel" style="-fx-font-size: 14px;"  />
                             </VBox>
                         </VBox>
                     </HBox>
@@ -167,7 +167,7 @@
                             </ImageView>
                             <Label style="-fx-font-weight: bold; -fx-font-size: 16px;" text="설명" />
                         </HBox>
-                        <Label fx:id="descriptionLabel" style="-fx-font-size: 14px; -fx-line-spacing: 5px;" text="조용하고 깨끗한 환경에서 집중해서 공부할 수 있는 스터디 카페입니다. 다양한 음료와 간단한 간식도 제공하며, 무료 Wi-Fi와 콘센트가 모든 좌석에 구비되어 있습니다." wrapText="true" />
+                        <Label fx:id="descriptionLabel" style="-fx-font-size: 14px; -fx-line-spacing: 5px;" wrapText="true" />
                     </VBox>
                 </VBox>
 

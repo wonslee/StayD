@@ -11,6 +11,8 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
 import javafx.event.ActionEvent;
 import javafx.stage.Stage;
+import org.example.stayd.domain.cafe.dto.CafeDto;
+import org.example.stayd.domain.cafe.service.CafeService;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -60,10 +62,20 @@ public class CafeDetailController implements Initializable {
     private String imageUrl;
     private double rating;
 
+    private CafeService cafeService;
+
+    // 🔹 기본 생성자 (FXML용 - 필수!)
+    public CafeDetailController() {
+        this.cafeService = new CafeService();
+    }
+
+
+
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         // 초기 데이터 설정
-        loadCafeData(1L);
+        loadCafeData(17L); // 현재 더미데이터 목록 구현되면 변경
 
         // 기본적으로 상세 탭이 활성화
         showDetailTab(null);
@@ -94,20 +106,31 @@ public class CafeDetailController implements Initializable {
         }
     }
 
-    /**
-     * 카페 데이터를 UI에 로드
-     */
     private void loadCafeData(Long cafeId) {
-        cafeName = "작심 스터디카페 해치점";
-        location = "서울특별시 종로구 창경궁로 254";
-        businessDays = "월, 화, 수, 목, 금";
-        operatingHours = "09:00 - 18:00";
-        hourlyPrice = 10000;
-        phoneNumber = "010-1234-4567";
-        description = "조용하고 깨끗한 환경에서 집중해서 공부할 수 있는 스터디 카페입니다. 다양한 음료와 간단한 간식도 제공하며, 무료 Wi-Fi와 콘센트가 모든 좌석에 구비되어 있습니다.";
-        imageUrl = "";
-        rating = 4.5;
+        CafeDto.DetailResponse cafe = cafeService.getCafeDetail(cafeId);
 
+        if (cafe == null) {
+            System.err.println("해당 ID의 카페를 찾을 수 없습니다: " + cafeId);
+            return;
+        }
+
+        // 모델에서 값 세팅
+        this.cafeName = cafe.getName();
+        this.location = cafe.getAddress();
+        this.hourlyPrice = cafe.getPricePerHour();
+        this.phoneNumber = cafe.getPhoneNumber();
+        this.description = cafe.getDescription();
+        this.imageUrl = cafe.getImageUrl();
+
+        // 운영 요일, 운영 시간
+        this.businessDays = String.join(", ", cafe.getOperatingDays());
+        this.operatingHours = String.format("%02d:00 - %02d:00",
+                cafe.getOperatingStartHour(), cafe.getOperatingEndHour());
+
+        // 평점은 임시
+        this.rating = 4.5;
+
+        // UI 반영
         cafeNameLabel.setText(cafeName);
         ratingLabel.setText(String.valueOf(rating));
         locationLabel.setText(location);
@@ -117,17 +140,17 @@ public class CafeDetailController implements Initializable {
         phoneLabel.setText(phoneNumber);
         descriptionLabel.setText(description);
 
-        // 이미지 로드 (URL이 있는 경우)
         if (imageUrl != null && !imageUrl.trim().isEmpty()) {
             try {
                 Image image = new Image(imageUrl);
                 mainImageView.setImage(image);
             } catch (Exception e) {
-                // 이미지 로드 실패 시 기본 이미지 유지
                 System.out.println("이미지 로드 실패: " + e.getMessage());
             }
         }
     }
+
+
 
     /**
      * 찜하기 버튼 토글
@@ -252,7 +275,7 @@ public class CafeDetailController implements Initializable {
         this.rating = rating;
 
         // UI 업데이트
-        loadCafeData(1L);
+        loadCafeData(17L);
     }
 
     /**
