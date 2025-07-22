@@ -1,3 +1,4 @@
 *.jar filter=lfs diff=lfs merge=lfs -text
 *.zip filter=lfs diff=lfs merge=lfs -text
 caches/8.8/transforms/964c18c8d317ffc702e52f8cc3322cd4/transformed/instrumented/instrumented-gradle-api-8.10.jar filter=lfs diff=lfs merge=lfs -text
+path/to/gradle-api-8.10.jar filter=lfs diff=lfs merge=lfs -text
