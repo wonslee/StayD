@@ -120,90 +120,7 @@ public class CafeDao {
         return result;
     }
 
-//    /**
-//     * 스터디 카페 생성 (트랜잭션으로 카페, 운영시간, 좌석 20개 모두 생성)
-//     * @param cafe 생성할 카페 정보
-//     * @param operatingHours 운영시간 목록
-//     * @return 생성된 카페 ID
-//     * @throws SQLException SQL 예외
-//     */
-//    public Long createCafe(CafeModel cafe, List<CafeDto.OperatingHours> operatingHours) throws SQLException {
-//        Connection connection = databaseConnection.getConnection();
-//
-//        try {
-//            // 트랜잭션 시작
-//            connection.setAutoCommit(false);
-//
-//            // 1. 카페 등록
-//            Long cafeId = insertCafe(connection, cafe);
-//
-//            // 2. 운영시간 등록
-//            insertOperatingHours(connection, cafeId, operatingHours);
-//
-//            // 3. 좌석 20개 생성 (A1~A10, B1~B10)
-//            createSeats(connection, cafeId);
-//
-//            // 트랜잭션 커밋
-//            connection.commit();
-//
-//            return cafeId;
-//
-//        } catch (SQLException e) {
-//            // 롤백
-//            try {
-//                connection.rollback();
-//            } catch (SQLException rollbackEx) {
-//                rollbackEx.printStackTrace();
-//            }
-//            throw e;
-//        } finally {
-//            try {
-//                connection.setAutoCommit(true);
-//                connection.close();
-//            } catch (SQLException e) {
-//                e.printStackTrace();
-//            }
-//        }
-//    }
 
-//    /**
-//     * 스터디 카페 등록
-//     * @param connection DB 연결
-//     * @param cafe 등록할 카페 정보
-//     * @return 등록된 카페 ID
-//     * @throws SQLException SQL 예외
-//     */
-//    public Long insertCafe(Connection connection, CafeModel cafe) throws SQLException {
-//        String sql = "INSERT INTO cafe (owner_id, name, address, price_per_hour, description, phone_number, image_url, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-//
-//        try (PreparedStatement pstmt = connection.prepareStatement(sql, new String[]{"CAFE_ID"})) {
-//
-//            pstmt.setLong(1, cafe.getOwnerId());
-//            pstmt.setString(2, cafe.getName());
-//            pstmt.setString(3, cafe.getAddress());
-//            pstmt.setInt(4, cafe.getPricePerHour());
-//            pstmt.setString(5, cafe.getDescription());
-//            pstmt.setString(6, cafe.getPhoneNumber());
-//            pstmt.setString(7, cafe.getImageUrl());
-//            pstmt.setTimestamp(8, Timestamp.valueOf(cafe.getCreatedAt()));
-//
-//            int affectedRows = pstmt.executeUpdate();
-//
-//            if (affectedRows == 0) {
-//                throw new SQLException("카페 등록에 실패했습니다.");
-//            }
-//
-//            // 생성된 키 가져오기
-//            try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
-//                if (generatedKeys.next()) {
-//                    return generatedKeys.getLong(1);
-//                } else {
-//                    throw new SQLException("카페 ID를 가져올 수 없습니다.");
-//                }
-//            }
-//        }
-//    }
-//
     /**
      * 운영시간 등록
      * @param connection DB 연결
@@ -231,31 +148,6 @@ public class CafeDao {
             pstmt.executeBatch();
         }
     }
-
-//    /**
-//     * 좌석 20개 생성 (A1~A10, B1~B10)
-//     * @param connection DB 연결
-//     * @param cafeId 카페 ID
-//     * @throws SQLException SQL 예외
-//     */
-//    private void createSeats(Connection connection, Long cafeId) throws SQLException {
-//        String sql = "INSERT INTO seat (cafe_id, seat_number, is_available, created_at) VALUES (?, ?, 'Y', ?)";
-//
-//        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-//            LocalDateTime now = LocalDateTime.now();
-//
-//            // 1~20 생성
-//            for (int i = 1; i <= 20; i++) {
-//                pstmt.setLong(1, cafeId);
-//                pstmt.setString(2, ""+i);
-//                pstmt.setTimestamp(3, Timestamp.valueOf(now));
-//                pstmt.addBatch();
-//            }
-//
-//
-//            pstmt.executeBatch();
-//        }
-//    }
 
     /**
      * 요일 문자열을 DB 형식으로 변환 (한글 그대로 저장)
@@ -650,6 +542,8 @@ public class CafeDao {
         }
     }
 
+
+
     /**
      * 기존 운영시간 삭제
      * @param connection DB 연결
@@ -666,77 +560,71 @@ public class CafeDao {
     }
 
     /**
-     * 카페 삭제 (카페, 운영시간, 좌석 모두 삭제)
+     * 카페 삭제 (PL/SQL 프로시저 사용)
      * @param cafeId 삭제할 카페 ID
+     * @param ownerId 소유자 ID
      * @throws SQLException SQL 예외
      */
-    public void deleteCafe(Long cafeId) throws SQLException {
+    public void deleteCafe(Long cafeId, Long ownerId) throws SQLException {
         Connection connection = databaseConnection.getConnection();
 
         try {
-            // 트랜잭션 시작
-            connection.setAutoCommit(false);
+            System.out.println("🔄 PL/SQL 프로시저로 카페 삭제 시작...");
+            System.out.println("   카페 ID: " + cafeId + ", 소유자 ID: " + ownerId);
 
-            // 1. 좌석 삭제
-            deleteSeats(connection, cafeId);
+            // PL/SQL 프로시저 호출
+            String sql = "{ call delete_study_cafe(?, ?, ?) }";
 
-            // 2. 운영시간 삭제
-            deleteOperatingHours(connection, cafeId);
+            try (CallableStatement cstmt = connection.prepareCall(sql)) {
 
-            // 3. 카페 삭제
-            deleteCafeInfo(connection, cafeId);
+                // 입력 파라미터 설정
+                cstmt.setLong(1, cafeId);
+                cstmt.setLong(2, ownerId);
 
-            // 트랜잭션 커밋
-            connection.commit();
+                // 출력 파라미터 설정
+                cstmt.registerOutParameter(3, Types.NUMERIC); // p_result
 
-        } catch (SQLException e) {
-            // 롤백
-            try {
-                connection.rollback();
-            } catch (SQLException rollbackEx) {
-                rollbackEx.printStackTrace();
+                // 프로시저 실행 및 성능 측정
+                long startTime = System.currentTimeMillis();
+                cstmt.execute();
+                long endTime = System.currentTimeMillis();
+
+                // 결과 확인
+                int result = cstmt.getInt(3);
+
+                System.out.println("⏱️ PL/SQL 프로시저 실행 시간: " + (endTime - startTime) + "ms");
+
+                switch (result) {
+                    case 0:
+                        // 성공
+                        System.out.println("🎉 PL/SQL 카페 삭제 성공!");
+                        System.out.println("   네트워크 호출: 1번 (기존 4번에서 대폭 감소!)");
+                        System.out.println("   처리된 작업: 소유자 확인 + 좌석 삭제 + 운영시간 삭제 + 카페 삭제");
+                        break;
+
+                    case 1:
+                        // 권한 없음
+                        System.out.println("❌ 권한 없음: 소유자만 카페를 삭제할 수 있습니다.");
+                        throw new SQLException("본인이 소유한 카페만 삭제할 수 있습니다.");
+
+                    case 3:
+                        // 카페 없음
+                        System.out.println("❌ 존재하지 않는 카페입니다.");
+                        throw new SQLException("해당 카페를 찾을 수 없습니다.");
+
+                    case 2:
+                    default:
+                        // 일반 실패
+                        System.out.println("❌ PL/SQL 프로시저 실행 실패 (결과 코드: " + result + ")");
+                        throw new SQLException("카페 삭제 프로시저 실행 실패");
+                }
             }
-            throw e;
+
         } finally {
             try {
-                connection.setAutoCommit(true);
                 connection.close();
             } catch (SQLException e) {
                 e.printStackTrace();
-            }
-        }
-    }
-
-    /**
-     * 좌석 삭제
-     * @param connection DB 연결
-     * @param cafeId 카페 ID
-     * @throws SQLException SQL 예외
-     */
-    private void deleteSeats(Connection connection, Long cafeId) throws SQLException {
-        String sql = "DELETE FROM seat WHERE cafe_id = ?";
-
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setLong(1, cafeId);
-            pstmt.executeUpdate();
-        }
-    }
-
-    /**
-     * 카페 정보 삭제
-     * @param connection DB 연결
-     * @param cafeId 카페 ID
-     * @throws SQLException SQL 예외
-     */
-    private void deleteCafeInfo(Connection connection, Long cafeId) throws SQLException {
-        String sql = "DELETE FROM cafe WHERE cafe_id = ?";
-
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setLong(1, cafeId);
-
-            int affectedRows = pstmt.executeUpdate();
-            if (affectedRows == 0) {
-                throw new SQLException("카페 삭제에 실패했습니다.");
             }
         }
     }

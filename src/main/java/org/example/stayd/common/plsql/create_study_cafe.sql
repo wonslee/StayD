@@ -1,6 +1,6 @@
 -- 기존 타입과 프로시저 삭제
 DROP PROCEDURE create_study_cafe;
-DROP TYPE operating_days_array;
+
 -- 스터디 카페 생성 프로시저
 CREATE OR REPLACE PROCEDURE create_study_cafe(
     p_owner_id IN NUMBER,
@@ -32,7 +32,7 @@ END IF;
 SAVEPOINT create_cafe_start;
 
 BEGIN
-        DBMS_OUTPUT.PUT_LINE('🔄 PL/SQL 카페 생성 시작...');
+        DBMS_OUTPUT.PUT_LINE('PL/SQL 카페 생성 시작...');
 
         -- 1. 카페 생성 및 ID 반환
 INSERT INTO cafe (
@@ -43,7 +43,7 @@ INSERT INTO cafe (
              p_description, p_phone_number, p_image_url, v_current_time
          ) RETURNING cafe_id INTO p_cafe_id;
 
-DBMS_OUTPUT.PUT_LINE('✅ 카페 생성 완료 - ID: ' || p_cafe_id);
+DBMS_OUTPUT.PUT_LINE('카페 생성 완료 - ID: ' || p_cafe_id);
 
         -- 2. 운영시간 파싱 및 생성
         -- "월,화,수,목,금" 문자열을 파싱하여 각각 INSERT
@@ -71,7 +71,7 @@ END IF;
                 );
 
                 v_days_processed := v_days_processed + 1;
-                DBMS_OUTPUT.PUT_LINE('✅ 운영시간 추가: ' || v_day || ' ' || p_start_hour || ':00-' || p_end_hour || ':00');
+                DBMS_OUTPUT.PUT_LINE('운영시간 추가: ' || v_day || ' ' || p_start_hour || ':00-' || p_end_hour || ':00');
 END IF;
 END LOOP;
 
@@ -89,7 +89,7 @@ COMMIT;
 p_result := 0; -- 성공
 
         -- 최종 성공 로그
-        DBMS_OUTPUT.PUT_LINE('🎉 카페 생성 완료!');
+        DBMS_OUTPUT.PUT_LINE(' 카페 생성 완료!');
         DBMS_OUTPUT.PUT_LINE('   카페 ID: ' || p_cafe_id);
         DBMS_OUTPUT.PUT_LINE('   운영일 수: ' || v_days_processed || '개');
         DBMS_OUTPUT.PUT_LINE('   좌석 수: 20개');
@@ -102,7 +102,7 @@ EXCEPTION
             p_cafe_id := NULL;
 
             -- 에러 로그
-            DBMS_OUTPUT.PUT_LINE('❌ PL/SQL 카페 생성 실패: ' || SQLERRM);
+            DBMS_OUTPUT.PUT_LINE(' PL/SQL 카페 생성 실패: ' || SQLERRM);
             RAISE;
 END;
 END create_study_cafe;

@@ -389,7 +389,7 @@ public class CafeService {
             }
 
             // 카페 삭제 (관련 데이터도 함께 삭제)
-            cafeDao.deleteCafe(cafeId);
+            cafeDao.deleteCafe(cafeId, ownerId);
 
             return new CafeDto.DeleteResponse(true, "카페가 성공적으로 삭제되었습니다.");
 
