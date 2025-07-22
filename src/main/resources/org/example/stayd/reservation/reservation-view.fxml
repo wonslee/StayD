@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+    예약 생성 화면
+    ─ Controller : org.example.stayd.domain.reservation.controller.ReservationCreateController
+-->
+<!--fx:controller="org.example.stayd.domain.reservation.controller.ReservationCreateController"-->
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.ScrollPane?>
+
+<?import javafx.scene.layout.HBox?>
+<AnchorPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="org.example.stayd.domain.reservation.controller.ReservationCreateController"
+            prefWidth="1024" prefHeight="768"
+            styleClass="page-container">
+    <VBox spacing="0"
+          AnchorPane.topAnchor="0" AnchorPane.bottomAnchor="0"
+          AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0">
+    <fx:include source="../common/header.fxml"/>
+    <!-- 화면 전체 레이아웃 -->
+    <!-- ───────────── 기본 정보 입력 블록 ───────────── -->
+    <VBox spacing="50"
+          prefWidth="860" >
+        <!-- 카페 이름이나 상단 제목은 컨트롤러에서 Label‧Breadcrumb 등으로 주입해도 된다 -->
+        <Label fx:id="cafeTitle" text="작심 스터디카페 혜화점" styleClass="title"/>
+
+        <!-- 날짜 & 시간대 입력 -->
+        <GridPane hgap="10" vgap="12">
+            <columnConstraints>
+                <ColumnConstraints halignment="RIGHT" minWidth="80"/>
+                <ColumnConstraints halignment="LEFT" minWidth="200"/>
+                <ColumnConstraints halignment="RIGHT" minWidth="80"/>
+                <ColumnConstraints halignment="LEFT" minWidth="200"/>
+            </columnConstraints>
+
+            <!-- 1행 : 날짜 · 총 금액 -->
+            <Label text="날짜" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+            <DatePicker fx:id="datePicker" GridPane.rowIndex="0" GridPane.columnIndex="1" prefWidth="180"/>
+
+            <Label text="총 금액" GridPane.rowIndex="0" GridPane.columnIndex="2"/>
+            <Label fx:id="totalPriceLabel"
+                   text="0"
+                   style="-fx-font-weight:bold; -fx-text-fill:#16a085;"
+                   GridPane.rowIndex="0" GridPane.columnIndex="3"/>
+
+            <!-- 2행 : 시작/종료 시간 -->
+<!--            <Label text="시작 시간" GridPane.rowIndex="1" GridPane.columnIndex="0"/>-->
+<!--            <ComboBox fx:id="startHourCombo"-->
+<!--                      promptText="0~23"-->
+<!--                      prefWidth="180"-->
+<!--                      GridPane.rowIndex="1" GridPane.columnIndex="1"/>-->
+
+<!--            <Label text="종료 시간" GridPane.rowIndex="1" GridPane.columnIndex="2"/>-->
+<!--            <ComboBox fx:id="endHourCombo"-->
+<!--                      promptText="0~23"-->
+<!--                      prefWidth="180"-->
+<!--                      GridPane.rowIndex="1" GridPane.columnIndex="3"/>-->
+            <HBox spacing="10">
+                <Label text="시작 시간"/>
+                <ComboBox fx:id="startHourCombo" prefWidth="100"/>
+
+                <Label text="종료 시간"/>
+                <ComboBox fx:id="endHourCombo" prefWidth="100"/>
+            </HBox>
+
+        </GridPane>
+    </VBox>
+
+        <fx:include source="../reservation/cafe-seats-selection.fxml"/>
+    <Separator prefWidth="860"/>
+    </VBox>
+</AnchorPane>
