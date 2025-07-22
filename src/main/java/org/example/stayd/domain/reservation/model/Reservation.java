@@ -7,6 +7,7 @@ import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Optional;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -34,11 +35,13 @@ public class Reservation {
     private LocalDate reservationDate;   // DB: DATE
 
     @NotNull
-    @Size(min = 0, max = 24)
+    @Min(0)
+    @Max(23)
     private int usageStartedAt;
 
     @NotNull
-    @Size(min = 0, max = 24)
+    @Min(0)
+    @Max(23)
     private int usageEndedAt;
 
     @NotNull
@@ -50,11 +53,11 @@ public class Reservation {
     @PositiveOrZero
     private Integer discountPrice;
 
-    private Instant createdAt;
+    private LocalDateTime createdAt;
 
     /* 예약 취소 */
     private boolean isCanceled;     // DB = 'Y' / NULL
-    private Instant canceledAt;
+    private LocalDateTime canceledAt;
 
     /* 리뷰 */
     @Min(1)
@@ -64,13 +67,14 @@ public class Reservation {
     @Size(max = 2000)
     private String content;
 
-    private Instant reviewCreatedAt;
+    private LocalDateTime reviewCreatedAt;
 
     // TODO: 'Y' OR NULL -> boolean 변환
     /**
      * 추가 논리 제약
      */
     public void validateCustom() {
+        System.out.println("validateCustom()");
         if (usageEndedAt < usageStartedAt) {
             throw new IllegalArgumentException("종료 시간이 시작 시간보다 이전입니다.");
         }

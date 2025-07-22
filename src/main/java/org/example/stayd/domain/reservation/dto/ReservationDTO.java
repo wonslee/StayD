@@ -2,9 +2,9 @@ package org.example.stayd.domain.reservation.dto;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import lombok.Builder;
 import lombok.Getter;
-import org.example.stayd.common.YesNoBooleanConverter;
 import org.example.stayd.domain.reservation.model.DayOfWeek;
 import org.example.stayd.domain.reservation.model.Reservation;
 
@@ -25,14 +25,14 @@ public class ReservationDTO {
     private int originalPrice;
     private int discountPrice;
 
-    private Instant createdAt;
+    private LocalDateTime createdAt;
 
     private boolean canceled;
-    private Instant canceledAt;
+    private LocalDateTime canceledAt;
 
     private Integer rating;
     private String content;
-    private Instant reviewCreatedAt;
+    private LocalDateTime reviewCreatedAt;
 
     // TODO: 얘네 고민
     /* JDBC ↔ DTO 변환 편의 */
@@ -56,13 +56,13 @@ public class ReservationDTO {
                 .build();
     }
 
-    // NOTE: 개발용
     @Override
     public String toString() {
         return "ReservationDTO{" +
                 "reservationId=" + reservationId +
                 ", userId=" + userId +
                 ", cafeId=" + cafeId +
+                ", reservationDate=" + reservationDate +
                 ", usageStartedAt=" + usageStartedAt +
                 ", usageEndedAt=" + usageEndedAt +
                 ", dayOfWeek=" + dayOfWeek +

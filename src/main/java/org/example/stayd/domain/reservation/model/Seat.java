@@ -4,6 +4,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -29,7 +30,7 @@ public class Seat {
     @NotNull
     private boolean isAvailable;
 
-    private Instant createdAt;
+    private LocalDateTime createdAt;
 
     /* JDBC용 변환자 */
     public char getAvailableYn() {
@@ -41,7 +42,7 @@ public class Seat {
     }
 
     // TODO: is_available NULL 값 들어올시 boolean(false)로 변환
-    public Seat(Long seatId, Long cafeId, String seatNumber, boolean isAvailable, Instant createdAt) {
+    public Seat(Long seatId, Long cafeId, String seatNumber, boolean isAvailable, LocalDateTime createdAt) {
         this.seatId = seatId;
         this.cafeId = cafeId;
         this.seatNumber = seatNumber;
