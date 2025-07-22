@@ -7,6 +7,10 @@ import javafx.scene.text.Font;
 import javafx.event.ActionEvent;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
+
+import org.example.stayd.domain.cafe.dto.CafeDto;
+import org.example.stayd.domain.cafe.service.CafeService;
+
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -40,6 +44,19 @@ public class CafeCreateController implements Initializable {
     private int startHour = 9;
     private int endHour = 18;
     private List<String> selectedDays = new ArrayList<>();
+
+    // 서비스 계층
+    private final CafeService cafeService;
+
+    public CafeCreateController() {
+        this.cafeService = new CafeService();
+    }
+
+    // 테스트용 생성자
+    public CafeCreateController(CafeService cafeService) {
+        this.cafeService = cafeService;
+    }
+
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -175,65 +192,108 @@ public class CafeCreateController implements Initializable {
         registerButton.setStyle("-fx-background-color: white; -fx-font-weight: bold; -fx-background-radius: 10; -fx-font-size: 14px;");
     }
 
-    // 등록 버튼 클릭
+    // 카페 생성 버튼 클릭 (백엔드 연동)
     @FXML
     private void registerCafe(ActionEvent event) {
-        // 입력 값 검증
-        if (cafeNameField.getText().trim().isEmpty()) {
-            showAlert("스터디 카페 이름을 입력해주세요.");
-            return;
-        }
+        try {
+            // DTO 생성
+            CafeDto.CreateRequest request = createCafeRequest();
 
-        if (locationField.getText().trim().isEmpty()) {
-            showAlert("위치를 입력해주세요.");
-            return;
-        }
+            // 더미 오너 ID 가져오기 (실제로는 현재 로그인한 사용자 ID)
+            Long ownerId = cafeService.getDummyOwnerId();
 
-        if (selectedDays.isEmpty()) {
-            showAlert("영업일을 선택해주세요.");
-            return;
-        }
+            // 카페 생성 서비스 호출
+            CafeDto.CreateResponse response = cafeService.createCafe(request, ownerId);
 
-        if (phoneField.getText().trim().isEmpty()) {
-            showAlert("전화번호를 입력해주세요.");
-            return;
-        }
+            if (response.isSuccess()) {
+                // 성공 시
+                showAlert(Alert.AlertType.INFORMATION, "생성 성공",
+                        "카페 ID: " + response.getCafeId() + "\n" + response.getMessage());
+                clearForm();
+            } else {
+                // 실패 시
+                showAlert(Alert.AlertType.ERROR, "생성 실패", response.getMessage());
+            }
 
-        if (descriptionArea.getText().trim().isEmpty()) {
-            showAlert("설명을 입력해주세요.");
-            return;
+        } catch (Exception e) {
+            e.printStackTrace();
+            showAlert(Alert.AlertType.ERROR, "오류 발생", "예상치 못한 오류가 발생했습니다: " + e.getMessage());
         }
-
-        // 여기서 데이터베이스에 저장하는 로직 구현
-        saveCafeData();
     }
 
-    private void saveCafeData() {
-        // 데이터베이스 저장 로직
-        String cafeName = cafeNameField.getText();
-        String location = locationField.getText();
-        String businessDays = String.join(",", selectedDays);
-        String startTime = startTimeField.getText();
-        String endTime = endTimeField.getText();
-        int price = currentPrice;
-        String phone = phoneField.getText();
-        String imageUrl = imageUrlField.getText();
-        String description = descriptionArea.getText();
+    /**
+     * 입력 데이터로부터 카페 생성 요청 DTO 생성
+     * @return 카페 생성 요청 DTO
+     */
+    private CafeDto.CreateRequest createCafeRequest() {
+        CafeDto.CreateRequest request = new CafeDto.CreateRequest();
 
-        System.out.println("cafeName: " + cafeName);
-        System.out.println("location: " + location);
-        System.out.println("businessDays: " + businessDays);
-        System.out.println("businessTime: " + startTime + " ~ " + endTime);
-        System.out.println("price: " + price);
-        System.out.println("phone: " + phone);
-        System.out.println("imageUrl: " + imageUrl);
-        System.out.println("description: " + description);
+        request.setName(cafeNameField.getText());
+        request.setAddress(locationField.getText());
+        request.setPricePerHour(currentPrice);
+        request.setDescription(descriptionArea.getText());
+        request.setPhoneNumber(phoneField.getText());
+        request.setImageUrl(imageUrlField.getText());
+        request.setOperatingDays(new ArrayList<>(selectedDays));
+        request.setOperatingStartHour(startHour);
+        request.setOperatingEndHour(endHour);
 
-        showAlert("스터디 카페가 성공적으로 등록되었습니다!");
+        return request;
     }
 
-    private void showAlert(String message) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+    /**
+     * 폼 초기화
+     */
+    private void clearForm() {
+        cafeNameField.clear();
+        locationField.clear();
+        phoneField.clear();
+        imageUrlField.clear();
+        descriptionArea.clear();
+
+        // 요일 버튼 초기화
+        resetDayButtons();
+
+        // 시간 및 가격 초기화
+        currentPrice = 1000;
+        startHour = 9;
+        endHour = 18;
+        priceField.setText(String.valueOf(currentPrice));
+        startTimeField.setText(String.format("%02d:00", startHour));
+        endTimeField.setText(String.format("%02d:00", endHour));
+
+        // 글자 수 카운터 초기화
+        charCountLabel.setText("0/200");
+
+        // 선택된 요일 초기화
+        selectedDays.clear();
+        selectedDaysField.clear();
+    }
+
+    /**
+     * 요일 버튼들 초기화
+     */
+    private void resetDayButtons() {
+        ToggleButton[] dayButtons = {
+                mondayButton, tuesdayButton, wednesdayButton, thursdayButton,
+                fridayButton, saturdayButton, sundayButton
+        };
+
+        for (ToggleButton button : dayButtons) {
+            button.setSelected(false);
+            button.setOpacity(0.5);
+        }
+    }
+
+    /**
+     * 알림 다이얼로그 표시
+     * @param alertType 알림 타입
+     * @param title 제목
+     * @param message 메시지
+     */
+    private void showAlert(Alert.AlertType alertType, String title, String message) {
+        Alert alert = new Alert(alertType);
+        alert.setTitle(title);
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
