@@ -242,7 +242,7 @@ public class CafeService {
      */
     public Long getDummyOwnerId() {
         // TODO: 실제 사용자 모듈 완성 후 제거
-        return 1L; // 더미 카페 오너 ID
+        return 5L; // 더미 카페 오너 ID
     }
 
     /**
@@ -274,38 +274,42 @@ public class CafeService {
 
 
     /**
-     * 모든 카페 목록 조회 (리스트용)
+     * 모든 카페 목록 조회 (정렬 옵션 추가)
+     * @param sortByRating true: 평점순, false: 최신순
      * @return 카페 DTO 목록
      */
-
-    public List<CafeDto.SimpleCafeDto> getAllCafes() {
-//        return PerformanceMonitor.measureTimeWithResult("DB - Get All Cafes", () -> {
-            try {
-                return cafeDao.findAllCafes();
-            } catch (SQLException e) {
-                e.printStackTrace();
-                throw new RuntimeException("Error loading cafe list: " + e.getMessage());
-            }
-//        });
+    public List<CafeDto.SimpleCafeDto> getAllCafes(boolean sortByRating) {
+        try {
+            return cafeDao.findAllCafes(sortByRating);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Error loading cafe list: " + e.getMessage());
+        }
     }
 
     /**
-     * 카페 이름으로 검색
+     * 카페 이름으로 검색 (정렬 옵션 추가)
      * @param keyword 검색 키워드
+     * @param sortByRating true: 평점순, false: 최신순
      * @return 검색된 카페 DTO 목록
      */
-    public List<CafeDto.SimpleCafeDto> searchCafesByName(String keyword) {
-//        return PerformanceMonitor.measureTimeWithResult("DB - Search Cafes (keyword: " + keyword + ")", () -> {
-            try {
-                if (keyword == null || keyword.trim().isEmpty()) {
-                    return getAllCafes();
-                }
-                return cafeDao.searchCafesByName(keyword.trim());
-            } catch (SQLException e) {
-                e.printStackTrace();
-                throw new RuntimeException("Error searching cafes: " + e.getMessage());
+    public List<CafeDto.SimpleCafeDto> searchCafesByName(String keyword, boolean sortByRating) {
+        try {
+            if (keyword == null || keyword.trim().isEmpty()) {
+                return getAllCafes(sortByRating);
             }
-//        });
+            return cafeDao.searchCafesByName(keyword.trim(), sortByRating);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Error searching cafes: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 기존 searchCafesByName() 메서드 (하위 호환성)
+     */
+    public List<CafeDto.SimpleCafeDto> searchCafesByName(String keyword) {
+        return searchCafesByName(keyword, false); // 기본값: 최신순
     }
 
     /**

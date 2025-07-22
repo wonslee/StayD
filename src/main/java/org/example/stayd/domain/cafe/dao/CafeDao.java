@@ -228,17 +228,39 @@ public class CafeDao {
     // CafeDao.java 파일에 다음 메서드들을 추가하세요
 
     /**
-     * 모든 카페 목록 조회 (리스트용)
+     * 모든 카페 목록 조회 (정렬 옵션 추가)
+     * @param sortByRating true: 평점순, false: 최신순
      */
-    public List<CafeDto.SimpleCafeDto> findAllCafes() throws SQLException {
-        String sql = """
-        SELECT c.cafe_id, c.name, c.address, c.price_per_hour, c.description, 
-               c.phone_number, c.image_url,
-               0.0 as avg_rating,
-               0 as review_count
-        FROM cafe c
-        ORDER BY c.cafe_id DESC
-        """;
+    public List<CafeDto.SimpleCafeDto> findAllCafes(boolean sortByRating) throws SQLException {
+        String sql;
+
+        if (sortByRating) {
+            // 평점순 정렬 (평점 높은 순, 같으면 리뷰 수 많은 순)
+            sql = """
+            SELECT c.cafe_id, c.name, c.address, c.price_per_hour, c.description, 
+                   c.phone_number, c.image_url,
+                   COALESCE(AVG(r.rating), 0.0) as avg_rating,
+                   COUNT(CASE WHEN r.rating IS NOT NULL THEN 1 END) as review_count
+            FROM cafe c
+            LEFT JOIN reservation r ON c.cafe_id = r.cafe_id AND r.rating IS NOT NULL
+            GROUP BY c.cafe_id, c.name, c.address, c.price_per_hour, c.description, 
+                     c.phone_number, c.image_url
+            ORDER BY avg_rating DESC, review_count DESC, c.cafe_id DESC
+            """;
+        } else {
+            // 최신순 정렬 (기존과 동일)
+            sql = """
+            SELECT c.cafe_id, c.name, c.address, c.price_per_hour, c.description, 
+                   c.phone_number, c.image_url,
+                   COALESCE(AVG(r.rating), 0.0) as avg_rating,
+                   COUNT(CASE WHEN r.rating IS NOT NULL THEN 1 END) as review_count
+            FROM cafe c
+            LEFT JOIN reservation r ON c.cafe_id = r.cafe_id AND r.rating IS NOT NULL
+            GROUP BY c.cafe_id, c.name, c.address, c.price_per_hour, c.description, 
+                     c.phone_number, c.image_url
+            ORDER BY c.cafe_id DESC
+            """;
+        }
 
         List<CafeDto.SimpleCafeDto> cafes = new ArrayList<>();
 
@@ -257,7 +279,7 @@ public class CafeDao {
                 cafe.setPricePerHour(rs.getInt("price_per_hour"));
                 cafe.setDescription(rs.getString("description"));
                 cafe.setPhoneNumber(rs.getString("phone_number"));
-                cafe.setFavorite(false); // 기본값 (찜하기 기능 구현 시 수정)
+                cafe.setFavorite(false); // 기본값
 
                 cafes.add(cafe);
             }
@@ -267,18 +289,47 @@ public class CafeDao {
     }
 
     /**
-     * 카페 이름으로 검색
+     * 기존 findAllCafes() 메서드 (하위 호환성)
      */
-    public List<CafeDto.SimpleCafeDto> searchCafesByName(String keyword) throws SQLException {
-        String sql = """
-        SELECT c.cafe_id, c.name, c.address, c.price_per_hour, c.description, 
-               c.phone_number, c.image_url,
-               0.0 as avg_rating,
-               0 as review_count
-        FROM cafe c
-        WHERE c.name LIKE ?
-        ORDER BY c.cafe_id DESC
-        """;
+    public List<CafeDto.SimpleCafeDto> findAllCafes() throws SQLException {
+        return findAllCafes(false); // 기본값: 최신순
+    }
+
+    /**
+     * 카페 이름으로 검색 (정렬 옵션 추가)
+     * @param keyword 검색 키워드
+     * @param sortByRating true: 평점순, false: 최신순
+     */
+    public List<CafeDto.SimpleCafeDto> searchCafesByName(String keyword, boolean sortByRating) throws SQLException {
+        String sql;
+
+        if (sortByRating) {
+            sql = """
+            SELECT c.cafe_id, c.name, c.address, c.price_per_hour, c.description, 
+                   c.phone_number, c.image_url,
+                   COALESCE(AVG(r.rating), 0.0) as avg_rating,
+                   COUNT(CASE WHEN r.rating IS NOT NULL THEN 1 END) as review_count
+            FROM cafe c
+            LEFT JOIN reservation r ON c.cafe_id = r.cafe_id AND r.rating IS NOT NULL
+            WHERE c.name LIKE ?
+            GROUP BY c.cafe_id, c.name, c.address, c.price_per_hour, c.description, 
+                     c.phone_number, c.image_url
+            ORDER BY avg_rating DESC, review_count DESC, c.cafe_id DESC
+            """;
+        } else {
+            sql = """
+            SELECT c.cafe_id, c.name, c.address, c.price_per_hour, c.description, 
+                   c.phone_number, c.image_url,
+                   COALESCE(AVG(r.rating), 0.0) as avg_rating,
+                   COUNT(CASE WHEN r.rating IS NOT NULL THEN 1 END) as review_count
+            FROM cafe c
+            LEFT JOIN reservation r ON c.cafe_id = r.cafe_id AND r.rating IS NOT NULL
+            WHERE c.name LIKE ?
+            GROUP BY c.cafe_id, c.name, c.address, c.price_per_hour, c.description, 
+                     c.phone_number, c.image_url
+            ORDER BY c.cafe_id DESC
+            """;
+        }
 
         List<CafeDto.SimpleCafeDto> cafes = new ArrayList<>();
 
@@ -307,6 +358,13 @@ public class CafeDao {
         }
 
         return cafes;
+    }
+
+    /**
+     * 기존 searchCafesByName() 메서드 (하위 호환성)
+     */
+    public List<CafeDto.SimpleCafeDto> searchCafesByName(String keyword) throws SQLException {
+        return searchCafesByName(keyword, false); // 기본값: 최신순
     }
 
     /**

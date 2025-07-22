@@ -121,88 +121,85 @@ public class CafeListController implements Initializable {
     }
 
     /**
-     * 더미 데이터 초기화
-     */
-    /**
-     * DB에서 카페 데이터 로드
+     * DB에서 카페 데이터 로드 (정렬 적용)
      */
     private void loadCafesFromDB() {
-//        PerformanceMonitor.measureTime("Controller - Load All Cafes", () -> {
-            try {
-                // CafeService를 통해 DB에서 모든 카페 데이터 가져오기
-                List<CafeDto.SimpleCafeDto> cafeList = cafeService.getAllCafes();
+        try {
+            // 현재 정렬 상태에 따라 데이터 가져오기
+            boolean sortByRating = !isSortByLatest; // 최신순이 아니면 평점순
+            List<CafeDto.SimpleCafeDto> cafeList = cafeService.getAllCafes(sortByRating);
 
-                allCafes.clear();
+            allCafes.clear();
 
-                // DTO를 내부 CafeData로 변환
-                for (CafeDto.SimpleCafeDto dto : cafeList) {
-                    allCafes.add(new CafeData(
-                            dto.getId(),
-                            dto.getName(),
-                            dto.getRating(),
-                            dto.getReviewCount(),
-                            dto.getImageUrl(),
-                            dto.isFavorite()
-                    ));
-                }
-
-                filteredCafes = new ArrayList<>(allCafes);
-                totalPages = (int) Math.ceil(filteredCafes.size() / 8.0);
-
-                System.out.println("Cafe data loaded successfully: " + allCafes.size() + " cafes");
-
-            } catch (Exception e) {
-                e.printStackTrace();
-                System.err.println("Failed to load cafe data: " + e.getMessage());
-                // 실패 시 빈 리스트로 초기화
-                allCafes.clear();
-                filteredCafes.clear();
-                totalPages = 1;
+            // DTO를 내부 CafeData로 변환
+            for (CafeDto.SimpleCafeDto dto : cafeList) {
+                allCafes.add(new CafeData(
+                        dto.getId(),
+                        dto.getName(),
+                        dto.getRating(),
+                        dto.getReviewCount(),
+                        dto.getImageUrl(),
+                        dto.isFavorite()
+                ));
             }
-//        });
+
+            filteredCafes = new ArrayList<>(allCafes);
+            totalPages = (int) Math.ceil(filteredCafes.size() / 8.0);
+
+            System.out.println("Cafe data loaded successfully: " + allCafes.size() + " cafes (Sort by rating: " + sortByRating + ")");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("Failed to load cafe data: " + e.getMessage());
+            // 실패 시 빈 리스트로 초기화
+            allCafes.clear();
+            filteredCafes.clear();
+            totalPages = 1;
+        }
     }
 
+
     /**
-     * 검색창에서 Enter 키 처리
+     * 검색 메서드 수정 (정렬 적용)
      */
     @FXML
     private void searchCafes(ActionEvent event) {
-//        PerformanceMonitor.measureTime("Controller - Search Cafes", () -> {
-            currentSearchKeyword = searchField.getText().trim();
-            currentPage = 1;
+        currentSearchKeyword = searchField.getText().trim();
+        currentPage = 1;
 
-            try {
-                if (currentSearchKeyword.isEmpty()) {
-                    // 전체 카페 다시 로드
-                    List<CafeDto.SimpleCafeDto> cafeList = cafeService.getAllCafes();
-                    filteredCafes.clear();
-                    for (CafeDto.SimpleCafeDto dto : cafeList) {
-                        filteredCafes.add(convertToCafeData(dto));
-                    }
-                } else {
-                    // DB에서 검색어로 필터링된 결과 가져오기
-                    List<CafeDto.SimpleCafeDto> searchResults = cafeService.searchCafesByName(currentSearchKeyword);
-                    filteredCafes.clear();
-                    for (CafeDto.SimpleCafeDto dto : searchResults) {
-                        filteredCafes.add(convertToCafeData(dto));
-                    }
+        try {
+            boolean sortByRating = !isSortByLatest; // 최신순이 아니면 평점순
+
+            if (currentSearchKeyword.isEmpty()) {
+                // 전체 카페 다시 로드 (정렬 적용)
+                List<CafeDto.SimpleCafeDto> cafeList = cafeService.getAllCafes(sortByRating);
+                filteredCafes.clear();
+                for (CafeDto.SimpleCafeDto dto : cafeList) {
+                    filteredCafes.add(convertToCafeData(dto));
                 }
-
-                // 정렬 적용
-                applySorting();
-
-                // 총 페이지 수 업데이트
-                totalPages = Math.max(1, (int) Math.ceil(filteredCafes.size() / 8.0));
-
-                // 결과 표시
-                displayCurrentPage();
-                updatePaginationButtons();
-
-            } catch (Exception e) {
-                e.printStackTrace();
-                System.err.println("Search failed: " + e.getMessage());
+            } else {
+                // DB에서 검색어로 필터링된 결과 가져오기 (정렬 적용)
+                List<CafeDto.SimpleCafeDto> searchResults = cafeService.searchCafesByName(currentSearchKeyword, sortByRating);
+                filteredCafes.clear();
+                for (CafeDto.SimpleCafeDto dto : searchResults) {
+                    filteredCafes.add(convertToCafeData(dto));
+                }
             }
-//        });
+
+            // 프론트엔드 정렬 제거 (DB에서 이미 정렬되어 옴)
+            // applySorting(); // 이 줄 주석처리 또는 삭제
+
+            // 총 페이지 수 업데이트
+            totalPages = Math.max(1, (int) Math.ceil(filteredCafes.size() / 8.0));
+
+            // 결과 표시
+            displayCurrentPage();
+            updatePaginationButtons();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("Search failed: " + e.getMessage());
+        }
     }
 
     @FXML
@@ -213,7 +210,7 @@ public class CafeListController implements Initializable {
     }
 
     /**
-     * 정렬 순서 토글 (최신순 ↔ 평점순)
+     * 정렬 순서 토글 (DB에서 정렬하도록 수정)
      */
     @FXML
     private void toggleSortOrder(ActionEvent event) {
@@ -225,31 +222,17 @@ public class CafeListController implements Initializable {
             sortButton.setText("평점순 ▼");
         }
 
-        // 정렬 적용
-        applySorting();
+        // DB에서 새로운 정렬로 데이터 다시 로드
+        if (currentSearchKeyword.isEmpty()) {
+            loadCafesFromDB(); // 전체 데이터 다시 로드
+        } else {
+            searchCafes(null); // 검색 결과 다시 로드
+        }
 
         // 현재 페이지 다시 표시
         displayCurrentPage();
     }
 
-    /**
-     * 정렬 적용
-     */
-    private void applySorting() {
-        if (isSortByLatest) {
-            // 최신순 정렬 (ID 역순)
-            filteredCafes.sort((a, b) -> Integer.compare(b.getCafeId(), a.getCafeId()));
-        } else {
-            // 평점순 정렬 (평점 높은 순, 같으면 리뷰 수 많은 순)
-            filteredCafes.sort((a, b) -> {
-                int ratingCompare = Double.compare(b.getRating(), a.getRating());
-                if (ratingCompare == 0) {
-                    return Integer.compare(b.getReviewCount(), a.getReviewCount());
-                }
-                return ratingCompare;
-            });
-        }
-    }
 
     /**
      * 현재 페이지의 카페들을 화면에 표시
