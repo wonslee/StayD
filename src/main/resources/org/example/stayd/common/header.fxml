@@ -1,14 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
 
-<AnchorPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="org.example.stayd.common.Header"
-            prefHeight="400.0" prefWidth="600.0">
+<HBox fx:id="headerHBox" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="130.0" prefWidth="1024.0" spacing="30" style="-fx-background-color: white;" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1">
+    <children>
+        <ImageView fitHeight="130.0" fitWidth="150.0" pickOnBounds="true" preserveRatio="true" style="-fx-translate-x: 50;">
+        <image>
+            <Image url="@images/logo.png" />
+        </image>
+    </ImageView>
 
-</AnchorPane>
+    <!-- 빈 공간 -->
+    <Region HBox.hgrow="ALWAYS" />
+
+    <!-- 알람 아이콘: 오른쪽에 배치 -->
+    <ImageView fitHeight="130.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true" style="-fx-translate-x: -50;">
+        <image>
+            <Image url="@images/icon_notification.png" />
+        </image>
+    </ImageView>
+
+    <!-- 유저 프로필 아이콘: 오른쪽에 배치 -->
+    <ImageView fitHeight="130.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true" style="-fx-translate-x: -50;">
+        <image>
+            <Image url="@images/icon_user_profile.png" />
+        </image>
+    </ImageView>
+</children>
+</HBox>
