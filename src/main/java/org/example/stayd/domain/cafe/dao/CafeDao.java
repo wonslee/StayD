@@ -7,9 +7,7 @@ import org.example.stayd.domain.cafe.model.CafeModel;
 import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * 스터디 카페 데이터 접근 객체
@@ -160,21 +158,13 @@ public class CafeDao {
     }
 
     /**
-     * 요일 문자열을 DB 형식으로 변환
+     * 요일 문자열을 DB 형식으로 변환 (한글 그대로 저장)
      * @param dayInKorean 한글 요일 (월, 화, 수, 목, 금, 토, 일)
-     * @return DB 요일 형식 (MON, TUE, WED, THU, FRI, SAT, SUN)
+     * @return 한글 요일 그대로 반환
      */
     public static String convertDayToDbFormat(String dayInKorean) {
-        Map<String, String> dayMap = new HashMap<>();
-        dayMap.put("월", "MON");
-        dayMap.put("화", "TUE");
-        dayMap.put("수", "WED");
-        dayMap.put("목", "THU");
-        dayMap.put("금", "FRI");
-        dayMap.put("토", "SAT");
-        dayMap.put("일", "SUN");
-
-        return dayMap.getOrDefault(dayInKorean, "");
+        // 한글 그대로 반환 (변환하지 않음)
+        return dayInKorean;
     }
 
     /**
@@ -183,6 +173,10 @@ public class CafeDao {
      * @return CafeModel 객체 (없으면 null)
      */
     public CafeDto.DetailResponse findById(Long cafeId) throws SQLException {
+        // 🔍 디버깅 로그 추가
+        System.out.println("=== DAO 디버깅 ===");
+        System.out.println("조회할 카페 ID: " + cafeId);
+
         String cafeSql = "SELECT * FROM cafe WHERE cafe_id = ?";
         String opSql = "SELECT * FROM operation_hours WHERE cafe_id = ?";
 
@@ -193,9 +187,16 @@ public class CafeDao {
             cafeStmt.setLong(1, cafeId);
             ResultSet cafeRs = cafeStmt.executeQuery();
 
+            // 🔍 결과 확인
+            System.out.println("SQL 쿼리 실행: " + cafeSql);
+            System.out.println("파라미터: " + cafeId);
+
             if (!cafeRs.next()) {
+                System.out.println("결과 없음");
                 throw new SQLException("해당 ID의 카페를 찾을 수 없습니다.");
             }
+
+            System.out.println("✅ 카페 찾음!");
 
             // 카페 기본 정보 추출
             String name = cafeRs.getString("name");
