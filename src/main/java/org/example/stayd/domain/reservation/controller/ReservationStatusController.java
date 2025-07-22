@@ -1,6 +1,7 @@
 package org.example.stayd.domain.reservation.controller;
 
 import javafx.application.Application;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
@@ -169,10 +170,14 @@ public class ReservationStatusController {
     }
 
     @FXML
-    private void goToReservationSettings(MouseEvent event) {
+    private void goToDiscountSettings(ActionEvent event) {
         try {
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            FXUtils.switchScene(stage, SceneConfig.RESERVATION_SETTINGS_FXML);  // 예약 설정 페이지로 이동
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(SceneConfig.DISCOUNT_SETTINGS_FXML));    // 예약 설정 페이지로 이동
+            AnchorPane root = loader.load();
+            Scene scene = new Scene(root);
+            stage.setScene(scene);
+            stage.show();  // 할인 설정 페이지로 전환
         } catch (IOException e) {
             e.printStackTrace();
             showAlert(Alert.AlertType.WARNING, "날짜 선택", "예약 설정 페이지로 이동하는 중 오류가 발생했습니다.");

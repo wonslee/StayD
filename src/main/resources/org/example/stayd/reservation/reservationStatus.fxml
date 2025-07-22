@@ -21,7 +21,7 @@
         <Text text="날짜 선택: " />
         <DatePicker fx:id="datePicker" />
         <Button text="조회" onAction="#loadReservationStatus" />
-<!--        <Button text="할인 " onAction="#showDiscountNotification" />-->
+        <Button text="할인 설정" onAction="#goToDiscountSettings" />
     </HBox>
 
     <ScrollPane AnchorPane.topAnchor="180.0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.bottomAnchor="0">
