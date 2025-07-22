@@ -12,7 +12,7 @@
 <?import javafx.scene.shape.Line?>
 <?import javafx.scene.shape.Rectangle?>
 
-<!-- 1024 × 768, 헤더 자리 130 px 확보 -->
+<!-- 1024×768, 헤더 자리 130px 확보 -->
 
 <AnchorPane prefHeight="768" prefWidth="1024" style="-fx-background-color:white;" xmlns="http://javafx.com/javafx/21.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.stayd.domain.review.controller.ReviewController">
 
