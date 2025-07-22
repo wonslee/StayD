@@ -11,6 +11,15 @@ import java.time.LocalDateTime;
 
 @Getter
 @AllArgsConstructor
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.sql.Timestamp;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class ReservationDto {
     private final int reservationId;
     private final int cafeId;
@@ -23,4 +32,19 @@ public class ReservationDto {
     // TODO: 통합 시 조치사항
     // - ReservationDto가 이미 존재한다면 이 클래스 삭제 또는 통합
     // - 필요한 필드(좌석, 가격 등) 포함 여부 점검
+}
+    private int reservationId;
+    private int userId;
+    private int cafeId;
+    private Timestamp usageStartedAt;
+    private Timestamp usageEndedAt;
+    private String dayOfWeek;
+    private double originalPrice;
+    private double discountPrice;
+    private Timestamp createdAt;
+    private String isCanceled;
+    private Timestamp canceledAt;
+    private int rating;
+    private String content;
+    private Timestamp reviewCreatedAt;
 }
