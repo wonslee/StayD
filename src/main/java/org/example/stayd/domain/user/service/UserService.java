@@ -4,12 +4,17 @@ import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
+import javafx.scene.control.Alert;
+import javafx.stage.Stage;
+import org.example.stayd.common.FXUtils;
 import org.example.stayd.common.SessionManager;
+import org.example.stayd.config.SceneConfig;
 import org.example.stayd.domain.user.dao.UserDAO;
 import org.example.stayd.domain.user.dto.PasswordResetDTO;
 import org.example.stayd.domain.user.dto.UserDTO;
 import org.mindrot.jbcrypt.BCrypt;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Optional;
 import java.util.Set;
@@ -146,14 +151,9 @@ public class UserService {
             SessionManager.getInstance().setLoggedInUser(user);
 
             // 인증 성공
-            UserDTO result = new UserDTO();
-            result.setLogin_id(user.getLogin_id());
-            result.setEmail(user.getEmail());
-            result.setRole(user.getRole());
-            result.setPassword(null);
-            result.setPasswordCheck(null);
-
-            return result;
+            user.setPassword(null);
+            user.setPasswordCheck(null);
+            return user;
         } catch (SQLException e) {
             throw new AuthenticationException("로그인 처리 중 DB 오류가 발생했습니다.");
         }

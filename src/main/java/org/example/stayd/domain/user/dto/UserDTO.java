@@ -13,6 +13,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class UserDTO {
 
+    private int user_id;
+
     @NotBlank(message = "아이디를 입력해주세요.")
     private String login_id;
 
@@ -33,4 +35,12 @@ public class UserDTO {
 
     @NotBlank(message="역할")
     private String role;
+
+    public UserDTO(String login_id, String email, String password, String passwordCheck, String role) {
+        this.login_id = login_id;
+        this.email = email;
+        this.password = password;
+        this.passwordCheck = passwordCheck;
+        this.role = role;
+    }
 }

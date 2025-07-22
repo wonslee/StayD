@@ -70,7 +70,8 @@ public class UserDAO {
      */
     public Optional<UserDTO> findByLoginId(String loginId) throws SQLException {
         String sql = """
-                SELECT login_id,
+                SELECT user_id,
+                login_id,
                        email,
                        password,
                        role
@@ -85,6 +86,7 @@ public class UserDAO {
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     UserDTO user = new UserDTO();
+                    user.setUser_id(rs.getInt("user_id"));
                     user.setLogin_id(rs.getString("login_id"));
                     user.setEmail(rs.getString("email"));
                     user.setPassword(rs.getString("password")); // 해시
