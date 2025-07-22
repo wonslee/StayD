@@ -1,6 +1,7 @@
 package org.example.stayd.domain.reservation.dto;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import lombok.Builder;
 import lombok.Getter;
 import org.example.stayd.common.YesNoBooleanConverter;
@@ -16,6 +17,7 @@ public class ReservationDTO {
     private Long userId;
     private Long cafeId;
 
+    private LocalDate reservationDate;
     private int usageStartedAt;
     private int usageEndedAt;
     private DayOfWeek dayOfWeek;
@@ -40,6 +42,7 @@ public class ReservationDTO {
                 .reservationId(reservation.getReservationId())
                 .userId(reservation.getUserId())
                 .cafeId(reservation.getCafeId())
+                .reservationDate(reservation.getReservationDate())
                 .usageStartedAt(reservation.getUsageStartedAt())
                 .usageEndedAt(reservation.getUsageEndedAt())
                 .dayOfWeek(reservation.getDayOfWeek())

@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.Optional;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -26,6 +27,11 @@ public class Reservation {
 
     @NotNull
     private Long cafeId;          // FK
+
+
+    /** 예약한 “날짜” (시간대와 분리) */
+    @NotNull
+    private LocalDate reservationDate;   // DB: DATE
 
     @NotNull
     @Size(min = 0, max = 24)
