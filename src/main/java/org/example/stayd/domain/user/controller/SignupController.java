@@ -25,6 +25,8 @@ import java.util.Properties;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
+import static org.example.stayd.common.FXUtils.showAlert;
+
 public class SignupController {
 
     @FXML
@@ -163,7 +165,7 @@ public class SignupController {
         try {
             userService.validateForPending(pendingDto);
         } catch (UserService.ValidationException ex) {
-            showAlert(Alert.AlertType.WARNING, "회원가입 실패", ex.getMessage());
+            showAlert(signUpButton.getScene().getWindow(), Alert.AlertType.WARNING, "회원가입 실패", ex.getMessage());
             return;
         }
 
@@ -176,7 +178,7 @@ public class SignupController {
         try (FileInputStream fis = new FileInputStream(propertiesFile)) {
             props.load(fis);
         } catch (IOException e) {
-            showAlert(Alert.AlertType.ERROR, "설정 오류", "메일 설정을 불러오지 못했습니다.");
+            showAlert(signUpButton.getScene().getWindow(), Alert.AlertType.ERROR, "설정 오류", "메일 설정을 불러오지 못했습니다.");
             signUpButton.setDisable(false);
             return;
         }
@@ -204,14 +206,16 @@ public class SignupController {
                 });
             } catch (Exception e) {
                 Platform.runLater(() -> {
-                    showAlert(Alert.AlertType.ERROR, "발송 실패", "이메일 발송에 실패했습니다. 다시 시도하세요.");
+                    showAlert(signUpButton.getScene().getWindow(), Alert.AlertType.ERROR, "발송 실패", "이메일 발송에 실패했습니다. 다시 시도하세요.");
                     signUpButton.setDisable(false);
                 });
             }
         }).start();
     }
 
-    /** 인증 코드 입력/검증 후 최종 등록 */
+    /**
+     * 인증 코드 입력/검증 후 최종 등록
+     */
     private void promptForVerification() {
         TextInputDialog dlg = new TextInputDialog();
         dlg.setTitle("이메일 인증");
@@ -222,46 +226,42 @@ public class SignupController {
 
         Optional<String> result = dlg.showAndWait();
         if (result.isEmpty()) {
-            showAlert(Alert.AlertType.INFORMATION, "인증 취소", "인증이 취소되었습니다.");
+            showAlert(signUpButton.getScene().getWindow(), Alert.AlertType.INFORMATION, "인증 취소", "인증이 취소되었습니다.");
             signUpButton.setDisable(false);
             return;
         }
         String input = result.get().trim().toUpperCase();
         if (Instant.now().isAfter(tokenExpiresAt)) {
-            showAlert(Alert.AlertType.WARNING, "인증 실패", "인증 코드가 만료되었습니다.");
+            showAlert(signUpButton.getScene().getWindow(), Alert.AlertType.WARNING, "인증 실패", "인증 코드가 만료되었습니다.");
             signUpButton.setDisable(false);
             return;
         }
         if (!input.equals(pendingToken)) {
-            showAlert(Alert.AlertType.WARNING, "인증 실패", "인증 코드가 일치하지 않습니다.");
+            showAlert(signUpButton.getScene().getWindow(), Alert.AlertType.WARNING, "인증 실패", "인증 코드가 일치하지 않습니다.");
             signUpButton.setDisable(false);
             return;
         }
         try {
             userService.register(pendingDto);
-            showAlert(Alert.AlertType.INFORMATION, "회원가입 성공", "이메일 인증을 완료했습니다.");
+            showAlert(signUpButton.getScene().getWindow(), Alert.AlertType.INFORMATION, "회원가입 성공", "이메일 인증을 완료했습니다.");
             goToLogin();
         } catch (UserService.ValidationException ex) {
-            showAlert(Alert.AlertType.WARNING, "회원가입 실패", ex.getMessage());
+            showAlert(signUpButton.getScene().getWindow(), Alert.AlertType.WARNING, "회원가입 실패", ex.getMessage());
             signUpButton.setDisable(false);
         }
     }
 
-    /** 알림 팝업 */
-    private void showAlert(Alert.AlertType type, String title, String msg) {
-        Alert a = new Alert(type);
-        a.setTitle(title);
-        a.setContentText(msg);
-        a.showAndWait();
-    }
-
-    /** 라벨 색 변환 */
+    /**
+     * 라벨 색 변환
+     */
     private void setLabel(Label label, String text, boolean positive) {
         label.setText(text);
         label.setTextFill(positive ? Color.GREEN : Color.RED);
     }
 
-    /** 로그인 페이지 이동 */
+    /**
+     * 로그인 페이지 이동
+     */
     @FXML
     private void goToLogin() {
         try {
@@ -269,7 +269,7 @@ public class SignupController {
             FXUtils.switchScene(stage, SceneConfig.LOGIN_FXML);
         } catch (IOException e) {
             e.printStackTrace();
-            showAlert(Alert.AlertType.ERROR, "화면 전환 오류", "로그인 화면을 불러오는 중 오류가 발생했습니다.");
+            showAlert(signUpButton.getScene().getWindow(), Alert.AlertType.ERROR, "화면 전환 오류", "로그인 화면을 불러오는 중 오류가 발생했습니다.");
         }
     }
 }
