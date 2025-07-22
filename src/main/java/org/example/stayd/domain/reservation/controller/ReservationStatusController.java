@@ -23,6 +23,7 @@ import org.example.stayd.common.SessionManager;
 import org.example.stayd.domain.reservation.dto.ReservationDto;
 import org.example.stayd.domain.reservation.service.ReservationService;
 
+import java.sql.Date;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDate;
@@ -37,7 +38,7 @@ public class ReservationStatusController {
     @FXML
     private CategoryAxis xAxis;
     @FXML
-    private NumberAxis yAxis;
+    private DatePicker datePicker;
 
     private ReservationService reservationService;
 
@@ -47,19 +48,28 @@ public class ReservationStatusController {
 
     // 조회 버튼 클릭 시 호출되는 메서드
     public void loadReservationStatus() {
-        try {
-            // 로그인한 유저의 cafe_id에 해당하는 예약 현황 데이터 가져오기
-            List<ReservationDto> reservationList = reservationService.getReservationStatusByLoggedInUser();
+        LocalDate localDate = datePicker.getValue();  // DatePicker에서 선택된 날짜
 
-            // 예약 리스트가 비어 있는지 확인
-            if (reservationList.isEmpty()) {
-                FXUtils.showAlert(null, javafx.scene.control.Alert.AlertType.WARNING, "알림", "예약 데이터가 없습니다.");
-            } else {
-                // 예약 현황을 BarChart로 업데이트
-                updateChart(reservationList);
+        if (localDate != null) {
+            // LocalDate를 java.sql.Date로 변환
+            Date selectedDate = Date.valueOf(localDate);
+
+            try {
+                // 선택된 날짜에 해당하는 예약 현황 데이터 가져오기
+                List<ReservationDto> reservationList = reservationService.getReservationStatusByLoggedInUser(selectedDate);
+
+                // 예약 리스트가 비어 있는지 확인
+                if (reservationList.isEmpty()) {
+                    showAlert(Alert.AlertType.WARNING, "알림", "예약 데이터가 없습니다.");
+                } else {
+                    // 예약 현황을 BarChart로 업데이트
+                    updateChart(reservationList);
+                }
+            } catch (SQLException e) {
+                showAlert(Alert.AlertType.ERROR, "오류", "예약 데이터를 가져오는 중 오류가 발생했습니다.");
             }
-        } catch (SQLException e) {
-            FXUtils.showAlert(null, javafx.scene.control.Alert.AlertType.ERROR, "오류", "예약 데이터를 가져오는 중 오류가 발생했습니다.");
+        } else {
+            showAlert(Alert.AlertType.WARNING, "날짜 선택", "날짜를 선택해주세요.");
         }
     }
 
@@ -146,5 +156,14 @@ public class ReservationStatusController {
     // 색상을 hex 값으로 변환
     private String colorToHex(Color color) {
         return String.format("#%02X%02X%02X", (int)(color.getRed() * 255), (int)(color.getGreen() * 255), (int)(color.getBlue() * 255));
+    }
+
+    // 알림창 표시 함수
+    private void showAlert(Alert.AlertType alertType, String title, String message) {
+        Alert alert = new Alert(alertType);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 }

@@ -1,0 +1,162 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "group": "org.beryx",
+    "module": "badass-jlink-plugin",
+    "version": "2.25.0",
+    "attributes": {
+      "org.gradle.status": "release"
+    }
+  },
+  "createdBy": {
+    "gradle": {
+      "version": "6.9.1",
+      "buildId": "3tn2fn6rd5bwrnu6a5oqspu2fq"
+    }
+  },
+  "variants": [
+    {
+      "name": "apiElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.version": 8,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-api"
+      },
+      "dependencies": [
+        {
+          "group": "org.ow2.asm",
+          "module": "asm",
+          "version": {
+            "requires": "9.2"
+          }
+        },
+        {
+          "group": "org.ow2.asm",
+          "module": "asm-commons",
+          "version": {
+            "requires": "9.2"
+          }
+        },
+        {
+          "group": "org.ow2.asm",
+          "module": "asm-tree",
+          "version": {
+            "requires": "9.2"
+          }
+        },
+        {
+          "group": "org.ow2.asm",
+          "module": "asm-util",
+          "version": {
+            "requires": "9.2"
+          }
+        },
+        {
+          "group": "org.ow2.asm",
+          "module": "asm-analysis",
+          "version": {
+            "requires": "9.2"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "badass-jlink-plugin-2.25.0.jar",
+          "url": "badass-jlink-plugin-2.25.0.jar",
+          "size": 788681,
+          "sha512": "d41be04805a84d15890101d71b0aca1e829e4200bc629ce4889ee455a83036405d61108c51cb8c951a260198a663c566d5ef14e15cedf6ba837ba96e6a94f962",
+          "sha256": "6d42489cb8f44e16def0fc89960974f746591d1dc658db4fe6c02bb3067bf293",
+          "sha1": "6f7d433bb46d97018dd3c03935064fb319cea09d",
+          "md5": "6a42926e034a7f4f8b049afa557414ee"
+        }
+      ]
+    },
+    {
+      "name": "runtimeElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.version": 8,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-runtime"
+      },
+      "dependencies": [
+        {
+          "group": "org.slf4j",
+          "module": "slf4j-api",
+          "version": {
+            "requires": "1.7.32"
+          }
+        },
+        {
+          "group": "org.ow2.asm",
+          "module": "asm",
+          "version": {
+            "requires": "9.2"
+          }
+        },
+        {
+          "group": "org.ow2.asm",
+          "module": "asm-commons",
+          "version": {
+            "requires": "9.2"
+          }
+        },
+        {
+          "group": "org.ow2.asm",
+          "module": "asm-tree",
+          "version": {
+            "requires": "9.2"
+          }
+        },
+        {
+          "group": "org.ow2.asm",
+          "module": "asm-util",
+          "version": {
+            "requires": "9.2"
+          }
+        },
+        {
+          "group": "org.ow2.asm",
+          "module": "asm-analysis",
+          "version": {
+            "requires": "9.2"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "badass-jlink-plugin-2.25.0.jar",
+          "url": "badass-jlink-plugin-2.25.0.jar",
+          "size": 788681,
+          "sha512": "d41be04805a84d15890101d71b0aca1e829e4200bc629ce4889ee455a83036405d61108c51cb8c951a260198a663c566d5ef14e15cedf6ba837ba96e6a94f962",
+          "sha256": "6d42489cb8f44e16def0fc89960974f746591d1dc658db4fe6c02bb3067bf293",
+          "sha1": "6f7d433bb46d97018dd3c03935064fb319cea09d",
+          "md5": "6a42926e034a7f4f8b049afa557414ee"
+        }
+      ]
+    },
+    {
+      "name": "shadowRuntimeElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "shadowed",
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-runtime"
+      },
+      "files": [
+        {
+          "name": "badass-jlink-plugin-2.25.0.jar",
+          "url": "badass-jlink-plugin-2.25.0.jar",
+          "size": 788681,
+          "sha512": "d41be04805a84d15890101d71b0aca1e829e4200bc629ce4889ee455a83036405d61108c51cb8c951a260198a663c566d5ef14e15cedf6ba837ba96e6a94f962",
+          "sha256": "6d42489cb8f44e16def0fc89960974f746591d1dc658db4fe6c02bb3067bf293",
+          "sha1": "6f7d433bb46d97018dd3c03935064fb319cea09d",
+          "md5": "6a42926e034a7f4f8b049afa557414ee"
+        }
+      ]
+    }
+  ]
+}
