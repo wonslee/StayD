@@ -1,14 +1,11 @@
 package org.example.stayd.domain.reservation.controller;
 
+import static org.example.stayd.common.BusinessLogicConstants.DEFAULT_SEAT_COLS;
+
 import java.sql.SQLException;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.List;
 import java.util.stream.IntStream;
-import javafx.beans.value.ChangeListener;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -17,175 +14,167 @@ import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.GridPane;
-import org.example.stayd.domain.cafe.dto.CafeDTO;
+import lombok.NoArgsConstructor;
+import org.example.stayd.common.SessionManager;
+import org.example.stayd.domain.cafe.dto.CafeDto;
+import org.example.stayd.domain.cafe.dto.CafeDto.DetailResponse;
 import org.example.stayd.domain.reservation.dto.ReservationDTO;
+import org.example.stayd.domain.reservation.model.DayOfWeek;
+import org.example.stayd.domain.reservation.model.Reservation;
 import org.example.stayd.domain.reservation.model.Seat;
 import org.example.stayd.domain.reservation.service.ReservationService;
-import org.example.stayd.domain.user.dto.UserDTO;
 
-/**
- *
- */
+@NoArgsConstructor
 public class ReservationCreateController {
-    private CafeDTO cafeDto;
-    private UserDTO user;
 
-
-    /* ───────────── FXML 바인딩 │ 기본 정보 영역 ───────────── */
+    /* FXML */
     @FXML
     private DatePicker datePicker;
     @FXML
-    private ComboBox<String> startHourCombo;
+    private ComboBox<Integer> startCombo, endCombo;
     @FXML
-    private ComboBox<String> endHourCombo;
-    @FXML
-    private Label totalPriceLabel;
-
-    /* ───────────── FXML 바인딩 │ 좌석 영역 ───────────── */
+    private Label totalPriceLabel, statusLabel;
     @FXML
     private GridPane seatGrid;
     @FXML
     private Button reserveBtn;
-    @FXML
-    private Label statusLabel;
 
-    /* ───────────── 런타임 필드 ───────────── */
+    /* 주입될 DTO */
+    private CafeDto.DetailResponse cafe;
+
+    /* 서비스 & 상태 */
     private final ReservationService service = new ReservationService();
     private Seat selectedSeat;
-    //    TODO: service로부터 DB 쳐서 가져오기.
-    private long cafeId = 1L;   // 실제 페이지 진입 시 파라미터로 주입한다고 가정
-    private long currentUserId = 1L;  // 로그인 세션 가정
-    private int pricePerHour = 10000;    // 로드 시 Cafe 정보에서 가져옴
 
-    /* ───────────── 초기화 ───────────── */
+    public ReservationCreateController(DetailResponse cafe) {
+        this.cafe = cafe;
+    }
+
+    /* 초기화는 FXML 로드 직후 호출 */
     @FXML
-    private void initialize() {
-        initHourCombos();
-        loadSelectionSeats();
-        fetchCafePrice();
+    public void initialize() {
+        initTimeCombos();
+        datePicker.setOnAction(e -> recalc());
+        startCombo.valueProperty().addListener((obs, o, n) -> recalc());
+        endCombo.valueProperty().addListener((obs, o, n) -> recalc());
+        reserveBtn.setOnAction(e -> makeReservation());
 
-        /* 가격 계산용 리스너 */
-        ChangeListener<Object> calc = (obs, o, n) -> calcTotalPrice();
-        datePicker.valueProperty().addListener(calc);
-        startHourCombo.valueProperty().addListener(calc);
-        endHourCombo.valueProperty().addListener(calc);
+//        TODO: cafe 존재하지 않을 경우 예외 처리
 
-//        TODO: ReservationDTO를 만들어서 createReservation() 호출
-//        reserveBtn.setOnAction(e -> createReservation());
+        if (cafe != null) {
+            loadSeats();
+        }
     }
 
-    /* 0~23시 콤보 채우기 */
-    private void initHourCombos() {
-        ObservableList<String> hours = FXCollections.observableArrayList(
-                IntStream.range(0, 24)
-                        .mapToObj(i -> String.format("%02d:00", i))
-                        .toList());
-        startHourCombo.setItems(hours);
-        endHourCombo.setItems(hours);
 
-        startHourCombo.getSelectionModel().select("09:00");
-        endHourCombo.getSelectionModel().select("18:00");
+    /* ───────── 시간 콤보 채우기 ───────── */
+    private void initTimeCombos() {
+        int open = 0, close = 24; // 운영시간 컬럼이 있으면 교체
+        startCombo.getItems().setAll(IntStream.range(open, close).boxed().toList());
+        endCombo.getItems().setAll(IntStream.rangeClosed(open + 1, close).boxed().toList());
     }
 
-    /* DB에서 좌석 목록 로드 & 버튼 렌더링 */
-    private void loadSelectionSeats() {
+    //    TODO: CafeService로 이동
+    /* ───────── 좌석 로딩 ───────── */
+    private void loadSeats() {
         try {
-            List<Seat> seats = service.getSeats(cafeId);
-            seatGrid.getChildren().clear();
             selectedSeat = null;
+            List<Seat> seats = service.getSeats(cafe.getCafeId());
 
-            final int cols = 6;
             for (int i = 0; i < seats.size(); i++) {
                 Seat s = seats.get(i);
-                ToggleButton btn = new ToggleButton(s.getSeatNumber());
-                btn.setPrefSize(80, 40);
+                ToggleButton btn = new ToggleButton(String.valueOf(s.getSeatNumber()));
+                btn.setPrefSize(45, 32);
                 btn.setDisable(!s.isAvailable());
                 btn.setAlignment(Pos.CENTER);
+                btn.setStyle("");
 
-                btn.selectedProperty().addListener((o, was, is) -> {
-                    if (is) {           // 새로 선택
-                        selectedSeat = s;
-                        seatGrid.getChildren().forEach(n -> {
-                            if (n instanceof ToggleButton tb && tb != btn) {
-                                tb.setSelected(false);
-                            }
-                        });
-                    } else if (selectedSeat == s) {  // 선택 해제
-                        selectedSeat = null;
+                if (!s.isAvailable()) {
+                    btn.setStyle("-fx-background-color: #e71919;");
+                } else {
+                    btn.setStyle("-fx-background-color: #B3B3B3FF;");
+                }
+
+                seatGrid.getChildren().forEach(n -> {
+                    if (n instanceof ToggleButton tb && tb != btn) {
+                        tb.setSelected(false);
                     }
                 });
-                seatGrid.add(btn, i % cols, i / cols);
+
+                btn.selectedProperty().addListener((o, was, sel) -> {
+                    if (sel) {
+                        btn.setStyle("-fx-background-color: #4CAF50;");
+                        selectedSeat = s;
+
+                    } else if (selectedSeat == s) {
+                        selectedSeat = null;
+                    } else {
+                        btn.setStyle("-fx-background-color: #BDBDBD;");
+                    }
+                });
+                seatGrid.add(btn, i % DEFAULT_SEAT_COLS, i / DEFAULT_SEAT_COLS);
             }
         } catch (SQLException ex) {
-            statusLabel.setText("좌석 로딩 실패: " + ex.getMessage());
+            statusLabel.setText("좌석 로드 실패: " + ex.getMessage());
         }
     }
 
-    /* 카페 가격 단가 로드 (간단히 1회 호출) */
-    private void fetchCafePrice() {
-        try {
-            // TODO: service 에서 가져오기
-            pricePerHour = 10000;   // 필요 시 ReservationService에 메서드 추가
-            calcTotalPrice();
-            if (false) {
-                throw new SQLException("lala");
-            }
-        } catch (SQLException ignore) { /* 가격 없으면 0 처리 */ }
-    }
-
-    /* 총 금액 계산 = 단가 × (종료 - 시작) */
-    private void calcTotalPrice() {
-        try {
-            int start = parseHour(startHourCombo.getValue());
-            int end = parseHour(endHourCombo.getValue());
-            if (end <= start) {
-                totalPriceLabel.setText("0");
-                return;
-            }
-            int hours = end - start;
-            int total = hours * pricePerHour;
-            totalPriceLabel.setText(String.format("%,d", total));
-        } catch (Exception ignore) {
+    /* ───────── 금액 계산 ───────── */
+    private void recalc() {
+        if (cafe == null) {
+            return;
+        }
+        Integer sh = startCombo.getValue(), eh = endCombo.getValue();
+        if (sh == null || eh == null || eh <= sh) {
             totalPriceLabel.setText("0");
+            return;
         }
+        int total = (eh - sh) * cafe.getPricePerHour();
+        totalPriceLabel.setText(String.format("%,d", total));
     }
 
-    private int parseHour(String comboVal) {
-        return comboVal == null ? 0 : Integer.parseInt(comboVal.substring(0, 2));
-    }
+    /* ───────── 예약 실행 ───────── */
+//    TODO: 예약 직후 예약 상세로 리다이렉션
+    private void makeReservation() {
+        if (cafe == null) {
+            return;
+        }
 
-    /* 예약 생성 호출 */
-    private void createReservation(ReservationDTO reservationDTO) {
+        LocalDate date = datePicker.getValue();
+        Integer sh = startCombo.getValue(), eh = endCombo.getValue();
+
+        if (date == null || sh == null || eh == null || eh <= sh) {
+            statusLabel.setText("날짜/시간을 확인하세요.");
+            return;
+        }
         if (selectedSeat == null) {
             statusLabel.setText("좌석을 선택하세요.");
             return;
         }
-        LocalDate date = datePicker.getValue();
-        if (date == null) {
-            statusLabel.setText("날짜를 선택하세요.");
-            return;
-        }
-        int startH = parseHour(startHourCombo.getValue());
-        int endH = parseHour(endHourCombo.getValue());
-        if (endH <= startH) {
-            statusLabel.setText("종료 시간이 시작 시간보다 커야 합니다.");
-            return;
-        }
 
-        LocalDateTime start = LocalDateTime.of(date, LocalTime.of(startH, 0));
-        LocalDateTime end = LocalDateTime.of(date, LocalTime.of(endH, 0));
-        int total = (endH - startH) * pricePerHour;
+        ReservationDTO dto = ReservationDTO.builder()
+                .reservationDate(date)
+                .usageStartedAt(sh)
+                .usageEndedAt(eh)
+                .dayOfWeek(DayOfWeek.valueOf(date.getDayOfWeek().name().substring(0, 3)))
+                .originalPrice((eh - sh) * cafe.getPricePerHour())
+                .discountPrice((eh - sh) * cafe.getPricePerHour()) // 할인 미적용
+                .build();
+
+        long userId = SessionManager.getInstance().getLoggedInUser().getUser_id();
 
         try {
-            service.createReservation(
-                    cafeId,
+            Reservation newReservation = service.createReservation(
+                    cafe.getCafeId(),
                     selectedSeat.getSeatId(),
-                    currentUserId,
-                    reservationDTO
+                    userId,
+                    dto
             );
+            statusLabel.setStyle("-fx-text-fill:#4CAF50;");
             statusLabel.setText("예약 완료!");
-            loadSelectionSeats();                // UI 업데이트
+            loadSeats();                    // 상태 갱신
         } catch (Exception ex) {
+            statusLabel.setStyle("-fx-text-fill:#e91e63;");
             statusLabel.setText("예약 실패: " + ex.getMessage());
         }
     }
