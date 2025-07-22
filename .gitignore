@@ -6,6 +6,7 @@ build/
 wrapper/
 .tmp/
 native/
+caches/
 
 ### IntelliJ IDEA ###
 .idea
