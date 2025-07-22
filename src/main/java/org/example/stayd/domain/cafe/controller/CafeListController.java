@@ -214,7 +214,7 @@ public class CafeListController implements Initializable {
      */
     @FXML
     private void toggleSortOrder(ActionEvent event) {
-        isSortByLatest = !isSortByLatest;
+        isSortByLatest = !isSortByLatest; // 클릭할 때마다 true ↔ false로 반전시켜 정렬 기준을 변경
 
         if (isSortByLatest) {
             sortButton.setText("최신순 ▼");
