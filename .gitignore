@@ -9,6 +9,7 @@ native/
 caches/
 wrapper/dists/
 daemon/
+caches/8.8/transforms/
 
 ### IntelliJ IDEA ###
 .idea
