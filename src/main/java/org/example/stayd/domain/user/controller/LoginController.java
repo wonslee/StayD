@@ -69,7 +69,7 @@ public class LoginController {
             // 로그인 성공 시, 사용자 정보를 SessionManager에 저장
             UserDTO user = loginTask.getValue();
             SessionManager.getInstance().setLoggedInUser(user);  // 로그인 정보 저장
-            goToHome();  // 홈 화면으로 이동
+            goToHome(user);  // 홈 화면으로 이동
         });
 
         loginTask.setOnFailed(evt -> {
@@ -81,13 +81,24 @@ public class LoginController {
         new Thread(loginTask).start();
     }
 
-    @FXML
-    private void goToHome() {
-        try {
-            Stage stage = (Stage) loginButton.getScene().getWindow();
-            FXUtils.switchScene(stage, SceneConfig.HOME_FXML);
-        } catch (IOException e) {
-            showAlert(Alert.AlertType.ERROR, "화면 전환 오류", "홈 화면으로 이동하는 중 오류가 발생했습니다.");
+    private void goToHome(UserDTO user) {
+        Stage stage = (Stage) loginButton.getScene().getWindow(); // 로그인 버튼이 속한 Stage를 가져옴
+
+        // 사용자의 역할에 맞게 화면을 전환
+        if ("CAFE_OWNER".equals(user.getRole())) {
+            try {
+                // CAFE_OWNER일 경우 스터디 카페 관리 화면으로 이동
+                FXUtils.switchScene(stage, SceneConfig.RESERVATION_STATUS_FXML);
+            } catch (IOException e) {
+                showAlert(Alert.AlertType.ERROR, "화면 전환 오류", "스터디 카페 관리 화면을 불러오는 중 오류가 발생했습니다.");
+            }
+        } else {
+            try {
+                // 기본 사용자일 경우 메인 화면으로 이동
+                FXUtils.switchScene(stage, SceneConfig.HOME_FXML);
+            } catch (IOException e) {
+                showAlert(Alert.AlertType.ERROR, "화면 전환 오류", "메인 화면을 불러오는 중 오류가 발생했습니다.");
+            }
         }
     }
 
