@@ -8,6 +8,8 @@ import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.sql.CallableStatement;
+import java.sql.Types;
 
 /**
  * 스터디 카페 데이터 접근 객체
@@ -19,9 +21,8 @@ public class CafeDao {
     public CafeDao() {
         this.databaseConnection = new DatabaseConnection();
     }
-
     /**
-     * 스터디 카페 생성 (트랜잭션으로 카페, 운영시간, 좌석 20개 모두 생성)
+     * 스터디 카페 생성 (PL/SQL 프로시저 사용 - 수정 버전)
      * @param cafe 생성할 카페 정보
      * @param operatingHours 운영시간 목록
      * @return 생성된 카페 ID
@@ -31,34 +32,64 @@ public class CafeDao {
         Connection connection = databaseConnection.getConnection();
 
         try {
-            // 트랜잭션 시작
-            connection.setAutoCommit(false);
+            System.out.println("🔄 PL/SQL 프로시저로 카페 생성 시작...");
 
-            // 1. 카페 등록
-            Long cafeId = insertCafe(connection, cafe);
+            // PL/SQL 프로시저 호출 (파라미터 11개)
+            String sql = "{ call create_study_cafe(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) }";
 
-            // 2. 운영시간 등록
-            insertOperatingHours(connection, cafeId, operatingHours);
+            try (CallableStatement cstmt = connection.prepareCall(sql)) {
 
-            // 3. 좌석 20개 생성 (A1~A10, B1~B10)
-            createSeats(connection, cafeId);
+                // 입력 파라미터 설정
+                cstmt.setLong(1, cafe.getOwnerId());
+                cstmt.setString(2, cafe.getName());
+                cstmt.setString(3, cafe.getAddress());
+                cstmt.setInt(4, cafe.getPricePerHour());
+                cstmt.setString(5, cafe.getDescription());
+                cstmt.setString(6, cafe.getPhoneNumber());
+                cstmt.setString(7, cafe.getImageUrl());
 
-            // 트랜잭션 커밋
-            connection.commit();
+                // 🔧 운영일을 문자열로 변환 ("월,화,수,목,금")
+                String operatingDaysString = createOperatingDaysString(operatingHours);
+                cstmt.setString(8, operatingDaysString);
+                System.out.println("🗓️ 운영일 문자열: " + operatingDaysString);
 
-            return cafeId;
+                // 운영시간 설정 (첫 번째 운영시간 사용)
+                if (!operatingHours.isEmpty()) {
+                    cstmt.setInt(9, operatingHours.get(0).getOperationStart());
+                    cstmt.setInt(10, operatingHours.get(0).getOperationEnd());
+                    System.out.println("⏰ 운영시간: " + operatingHours.get(0).getOperationStart() + ":00 - " + operatingHours.get(0).getOperationEnd() + ":00");
+                } else {
+                    throw new SQLException("운영시간이 설정되지 않았습니다.");
+                }
 
-        } catch (SQLException e) {
-            // 롤백
-            try {
-                connection.rollback();
-            } catch (SQLException rollbackEx) {
-                rollbackEx.printStackTrace();
+                // 출력 파라미터 설정
+                cstmt.registerOutParameter(11, Types.NUMERIC); // p_cafe_id
+                cstmt.registerOutParameter(12, Types.NUMERIC); // p_result
+
+                // 프로시저 실행 및 성능 측정
+                long startTime = System.currentTimeMillis();
+                cstmt.execute();
+                long endTime = System.currentTimeMillis();
+
+                // 결과 확인
+                int result = cstmt.getInt(12);
+                if (result == 0) {
+                    // 성공
+                    Long cafeId = cstmt.getLong(11);
+                    System.out.println("🎉 PL/SQL 프로시저 실행 성공!");
+                    System.out.println("   생성된 카페 ID: " + cafeId);
+                    System.out.println("   실행 시간: " + (endTime - startTime) + "ms");
+                    System.out.println("   네트워크 호출: 1번 (기존 20+번에서 대폭 감소!)");
+                    return cafeId;
+                } else {
+                    // 실패
+                    System.out.println("❌ PL/SQL 프로시저 실행 실패 (결과 코드: " + result + ")");
+                    throw new SQLException("카페 생성 프로시저 실행 실패");
+                }
             }
-            throw e;
+
         } finally {
             try {
-                connection.setAutoCommit(true);
                 connection.close();
             } catch (SQLException e) {
                 e.printStackTrace();
@@ -67,43 +98,112 @@ public class CafeDao {
     }
 
     /**
-     * 스터디 카페 등록
-     * @param connection DB 연결
-     * @param cafe 등록할 카페 정보
-     * @return 등록된 카페 ID
-     * @throws SQLException SQL 예외
+     * 운영시간 목록을 문자열로 변환 ("월,화,수,목,금")
+     * @param operatingHours 운영시간 목록
+     * @return 쉼표로 구분된 요일 문자열
      */
-    public Long insertCafe(Connection connection, CafeModel cafe) throws SQLException {
-        String sql = "INSERT INTO cafe (owner_id, name, address, price_per_hour, description, phone_number, image_url, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-
-        try (PreparedStatement pstmt = connection.prepareStatement(sql, new String[]{"CAFE_ID"})) {
-
-            pstmt.setLong(1, cafe.getOwnerId());
-            pstmt.setString(2, cafe.getName());
-            pstmt.setString(3, cafe.getAddress());
-            pstmt.setInt(4, cafe.getPricePerHour());
-            pstmt.setString(5, cafe.getDescription());
-            pstmt.setString(6, cafe.getPhoneNumber());
-            pstmt.setString(7, cafe.getImageUrl());
-            pstmt.setTimestamp(8, Timestamp.valueOf(cafe.getCreatedAt()));
-
-            int affectedRows = pstmt.executeUpdate();
-
-            if (affectedRows == 0) {
-                throw new SQLException("카페 등록에 실패했습니다.");
-            }
-
-            // 생성된 키 가져오기
-            try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
-                if (generatedKeys.next()) {
-                    return generatedKeys.getLong(1);
-                } else {
-                    throw new SQLException("카페 ID를 가져올 수 없습니다.");
-                }
-            }
+    private String createOperatingDaysString(List<CafeDto.OperatingHours> operatingHours) {
+        if (operatingHours == null || operatingHours.isEmpty()) {
+            return "";
         }
+
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < operatingHours.size(); i++) {
+            if (i > 0) {
+                sb.append(",");
+            }
+            sb.append(operatingHours.get(i).getDayOfWeek());
+        }
+
+        String result = sb.toString();
+        System.out.println("🗓️ 운영일 문자열 생성: " + result);
+        return result;
     }
 
+//    /**
+//     * 스터디 카페 생성 (트랜잭션으로 카페, 운영시간, 좌석 20개 모두 생성)
+//     * @param cafe 생성할 카페 정보
+//     * @param operatingHours 운영시간 목록
+//     * @return 생성된 카페 ID
+//     * @throws SQLException SQL 예외
+//     */
+//    public Long createCafe(CafeModel cafe, List<CafeDto.OperatingHours> operatingHours) throws SQLException {
+//        Connection connection = databaseConnection.getConnection();
+//
+//        try {
+//            // 트랜잭션 시작
+//            connection.setAutoCommit(false);
+//
+//            // 1. 카페 등록
+//            Long cafeId = insertCafe(connection, cafe);
+//
+//            // 2. 운영시간 등록
+//            insertOperatingHours(connection, cafeId, operatingHours);
+//
+//            // 3. 좌석 20개 생성 (A1~A10, B1~B10)
+//            createSeats(connection, cafeId);
+//
+//            // 트랜잭션 커밋
+//            connection.commit();
+//
+//            return cafeId;
+//
+//        } catch (SQLException e) {
+//            // 롤백
+//            try {
+//                connection.rollback();
+//            } catch (SQLException rollbackEx) {
+//                rollbackEx.printStackTrace();
+//            }
+//            throw e;
+//        } finally {
+//            try {
+//                connection.setAutoCommit(true);
+//                connection.close();
+//            } catch (SQLException e) {
+//                e.printStackTrace();
+//            }
+//        }
+//    }
+
+//    /**
+//     * 스터디 카페 등록
+//     * @param connection DB 연결
+//     * @param cafe 등록할 카페 정보
+//     * @return 등록된 카페 ID
+//     * @throws SQLException SQL 예외
+//     */
+//    public Long insertCafe(Connection connection, CafeModel cafe) throws SQLException {
+//        String sql = "INSERT INTO cafe (owner_id, name, address, price_per_hour, description, phone_number, image_url, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+//
+//        try (PreparedStatement pstmt = connection.prepareStatement(sql, new String[]{"CAFE_ID"})) {
+//
+//            pstmt.setLong(1, cafe.getOwnerId());
+//            pstmt.setString(2, cafe.getName());
+//            pstmt.setString(3, cafe.getAddress());
+//            pstmt.setInt(4, cafe.getPricePerHour());
+//            pstmt.setString(5, cafe.getDescription());
+//            pstmt.setString(6, cafe.getPhoneNumber());
+//            pstmt.setString(7, cafe.getImageUrl());
+//            pstmt.setTimestamp(8, Timestamp.valueOf(cafe.getCreatedAt()));
+//
+//            int affectedRows = pstmt.executeUpdate();
+//
+//            if (affectedRows == 0) {
+//                throw new SQLException("카페 등록에 실패했습니다.");
+//            }
+//
+//            // 생성된 키 가져오기
+//            try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
+//                if (generatedKeys.next()) {
+//                    return generatedKeys.getLong(1);
+//                } else {
+//                    throw new SQLException("카페 ID를 가져올 수 없습니다.");
+//                }
+//            }
+//        }
+//    }
+//
     /**
      * 운영시간 등록
      * @param connection DB 연결
@@ -132,30 +232,30 @@ public class CafeDao {
         }
     }
 
-    /**
-     * 좌석 20개 생성 (A1~A10, B1~B10)
-     * @param connection DB 연결
-     * @param cafeId 카페 ID
-     * @throws SQLException SQL 예외
-     */
-    private void createSeats(Connection connection, Long cafeId) throws SQLException {
-        String sql = "INSERT INTO seat (cafe_id, seat_number, is_available, created_at) VALUES (?, ?, 'Y', ?)";
-
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            LocalDateTime now = LocalDateTime.now();
-
-            // 1~20 생성
-            for (int i = 1; i <= 20; i++) {
-                pstmt.setLong(1, cafeId);
-                pstmt.setString(2, ""+i);
-                pstmt.setTimestamp(3, Timestamp.valueOf(now));
-                pstmt.addBatch();
-            }
-
-
-            pstmt.executeBatch();
-        }
-    }
+//    /**
+//     * 좌석 20개 생성 (A1~A10, B1~B10)
+//     * @param connection DB 연결
+//     * @param cafeId 카페 ID
+//     * @throws SQLException SQL 예외
+//     */
+//    private void createSeats(Connection connection, Long cafeId) throws SQLException {
+//        String sql = "INSERT INTO seat (cafe_id, seat_number, is_available, created_at) VALUES (?, ?, 'Y', ?)";
+//
+//        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+//            LocalDateTime now = LocalDateTime.now();
+//
+//            // 1~20 생성
+//            for (int i = 1; i <= 20; i++) {
+//                pstmt.setLong(1, cafeId);
+//                pstmt.setString(2, ""+i);
+//                pstmt.setTimestamp(3, Timestamp.valueOf(now));
+//                pstmt.addBatch();
+//            }
+//
+//
+//            pstmt.executeBatch();
+//        }
+//    }
 
     /**
      * 요일 문자열을 DB 형식으로 변환 (한글 그대로 저장)
