@@ -15,18 +15,25 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.event.ActionEvent;
+import javafx.application.Platform;
+import javafx.concurrent.Task;
+import java.util.HashMap;
+import java.util.Map;
+import lombok.Getter;
+import lombok.Setter;
+import org.example.stayd.domain.cafe.dto.CafeDto;
 import org.example.stayd.domain.cafe.service.CafeService;
 
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
+import org.example.stayd.common.PerformanceMonitor;
 
 public class CafeListController implements Initializable {
 
     // 검색 관련
     @FXML private TextField searchField;
-    @FXML private Button searchButton;
     @FXML private Button sortButton;
 
     // 카페 카드들 (8개)
@@ -54,13 +61,23 @@ public class CafeListController implements Initializable {
 
     // 상태 변수들
     private boolean isSortByLatest = true; // true: 최신순, false: 평점순
+    /**
+     * -- GETTER --
+     *  현재 페이지 반환
+     */
+
+    @Getter
     private int currentPage = 1;
     private int totalPages = 5;
+    // 현재 검색 키워드 반환
+    @Getter
     private String currentSearchKeyword = "";
     private List<CafeData> allCafes = new ArrayList<>();
     private List<CafeData> filteredCafes = new ArrayList<>();
 
     // 카페 데이터 클래스
+    @Getter
+    @Setter
     public static class CafeData {
         private String name;
         private double rating;
@@ -78,22 +95,14 @@ public class CafeListController implements Initializable {
             this.isFavorite = isFavorite;
         }
 
-        // Getters and Setters
-        public String getName() { return name; }
-        public void setName(String name) { this.name = name; }
-        public double getRating() { return rating; }
-        public void setRating(double rating) { this.rating = rating; }
-        public int getReviewCount() { return reviewCount; }
-        public void setReviewCount(int reviewCount) { this.reviewCount = reviewCount; }
-        public String getImageUrl() { return imageUrl; }
-        public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
         public boolean isFavorite() { return isFavorite; }
         public void setFavorite(boolean favorite) { isFavorite = favorite; }
-        public int getCafeId() { return cafeId; }
-        public void setCafeId(int cafeId) { this.cafeId = cafeId; }
+
     }
 
     private CafeService cafeService;
+    // 이미지 캐시 추가
+    private final Map<String, Image> imageCache = new HashMap<>();
 
     // 🔹 기본 생성자 (FXML용 - 필수!)
     public CafeListController() {
@@ -103,86 +112,104 @@ public class CafeListController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        // 더미 데이터 초기화
-        initializeDummyData();
 
-        // 초기 데이터 로드
-        loadCafesData();
+        loadCafesFromDB();
 
-        // 첫 페이지 표시
+        // 나머지는 동일
         displayCurrentPage();
-
-        // 페이지네이션 버튼 초기화
         updatePaginationButtons();
     }
 
     /**
      * 더미 데이터 초기화
      */
-    private void initializeDummyData() {
-        allCafes.clear();
+    /**
+     * DB에서 카페 데이터 로드
+     */
+    private void loadCafesFromDB() {
+//        PerformanceMonitor.measureTime("Controller - Load All Cafes", () -> {
+            try {
+                // CafeService를 통해 DB에서 모든 카페 데이터 가져오기
+                List<CafeDto.SimpleCafeDto> cafeList = cafeService.getAllCafes();
 
-        // 더미 카페 데이터 생성 (40개 - 5페이지 분량)
-        String[] cafeNames = {
-                "작심 스터디카페 해치점", "조용한 공부방", "집중 스터디룸", "편안한 카페",
-                "북카페 스터디", "24시간 스터디", "깔끔한 독서실", "모던 스터디카페"
-        };
+                allCafes.clear();
 
-        for (int i = 1; i <= 40; i++) {
-            String cafeName = cafeNames[(i-1) % cafeNames.length] + " " + i;
-            allCafes.add(new CafeData(
-                    i,
-                    cafeName,
-                    4.0 + (Math.random() * 1.0), // 4.0 ~ 5.0 사이 랜덤 평점
-                    (int)(50 + Math.random() * 200), // 50 ~ 250 사이 랜덤 리뷰 수
-                    "https://pimg.daara.co.kr/kidd/photo/2018/01/09/1515480765_11.jpg",
-                    false
-            ));
-        }
+                // DTO를 내부 CafeData로 변환
+                for (CafeDto.SimpleCafeDto dto : cafeList) {
+                    allCafes.add(new CafeData(
+                            dto.getId(),
+                            dto.getName(),
+                            dto.getRating(),
+                            dto.getReviewCount(),
+                            dto.getImageUrl(),
+                            dto.isFavorite()
+                    ));
+                }
 
-        filteredCafes = new ArrayList<>(allCafes);
-        totalPages = (int) Math.ceil(filteredCafes.size() / 8.0);
+                filteredCafes = new ArrayList<>(allCafes);
+                totalPages = (int) Math.ceil(filteredCafes.size() / 8.0);
+
+                System.out.println("Cafe data loaded successfully: " + allCafes.size() + " cafes");
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                System.err.println("Failed to load cafe data: " + e.getMessage());
+                // 실패 시 빈 리스트로 초기화
+                allCafes.clear();
+                filteredCafes.clear();
+                totalPages = 1;
+            }
+//        });
     }
 
     /**
      * 검색창에서 Enter 키 처리
      */
     @FXML
+    private void searchCafes(ActionEvent event) {
+//        PerformanceMonitor.measureTime("Controller - Search Cafes", () -> {
+            currentSearchKeyword = searchField.getText().trim();
+            currentPage = 1;
+
+            try {
+                if (currentSearchKeyword.isEmpty()) {
+                    // 전체 카페 다시 로드
+                    List<CafeDto.SimpleCafeDto> cafeList = cafeService.getAllCafes();
+                    filteredCafes.clear();
+                    for (CafeDto.SimpleCafeDto dto : cafeList) {
+                        filteredCafes.add(convertToCafeData(dto));
+                    }
+                } else {
+                    // DB에서 검색어로 필터링된 결과 가져오기
+                    List<CafeDto.SimpleCafeDto> searchResults = cafeService.searchCafesByName(currentSearchKeyword);
+                    filteredCafes.clear();
+                    for (CafeDto.SimpleCafeDto dto : searchResults) {
+                        filteredCafes.add(convertToCafeData(dto));
+                    }
+                }
+
+                // 정렬 적용
+                applySorting();
+
+                // 총 페이지 수 업데이트
+                totalPages = Math.max(1, (int) Math.ceil(filteredCafes.size() / 8.0));
+
+                // 결과 표시
+                displayCurrentPage();
+                updatePaginationButtons();
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                System.err.println("Search failed: " + e.getMessage());
+            }
+//        });
+    }
+
+    @FXML
     private void handleSearchKeyPress(KeyEvent event) {
         if (event.getCode() == KeyCode.ENTER) {
             searchCafes(null);
         }
-    }
-
-    /**
-     * 카페 검색
-     */
-    @FXML
-    private void searchCafes(ActionEvent event) {
-        currentSearchKeyword = searchField.getText().trim();
-        currentPage = 1; // 검색 시 첫 페이지로 이동
-
-        // 검색 필터링
-        if (currentSearchKeyword.isEmpty()) {
-            filteredCafes = new ArrayList<>(allCafes);
-        } else {
-            filteredCafes.clear();
-            for (CafeData cafe : allCafes) {
-                if (cafe.getName().toLowerCase().contains(currentSearchKeyword.toLowerCase())) {
-                    filteredCafes.add(cafe);
-                }
-            }
-        }
-
-        // 정렬 적용
-        applySorting();
-
-        // 총 페이지 수 업데이트
-        totalPages = Math.max(1, (int) Math.ceil(filteredCafes.size() / 8.0));
-
-        // 결과 표시
-        displayCurrentPage();
-        updatePaginationButtons();
     }
 
     /**
@@ -228,46 +255,99 @@ public class CafeListController implements Initializable {
      * 현재 페이지의 카페들을 화면에 표시
      */
     private void displayCurrentPage() {
-        VBox[] cafeCards = {cafeCard0, cafeCard1, cafeCard2, cafeCard3, cafeCard4, cafeCard5, cafeCard6, cafeCard7};
-        ImageView[] cafeImages = {cafeImage0, cafeImage1, cafeImage2, cafeImage3, cafeImage4, cafeImage5, cafeImage6, cafeImage7};
-        Label[] cafeNames = {cafeName0, cafeName1, cafeName2, cafeName3, cafeName4, cafeName5, cafeName6, cafeName7};
-        Label[] cafeRatings = {cafeRating0, cafeRating1, cafeRating2, cafeRating3, cafeRating4, cafeRating5, cafeRating6, cafeRating7};
-        Label[] cafeReviewCounts = {cafeReviewCount0, cafeReviewCount1, cafeReviewCount2, cafeReviewCount3, cafeReviewCount4, cafeReviewCount5, cafeReviewCount6, cafeReviewCount7};
-        Button[] favoriteBtns = {favoriteBtn0, favoriteBtn1, favoriteBtn2, favoriteBtn3, favoriteBtn4, favoriteBtn5, favoriteBtn6, favoriteBtn7};
+//        PerformanceMonitor.measureTime("UI - Display Cafe Cards", () -> {
+            VBox[] cafeCards = {cafeCard0, cafeCard1, cafeCard2, cafeCard3, cafeCard4, cafeCard5, cafeCard6, cafeCard7};
+            ImageView[] cafeImages = {cafeImage0, cafeImage1, cafeImage2, cafeImage3, cafeImage4, cafeImage5, cafeImage6, cafeImage7};
+            Label[] cafeNames = {cafeName0, cafeName1, cafeName2, cafeName3, cafeName4, cafeName5, cafeName6, cafeName7};
+            Label[] cafeRatings = {cafeRating0, cafeRating1, cafeRating2, cafeRating3, cafeRating4, cafeRating5, cafeRating6, cafeRating7};
+            Label[] cafeReviewCounts = {cafeReviewCount0, cafeReviewCount1, cafeReviewCount2, cafeReviewCount3, cafeReviewCount4, cafeReviewCount5, cafeReviewCount6, cafeReviewCount7};
+            Button[] favoriteBtns = {favoriteBtn0, favoriteBtn1, favoriteBtn2, favoriteBtn3, favoriteBtn4, favoriteBtn5, favoriteBtn6, favoriteBtn7};
 
-        int startIndex = (currentPage - 1) * 8;
+            int startIndex = (currentPage - 1) * 8;
 
-        for (int i = 0; i < 8; i++) {
-            int dataIndex = startIndex + i;
+            for (int i = 0; i < 8; i++) {
+                int dataIndex = startIndex + i;
 
-            if (dataIndex < filteredCafes.size()) {
-                CafeData cafe = filteredCafes.get(dataIndex);
+                if (dataIndex < filteredCafes.size()) {
+                    CafeData cafe = filteredCafes.get(dataIndex);
 
-                // 카페 정보 표시
-                cafeCards[i].setVisible(true);
-                cafeCards[i].setManaged(true);
-                cafeNames[i].setText(cafe.getName());
-                cafeRatings[i].setText(String.format("%.1f", cafe.getRating()));
-                cafeReviewCounts[i].setText("(" + cafe.getReviewCount() + ")");
+                    // 카페 정보 표시 (즉시)
+                    cafeCards[i].setVisible(true);
+                    cafeCards[i].setManaged(true);
+                    cafeNames[i].setText(cafe.getName());
+                    cafeRatings[i].setText(String.format("%.1f", cafe.getRating()));
+                    cafeReviewCounts[i].setText("(" + cafe.getReviewCount() + ")");
 
-                // 이미지 로드
-                try {
-                    cafeImages[i].setImage(new Image(cafe.getImageUrl()));
-                } catch (Exception e) {
-                    // 기본 이미지 설정
-                    System.out.println("이미지 로드 실패: " + e.getMessage());
+                    // 비동기 이미지 로딩으로 변경
+                    loadImageAsync(cafeImages[i], cafe.getImageUrl(), i);
+
+                    // 찜하기 버튼 상태 설정
+                    updateFavoriteButton(favoriteBtns[i], cafe.isFavorite());
+
+                } else {
+                    // 데이터가 없는 카드는 숨김
+                    cafeCards[i].setVisible(false);
+                    cafeCards[i].setManaged(false);
                 }
-
-                // 찜하기 버튼 상태 설정
-                updateFavoriteButton(favoriteBtns[i], cafe.isFavorite());
-
-            } else {
-                // 데이터가 없는 카드는 숨김
-                cafeCards[i].setVisible(false);
-                cafeCards[i].setManaged(false);
             }
-        }
+//        });
     }
+    /**
+     * 비동기 이미지 로딩 (캐시 적용)
+     */
+    private void loadImageAsync(ImageView imageView, String imageUrl, int cardIndex) {
+        if (imageUrl == null || imageUrl.trim().isEmpty()) {
+            return;
+        }
+
+        // 캐시에서 확인
+        if (imageCache.containsKey(imageUrl)) {
+            System.out.println("Image cache hit for card " + cardIndex);
+            imageView.setImage(imageCache.get(imageUrl));
+            return;
+        }
+
+        Task<Image> imageTask = new Task<Image>() {
+            @Override
+            protected Image call() throws Exception {
+                long startTime = System.currentTimeMillis();
+                Image image = new Image(imageUrl, true); // 백그라운드에서 로딩
+                long duration = System.currentTimeMillis() - startTime;
+
+//                System.out.println("[ASYNC] Image loaded for card " + cardIndex + " in " + duration + "ms");
+                return image;
+            }
+
+            @Override
+            protected void succeeded() {
+                Platform.runLater(() -> {
+                    Image loadedImage = getValue();
+                    imageCache.put(imageUrl, loadedImage); // 캐시에 저장
+                    imageView.setImage(loadedImage);
+//                    System.out.println("Image set for card " + cardIndex);
+                });
+            }
+
+            @Override
+            protected void failed() {
+                Platform.runLater(() -> {
+                    System.out.println("Image load failed for card " + cardIndex + ": " + getException().getMessage());
+                    // 기본 이미지 설정
+                    try {
+                        imageView.setImage(new Image("https://via.placeholder.com/200x150?text=No+Image"));
+                    } catch (Exception e) {
+                        System.out.println("Default image also failed for card " + cardIndex);
+                    }
+                });
+            }
+        };
+
+        // 데몬 스레드로 실행
+        Thread imageThread = new Thread(imageTask);
+        imageThread.setDaemon(true);
+        imageThread.start();
+    }
+
 
     /**
      * 찜하기 버튼 상태 업데이트
@@ -432,69 +512,71 @@ public class CafeListController implements Initializable {
      * 찜하기 상태 저장
      */
     private void saveFavoriteStatus(int cafeId, boolean isFavorite) {
-        // TODO: 데이터베이스에 찜하기 상태 저장
-        System.out.println("카페 ID " + cafeId + " 찜하기 상태: " + isFavorite);
+        try {
+            // 🔸 DB에 찜하기 상태 저장
+            cafeService.updateFavoriteStatus(cafeId, isFavorite);
+            System.out.println("카페 ID " + cafeId + " 찜하기 상태 저장 완료: " + isFavorite);
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("찜하기 상태 저장 실패: " + e.getMessage());
+        }
     }
-
+    /**
+     * CafeDto를 CafeData로 변환
+     */
+    private CafeData convertToCafeData(CafeDto.SimpleCafeDto dto) { // 타입 변경
+        return new CafeData(
+                dto.getId(),
+                dto.getName(),
+                dto.getRating(),
+                dto.getReviewCount(),
+                dto.getImageUrl(),
+                dto.isFavorite()
+        );
+    }
     /**
      * 카페 상세 페이지로 이동
      */
     private void navigateToCafeDetail(int cafeId) {
-        try {
-            // 현재 Stage 가져오기
-            Stage currentStage = (Stage) searchField.getScene().getWindow();
+//        PerformanceMonitor.measureTime("Navigation - Cafe Detail (ID: " + cafeId + ")", () -> {
+            try {
+                // DB에서 상세 정보 가져오기
+                CafeDto.SimpleCafeDto cafeDetail = cafeService.getCafeById(cafeId);
 
-            // 상세 페이지 FXML 로드
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/org/example/stayd/cafe/cafeDetailView.fxml"));
-            Scene scene = new Scene(fxmlLoader.load(), 1024, 768);
-
-            // Controller 가져와서 카페 데이터 설정
-            CafeDetailController detailController = fxmlLoader.getController();
-
-            // 선택된 카페 데이터 찾기
-            CafeData selectedCafe = null;
-            for (CafeData cafe : filteredCafes) {
-                if (cafe.getCafeId() == cafeId) {
-                    selectedCafe = cafe;
-                    break;
+                if (cafeDetail == null) {
+                    System.err.println("Cafe not found with ID: " + cafeId);
+                    return;
                 }
-            }
 
-            if (selectedCafe != null) {
-                // 카페 데이터를 상세 페이지에 전달
+                Stage currentStage = (Stage) searchField.getScene().getWindow();
+                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/org/example/stayd/cafe/cafeDetailView.fxml"));
+                Scene scene = new Scene(fxmlLoader.load(), 1024, 768);
+
+                CafeDetailController detailController = fxmlLoader.getController();
+
+                // DB에서 가져온 실제 데이터 전달
                 detailController.setCafeData(
-                        selectedCafe.getName(),
-                        "서울특별시 종로구 창경궁로 254", // 위치 (실제로는 DB에서)
-                        "월, 화, 수, 목, 금", // 영업일 (실제로는 DB에서)
-                        "09:00 - 18:00", // 운영시간 (실제로는 DB에서)
-                        10000, // 시간당 가격 (실제로는 DB에서)
-                        "02-123-4567", // 전화번호 (실제로는 DB에서)
-                        "조용하고 깨끗한 환경에서 집중해서 공부할 수 있는 스터디 카페입니다.", // 설명 (실제로는 DB에서)
-                        selectedCafe.getImageUrl(),
-                        selectedCafe.getRating()
+                        cafeDetail.getName(),
+                        cafeDetail.getAddress(),
+                        cafeDetail.getOperatingDays(),
+                        cafeDetail.getOperatingHours(),
+                        cafeDetail.getPricePerHour(),
+                        cafeDetail.getPhoneNumber(),
+                        cafeDetail.getDescription(),
+                        cafeDetail.getImageUrl(),
+                        cafeDetail.getRating()
                 );
 
-                // 찜하기 상태 설정
-                detailController.setFavorite(selectedCafe.isFavorite());
+                detailController.setFavorite(cafeDetail.isFavorite());
+
+                currentStage.setTitle("StayD - Cafe Detail");
+                currentStage.setScene(scene);
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                System.err.println("Error navigating to detail page: " + e.getMessage());
             }
-
-            // 화면 전환
-            currentStage.setTitle("StayD - 카페 상세");
-            currentStage.setScene(scene);
-
-            System.out.println("카페 ID " + cafeId + " 상세 페이지로 이동 완료");
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.err.println("상세 페이지 이동 중 오류 발생: " + e.getMessage());
-        }
-    }
-
-    /**
-     * 현재 검색 키워드 반환
-     */
-    public String getCurrentSearchKeyword() {
-        return currentSearchKeyword;
+//        });
     }
 
     /**
@@ -502,13 +584,6 @@ public class CafeListController implements Initializable {
      */
     public boolean isSortByLatest() {
         return isSortByLatest;
-    }
-
-    /**
-     * 현재 페이지 반환
-     */
-    public int getCurrentPage() {
-        return currentPage;
     }
 
     /**

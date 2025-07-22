@@ -8,6 +8,9 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+// CafeService.java 파일 상단에 import 추가
+import org.example.stayd.common.PerformanceMonitor;
+
 /**
  * 스터디 카페 생성 비즈니스 로직 서비스
  */
@@ -210,6 +213,68 @@ public class CafeService {
             e.printStackTrace();
             throw new RuntimeException("카페 상세 정보 조회 중 오류 발생: " + e.getMessage());
         }
+    }
+
+
+    /**
+     * 모든 카페 목록 조회 (리스트용)
+     * @return 카페 DTO 목록
+     */
+
+    public List<CafeDto.SimpleCafeDto> getAllCafes() {
+//        return PerformanceMonitor.measureTimeWithResult("DB - Get All Cafes", () -> {
+            try {
+                return cafeDao.findAllCafes();
+            } catch (SQLException e) {
+                e.printStackTrace();
+                throw new RuntimeException("Error loading cafe list: " + e.getMessage());
+            }
+//        });
+    }
+
+    /**
+     * 카페 이름으로 검색
+     * @param keyword 검색 키워드
+     * @return 검색된 카페 DTO 목록
+     */
+    public List<CafeDto.SimpleCafeDto> searchCafesByName(String keyword) {
+//        return PerformanceMonitor.measureTimeWithResult("DB - Search Cafes (keyword: " + keyword + ")", () -> {
+            try {
+                if (keyword == null || keyword.trim().isEmpty()) {
+                    return getAllCafes();
+                }
+                return cafeDao.searchCafesByName(keyword.trim());
+            } catch (SQLException e) {
+                e.printStackTrace();
+                throw new RuntimeException("Error searching cafes: " + e.getMessage());
+            }
+//        });
+    }
+
+    /**
+     * 카페 ID로 상세 정보 조회 (상세 페이지용)
+     * @param cafeId 카페 ID
+     * @return 카페 DTO (없으면 null)
+     */
+    public CafeDto.SimpleCafeDto getCafeById(int cafeId) {
+//        return PerformanceMonitor.measureTimeWithResult("DB - Get Cafe By ID: " + cafeId, () -> {
+            try {
+                return cafeDao.findCafeById(cafeId);
+            } catch (SQLException e) {
+                e.printStackTrace();
+                throw new RuntimeException("Error loading cafe detail: " + e.getMessage());
+            }
+//        });
+    }
+
+    /**
+     * 찜하기 상태 업데이트 (나중에 구현)
+     * @param cafeId 카페 ID
+     * @param isFavorite 찜하기 상태
+     */
+    public void updateFavoriteStatus(int cafeId, boolean isFavorite) {
+        // TODO: 찜하기 기능 구현 시 추가
+        System.out.println("찜하기 기능은 추후 구현 예정 - 카페 ID: " + cafeId + ", 상태: " + isFavorite);
     }
 
 }

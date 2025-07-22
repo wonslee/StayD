@@ -225,4 +225,198 @@ public class CafeDao {
     }
 
 
+    // CafeDao.java 파일에 다음 메서드들을 추가하세요
+
+    /**
+     * 모든 카페 목록 조회 (리스트용)
+     */
+    public List<CafeDto.SimpleCafeDto> findAllCafes() throws SQLException {
+        String sql = """
+        SELECT c.cafe_id, c.name, c.address, c.price_per_hour, c.description, 
+               c.phone_number, c.image_url,
+               0.0 as avg_rating,
+               0 as review_count
+        FROM cafe c
+        ORDER BY c.cafe_id DESC
+        """;
+
+        List<CafeDto.SimpleCafeDto> cafes = new ArrayList<>();
+
+        try (Connection conn = databaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+
+            while (rs.next()) {
+                CafeDto.SimpleCafeDto cafe = new CafeDto.SimpleCafeDto();
+                cafe.setId(rs.getInt("cafe_id"));
+                cafe.setName(rs.getString("name"));
+                cafe.setAddress(rs.getString("address"));
+                cafe.setRating(rs.getDouble("avg_rating"));
+                cafe.setReviewCount(rs.getInt("review_count"));
+                cafe.setImageUrl(rs.getString("image_url"));
+                cafe.setPricePerHour(rs.getInt("price_per_hour"));
+                cafe.setDescription(rs.getString("description"));
+                cafe.setPhoneNumber(rs.getString("phone_number"));
+                cafe.setFavorite(false); // 기본값 (찜하기 기능 구현 시 수정)
+
+                cafes.add(cafe);
+            }
+        }
+
+        return cafes;
+    }
+
+    /**
+     * 카페 이름으로 검색
+     */
+    public List<CafeDto.SimpleCafeDto> searchCafesByName(String keyword) throws SQLException {
+        String sql = """
+        SELECT c.cafe_id, c.name, c.address, c.price_per_hour, c.description, 
+               c.phone_number, c.image_url,
+               0.0 as avg_rating,
+               0 as review_count
+        FROM cafe c
+        WHERE c.name LIKE ?
+        ORDER BY c.cafe_id DESC
+        """;
+
+        List<CafeDto.SimpleCafeDto> cafes = new ArrayList<>();
+
+        try (Connection conn = databaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, "%" + keyword + "%");
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    CafeDto.SimpleCafeDto cafe = new CafeDto.SimpleCafeDto();
+                    cafe.setId(rs.getInt("cafe_id"));
+                    cafe.setName(rs.getString("name"));
+                    cafe.setAddress(rs.getString("address"));
+                    cafe.setRating(rs.getDouble("avg_rating"));
+                    cafe.setReviewCount(rs.getInt("review_count"));
+                    cafe.setImageUrl(rs.getString("image_url"));
+                    cafe.setPricePerHour(rs.getInt("price_per_hour"));
+                    cafe.setDescription(rs.getString("description"));
+                    cafe.setPhoneNumber(rs.getString("phone_number"));
+                    cafe.setFavorite(false); // 기본값
+
+                    cafes.add(cafe);
+                }
+            }
+        }
+
+        return cafes;
+    }
+
+    /**
+     * 카페 ID로 상세 정보 조회 (운영시간 포함)
+     */
+    public CafeDto.SimpleCafeDto findCafeById(int cafeId) throws SQLException {
+        String sql = """
+        SELECT c.cafe_id, c.name, c.address, c.price_per_hour, c.description, 
+               c.phone_number, c.image_url,
+               0.0 as avg_rating,
+               0 as review_count
+        FROM cafe c
+        WHERE c.cafe_id = ?
+        """;
+
+        try (Connection conn = databaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setInt(1, cafeId);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    CafeDto.SimpleCafeDto cafe = new CafeDto.SimpleCafeDto();
+                    cafe.setId(rs.getInt("cafe_id"));
+                    cafe.setName(rs.getString("name"));
+                    cafe.setAddress(rs.getString("address"));
+                    cafe.setRating(rs.getDouble("avg_rating"));
+                    cafe.setReviewCount(rs.getInt("review_count"));
+                    cafe.setImageUrl(rs.getString("image_url"));
+                    cafe.setPricePerHour(rs.getInt("price_per_hour"));
+                    cafe.setDescription(rs.getString("description"));
+                    cafe.setPhoneNumber(rs.getString("phone_number"));
+                    cafe.setFavorite(false); // 기본값
+
+                    // 운영시간 조회
+                    String operatingInfo = getOperatingHoursString(cafeId);
+                    cafe.setOperatingDays(extractOperatingDays(operatingInfo));
+                    cafe.setOperatingHours(extractOperatingHours(operatingInfo));
+
+                    return cafe;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * 운영시간 문자열 조회
+     */
+    private String getOperatingHoursString(int cafeId) throws SQLException {
+        String sql = "SELECT day_of_week, operation_start, operation_end FROM operation_hours WHERE cafe_id = ? ORDER BY day_of_week";
+
+        StringBuilder sb = new StringBuilder();
+
+        try (Connection conn = databaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setInt(1, cafeId);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    if (sb.length() > 0) sb.append(",");
+                    sb.append(rs.getString("day_of_week"))
+                            .append(":")
+                            .append(String.format("%02d:00-%02d:00",
+                                    rs.getInt("operation_start"),
+                                    rs.getInt("operation_end")));
+                }
+            }
+        }
+
+        return sb.toString();
+    }
+
+    /**
+     * 운영일 추출 (월,화,수,목,금)
+     */
+    private String extractOperatingDays(String operatingInfo) {
+        if (operatingInfo == null || operatingInfo.isEmpty()) return "";
+
+        StringBuilder days = new StringBuilder();
+        String[] parts = operatingInfo.split(",");
+
+        for (String part : parts) {
+            String[] dayHour = part.split(":");
+            if (dayHour.length >= 1) {
+                if (days.length() > 0) days.append(",");
+                days.append(dayHour[0].trim()); // 한글 요일 그대로 사용
+            }
+        }
+
+        return days.toString();
+    }
+
+    /**
+     * 운영시간 추출 (09:00-18:00)
+     */
+    private String extractOperatingHours(String operatingInfo) {
+        if (operatingInfo == null || operatingInfo.isEmpty()) return "";
+
+        String[] parts = operatingInfo.split(",");
+        if (parts.length > 0) {
+            String[] dayHour = parts[0].split(":");
+            if (dayHour.length >= 2) {
+                return dayHour[1]; // 첫 번째 운영시간 반환
+            }
+        }
+
+        return "";
+    }
+
 }

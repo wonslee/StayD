@@ -10,6 +10,7 @@ import java.util.List;
  */
 public class CafeDto {
 
+
     /**
      * 카페 생성 요청 DTO
      */
@@ -139,6 +140,58 @@ public class CafeDto {
             this.operatingEndHour = operatingEndHour;
         }
 
+    }
+
+
+    /**
+     * 카페 리스트용 간단한 DTO (컨트롤러에서 사용)
+     */
+    @Getter
+    @Setter
+    public static class SimpleCafeDto {
+        private int id;
+        private String name;
+        private String address;
+        private double rating;
+        private int reviewCount;
+        private String imageUrl;
+        private boolean isFavorite;
+        private Integer pricePerHour;
+        private String description;
+        private String phoneNumber;
+        private String operatingDays;   // "월,화,수,목,금" 형태
+        private String operatingHours;  // "09:00-18:00" 형태
+
+        // 기본 생성자
+        public SimpleCafeDto() {}
+
+        // 리스트용 생성자
+        public SimpleCafeDto(int id, String name, double rating, int reviewCount, String imageUrl) {
+            this.id = id;
+            this.name = name;
+            this.rating = rating;
+            this.reviewCount = reviewCount;
+            this.imageUrl = imageUrl;
+            this.isFavorite = false; // 기본값
+        }
+
+        // 전체 정보 생성자
+        public SimpleCafeDto(int id, String name, String address, double rating, int reviewCount,
+                             String imageUrl, boolean isFavorite, Integer pricePerHour,
+                             String description, String phoneNumber, String operatingDays, String operatingHours) {
+            this.id = id;
+            this.name = name;
+            this.address = address;
+            this.rating = rating;
+            this.reviewCount = reviewCount;
+            this.imageUrl = imageUrl;
+            this.isFavorite = isFavorite;
+            this.pricePerHour = pricePerHour;
+            this.description = description;
+            this.phoneNumber = phoneNumber;
+            this.operatingDays = operatingDays;
+            this.operatingHours = operatingHours;
+        }
     }
 
 }

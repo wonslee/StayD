@@ -11,10 +11,16 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
 import javafx.event.ActionEvent;
 import javafx.stage.Stage;
+import javafx.application.Platform;
+import javafx.concurrent.Task;
+import lombok.Getter;
 import org.example.stayd.domain.cafe.dto.CafeDto;
 import org.example.stayd.domain.cafe.service.CafeService;
+import org.example.stayd.common.PerformanceMonitor;
 
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.ResourceBundle;
 
 public class CafeDetailController implements Initializable {
@@ -49,9 +55,14 @@ public class CafeDetailController implements Initializable {
 
     // 상태 변수들
     private boolean isFavorite = false;
+    /**
+     * -- GETTER --
+     *  현재 표시된 탭 반환
+     */
+    @Getter
     private String currentTab = "detail";
 
-    // 카페 데이터 (실제로는 데이터베이스에서 받아올 데이터)
+    // 카페 데이터
     private String cafeName;
     private String location;
     private String businessDays;
@@ -64,73 +75,55 @@ public class CafeDetailController implements Initializable {
 
     private CafeService cafeService;
 
+    // 🚀 이미지 캐시 추가
+    private final Map<String, Image> imageCache = new HashMap<>();
+
     // 🔹 기본 생성자 (FXML용 - 필수!)
     public CafeDetailController() {
         this.cafeService = new CafeService();
     }
 
-
-
-
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        // 초기 데이터 설정
-        loadCafeData(17L); // 현재 더미데이터 목록 구현되면 변경
 
         // 기본적으로 상세 탭이 활성화
         showDetailTab(null);
     }
 
     /**
-     * 목록 페이지로 돌아가기
+     * 목록 페이지로 돌아가기 (최적화됨)
      */
     @FXML
     private void goBackToList(ActionEvent event) {
-        try {
-            // 현재 Stage 가져오기
-            Stage currentStage = (Stage) backButton.getScene().getWindow();
+//        PerformanceMonitor.measureTime("Navigation - Back to List", () -> {
+            try {
+                // 현재 Stage 가져오기
+                Stage currentStage = (Stage) backButton.getScene().getWindow();
 
-            // 목록 페이지 FXML 로드
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/org/example/stayd/cafe/cafeListView.fxml"));
-            Scene scene = new Scene(fxmlLoader.load(), 1024, 768);
+                // 목록 페이지 FXML 로드
+                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/org/example/stayd/cafe/cafeListView.fxml"));
+                Scene scene = new Scene(fxmlLoader.load(), 1024, 768);
 
-            // 목록 페이지로 화면 전환
-            currentStage.setTitle("StayD - 카페 목록");
-            currentStage.setScene(scene);
+                // 목록 페이지로 화면 전환
+                currentStage.setTitle("StayD - Cafe List");
+                currentStage.setScene(scene);
 
-            System.out.println("목록 페이지로 돌아가기 완료");
+                System.out.println("Back to list completed successfully");
 
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.err.println("목록 페이지로 돌아가기 중 오류 발생: " + e.getMessage());
-        }
+            } catch (Exception e) {
+                e.printStackTrace();
+                System.err.println("Error going back to list: " + e.getMessage());
+            }
+//        });
     }
 
-    private void loadCafeData(Long cafeId) {
-        CafeDto.DetailResponse cafe = cafeService.getCafeDetail(cafeId);
 
-        if (cafe == null) {
-            System.err.println("해당 ID의 카페를 찾을 수 없습니다: " + cafeId);
-            return;
-        }
 
-        // 모델에서 값 세팅
-        this.cafeName = cafe.getName();
-        this.location = cafe.getAddress();
-        this.hourlyPrice = cafe.getPricePerHour();
-        this.phoneNumber = cafe.getPhoneNumber();
-        this.description = cafe.getDescription();
-        this.imageUrl = cafe.getImageUrl();
-
-        // 운영 요일, 운영 시간
-        this.businessDays = String.join(", ", cafe.getOperatingDays());
-        this.operatingHours = String.format("%02d:00 - %02d:00",
-                cafe.getOperatingStartHour(), cafe.getOperatingEndHour());
-
-        // 평점은 임시
-        this.rating = 4.5;
-
-        // UI 반영
+    /**
+     * 새로운 메서드: UI 업데이트만 담당
+     */
+    private void updateUI() {
+        // 텍스트 정보 즉시 설정
         cafeNameLabel.setText(cafeName);
         ratingLabel.setText(String.valueOf(rating));
         locationLabel.setText(location);
@@ -140,17 +133,66 @@ public class CafeDetailController implements Initializable {
         phoneLabel.setText(phoneNumber);
         descriptionLabel.setText(description);
 
+        // 🚀 비동기 이미지 로딩
         if (imageUrl != null && !imageUrl.trim().isEmpty()) {
-            try {
-                Image image = new Image(imageUrl);
-                mainImageView.setImage(image);
-            } catch (Exception e) {
-                System.out.println("이미지 로드 실패: " + e.getMessage());
-            }
+            loadImageAsync(mainImageView, imageUrl);
         }
     }
 
+    /**
+     * 🚀 비동기 이미지 로딩 (캐시 적용)
+     */
+    private void loadImageAsync(ImageView imageView, String imageUrl) {
+        if (imageUrl == null || imageUrl.trim().isEmpty()) {
+            return;
+        }
 
+        // 캐시에서 확인
+        if (imageCache.containsKey(imageUrl)) {
+            System.out.println("Detail image cache hit");
+            imageView.setImage(imageCache.get(imageUrl));
+            return;
+        }
+
+        Task<Image> imageTask = new Task<Image>() {
+            @Override
+            protected Image call() throws Exception {
+                long startTime = System.currentTimeMillis();
+                Image image = new Image(imageUrl, true); // 백그라운드에서 로딩
+                long duration = System.currentTimeMillis() - startTime;
+
+                System.out.println("[ASYNC] Detail image loaded in " + duration + "ms");
+                return image;
+            }
+
+            @Override
+            protected void succeeded() {
+                Platform.runLater(() -> {
+                    Image loadedImage = getValue();
+                    imageCache.put(imageUrl, loadedImage); // 캐시에 저장
+                    imageView.setImage(loadedImage);
+                    System.out.println("Detail image set successfully");
+                });
+            }
+
+            @Override
+            protected void failed() {
+                Platform.runLater(() -> {
+                    System.out.println("Detail image load failed: " + getException().getMessage());
+                    // 기본 이미지 설정
+                    try {
+                        imageView.setImage(new Image("https://via.placeholder.com/400x300?text=No+Image"));
+                    } catch (Exception e) {
+                        System.out.println("Default detail image also failed");
+                    }
+                });
+            }
+        };
+
+        Thread imageThread = new Thread(imageTask);
+        imageThread.setDaemon(true);
+        imageThread.start();
+    }
 
     /**
      * 찜하기 버튼 토글
@@ -258,24 +300,28 @@ public class CafeDetailController implements Initializable {
     }
 
     /**
-     * 외부에서 카페 데이터를 설정하는 메소드
+     * 🚀 외부에서 카페 데이터를 설정하는 메소드 (최적화됨)
      * (다른 페이지에서 카페 상세 정보를 전달받을 때 사용)
      */
     public void setCafeData(String cafeName, String location, String businessDays,
                             String operatingHours, int hourlyPrice, String phoneNumber,
                             String description, String imageUrl, double rating) {
-        this.cafeName = cafeName;
-        this.location = location;
-        this.businessDays = businessDays;
-        this.operatingHours = operatingHours;
-        this.hourlyPrice = hourlyPrice;
-        this.phoneNumber = phoneNumber;
-        this.description = description;
-        this.imageUrl = imageUrl;
-        this.rating = rating;
 
-        // UI 업데이트
-        loadCafeData(17L);
+//        PerformanceMonitor.measureTime("Detail - Set Cafe Data", () -> {
+            // 데이터 설정
+            this.cafeName = cafeName;
+            this.location = location;
+            this.businessDays = businessDays;
+            this.operatingHours = operatingHours;
+            this.hourlyPrice = hourlyPrice;
+            this.phoneNumber = phoneNumber;
+            this.description = description;
+            this.imageUrl = imageUrl;
+            this.rating = rating;
+
+            // 🚀 즉시 UI 업데이트 (DB 호출 없이)
+            updateUI();
+//        });
     }
 
     /**
@@ -284,13 +330,6 @@ public class CafeDetailController implements Initializable {
     private void saveFavoriteStatus() {
         // TODO: 데이터베이스에 찜하기 상태 저장 로직 구현
         System.out.println("찜하기 상태 저장: " + isFavorite);
-    }
-
-    /**
-     * 현재 표시된 탭 반환
-     */
-    public String getCurrentTab() {
-        return currentTab;
     }
 
     /**
