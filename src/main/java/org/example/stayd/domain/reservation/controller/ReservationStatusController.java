@@ -32,9 +32,12 @@ import static org.example.stayd.common.FXUtils.showAlert;
 
 public class ReservationStatusController {
 
-    @FXML private BarChart<String, Number> reservationBarChart;
-    @FXML private CategoryAxis xAxis;
-    @FXML private NumberAxis yAxis;
+    @FXML
+    private BarChart<String, Number> reservationBarChart;
+    @FXML
+    private CategoryAxis xAxis;
+    @FXML
+    private NumberAxis yAxis;
 
     private ReservationService reservationService;
 
@@ -99,21 +102,26 @@ public class ReservationStatusController {
 
         // 차트 데이터 설정
         XYChart.Series<String, Number> series = new XYChart.Series<>();
-        series.setName("예약 건수");
 
         // 각 시간대별 예약 건수 추가
         for (int i = 0; i < 24; i++) {
             String timeRange = xAxis.getCategories().get(i);  // "00:00~01:00", "01:00~02:00" 등
             XYChart.Data<String, Number> data = new XYChart.Data<>(timeRange, reservationCounts[i]);
 
-            // 기존 막대에 텍스트 추가
+            // 예약 건수에 따른 색상 설정
+            Color barColor = getColorBasedOnCount(reservationCounts[i]);
+
+            // 텍스트를 막대 위에 배치
             Text text = new Text(Integer.toString(reservationCounts[i]));  // 예약 건수를 텍스트로 표시
             text.setStyle("-fx-font-size: 14; -fx-fill: black; -fx-stroke: white;");  // 텍스트 스타일 설정
 
-            // 텍스트를 막대 위에 배치
+            // 막대 색상 적용
             StackPane stack = new StackPane();
-            stack.getChildren().add(text);  // 텍스트를 스택에 추가
-            data.setNode(stack);  // 막대 노드에 텍스트를 배치
+            stack.getChildren().addAll(text);  // 텍스트만 스택에 추가
+            data.setNode(stack);  // 막대 노드에 텍스트 배치
+
+            // 스타일을 적용하는 코드: 노드를 설정한 후 스타일 적용
+            data.getNode().setStyle("-fx-bar-fill: " + colorToHex(barColor));  // 색상 적용
 
             // 데이터 추가
             series.getData().add(data);
@@ -122,5 +130,21 @@ public class ReservationStatusController {
         // 차트에 데이터 추가
         reservationBarChart.getData().clear();  // 기존 데이터 삭제
         reservationBarChart.getData().add(series);  // 새 데이터 추가
+
+        reservationBarChart.setLegendVisible(false); // 범례 숨김
+    }
+
+    // 예약 건수에 따른 색상 반환
+    private Color getColorBasedOnCount(int count) {
+        if (count > 5) {
+            return Color.web("#4CAF4F"); // 예약 건수 5건 이상 빨간색
+        } else {
+            return Color.web("#A8D6AA"); // 평소엔 stayD 대표색
+        }
+    }
+
+    // 색상을 hex 값으로 변환
+    private String colorToHex(Color color) {
+        return String.format("#%02X%02X%02X", (int)(color.getRed() * 255), (int)(color.getGreen() * 255), (int)(color.getBlue() * 255));
     }
 }
