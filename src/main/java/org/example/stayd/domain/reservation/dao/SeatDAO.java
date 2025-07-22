@@ -5,6 +5,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import org.example.stayd.common.YesNoBooleanConverter;
@@ -14,6 +16,7 @@ public class SeatDAO {
 
     /* SeatDao.java */
     public List<Seat> findByCafeId(Connection conn, long cafeId) throws SQLException {
+        System.out.println("cafeId = " + cafeId);
         String selectSeatsSQL = """
                 SELECT seat_id,
                        cafe_id,
@@ -36,10 +39,12 @@ public class SeatDAO {
                             .cafeId(rs.getLong("cafe_id"))
                             .seatNumber(rs.getString("seat_number"))
                             .isAvailable(YesNoBooleanConverter.toBoolean(rs.getString("is_available").charAt(0)))
-                            .createdAt(rs.getObject("created_at", Instant.class))
+                            .createdAt(rs.getObject("created_at", LocalDateTime.class))
                             .build();
                     list.add(seat);
                 }
+            } catch (SQLException e) {
+                e.printStackTrace();
             }
         }
         return list;
