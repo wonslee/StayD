@@ -75,7 +75,7 @@ public class CafeDetailController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         // 초기 데이터 설정
-        loadCafeData(14L); // 현재 더미데이터 목록 구현되면 변경
+        loadCafeData(17L); // 현재 더미데이터 목록 구현되면 변경
 
         // 기본적으로 상세 탭이 활성화
         showDetailTab(null);
@@ -275,7 +275,7 @@ public class CafeDetailController implements Initializable {
         this.rating = rating;
 
         // UI 업데이트
-        loadCafeData(1L);
+        loadCafeData(17L);
     }
 
     /**

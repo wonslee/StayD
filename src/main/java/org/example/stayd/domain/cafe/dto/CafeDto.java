@@ -1,5 +1,8 @@
 package org.example.stayd.domain.cafe.dto;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import java.util.List;
 
 /**
@@ -10,7 +13,10 @@ public class CafeDto {
     /**
      * 카페 생성 요청 DTO
      */
+    @Setter
+    @Getter
     public static class CreateRequest {
+        // Getters and Setters
         private String name;
         private String address;
         private Integer pricePerHour;
@@ -23,79 +29,6 @@ public class CafeDto {
 
         // 기본 생성자
         public CreateRequest() {}
-
-        // Getters and Setters
-        public String getName() {
-            return name;
-        }
-
-        public void setName(String name) {
-            this.name = name;
-        }
-
-        public String getAddress() {
-            return address;
-        }
-
-        public void setAddress(String address) {
-            this.address = address;
-        }
-
-        public Integer getPricePerHour() {
-            return pricePerHour;
-        }
-
-        public void setPricePerHour(Integer pricePerHour) {
-            this.pricePerHour = pricePerHour;
-        }
-
-        public String getDescription() {
-            return description;
-        }
-
-        public void setDescription(String description) {
-            this.description = description;
-        }
-
-        public String getPhoneNumber() {
-            return phoneNumber;
-        }
-
-        public void setPhoneNumber(String phoneNumber) {
-            this.phoneNumber = phoneNumber;
-        }
-
-        public String getImageUrl() {
-            return imageUrl;
-        }
-
-        public void setImageUrl(String imageUrl) {
-            this.imageUrl = imageUrl;
-        }
-
-        public List<String> getOperatingDays() {
-            return operatingDays;
-        }
-
-        public void setOperatingDays(List<String> operatingDays) {
-            this.operatingDays = operatingDays;
-        }
-
-        public Integer getOperatingStartHour() {
-            return operatingStartHour;
-        }
-
-        public void setOperatingStartHour(Integer operatingStartHour) {
-            this.operatingStartHour = operatingStartHour;
-        }
-
-        public Integer getOperatingEndHour() {
-            return operatingEndHour;
-        }
-
-        public void setOperatingEndHour(Integer operatingEndHour) {
-            this.operatingEndHour = operatingEndHour;
-        }
 
         @Override
         public String toString() {
@@ -116,7 +49,10 @@ public class CafeDto {
     /**
      * 카페 생성 응답 DTO
      */
+    @Setter
+    @Getter
     public static class CreateResponse {
+        // Getters and Setters
         private Long cafeId;
         private String message;
         private boolean success;
@@ -126,31 +62,6 @@ public class CafeDto {
         public CreateResponse(Long cafeId, String message, boolean success) {
             this.cafeId = cafeId;
             this.message = message;
-            this.success = success;
-        }
-
-        // Getters and Setters
-        public Long getCafeId() {
-            return cafeId;
-        }
-
-        public void setCafeId(Long cafeId) {
-            this.cafeId = cafeId;
-        }
-
-        public String getMessage() {
-            return message;
-        }
-
-        public void setMessage(String message) {
-            this.message = message;
-        }
-
-        public boolean isSuccess() {
-            return success;
-        }
-
-        public void setSuccess(boolean success) {
             this.success = success;
         }
 
@@ -167,7 +78,10 @@ public class CafeDto {
     /**
      * 운영시간 DTO
      */
+    @Setter
+    @Getter
     public static class OperatingHours {
+        // Getters and Setters
         private String dayOfWeek; // MON, TUE, WED, THU, FRI, SAT, SUN
         private Integer operationStart;
         private Integer operationEnd;
@@ -177,31 +91,6 @@ public class CafeDto {
         public OperatingHours(String dayOfWeek, Integer operationStart, Integer operationEnd) {
             this.dayOfWeek = dayOfWeek;
             this.operationStart = operationStart;
-            this.operationEnd = operationEnd;
-        }
-
-        // Getters and Setters
-        public String getDayOfWeek() {
-            return dayOfWeek;
-        }
-
-        public void setDayOfWeek(String dayOfWeek) {
-            this.dayOfWeek = dayOfWeek;
-        }
-
-        public Integer getOperationStart() {
-            return operationStart;
-        }
-
-        public void setOperationStart(Integer operationStart) {
-            this.operationStart = operationStart;
-        }
-
-        public Integer getOperationEnd() {
-            return operationEnd;
-        }
-
-        public void setOperationEnd(Integer operationEnd) {
             this.operationEnd = operationEnd;
         }
 
@@ -215,7 +104,11 @@ public class CafeDto {
         }
     }
 
+    @Setter
+    @Getter
     public static class DetailResponse {
+        // 🔹 모든 getter/setter 메소드들
+        // 🔹 모든 필드를 맨 위에 선언
         private Long cafeId;
         private String name;
         private String address;
@@ -223,93 +116,14 @@ public class CafeDto {
         private String description;
         private String phoneNumber;
         private String imageUrl;
-
-        public Long getCafeId() {
-            return cafeId;
-        }
-
-        public void setCafeId(Long cafeId) {
-            this.cafeId = cafeId;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public void setName(String name) {
-            this.name = name;
-        }
-
-        public String getAddress() {
-            return address;
-        }
-
-        public void setAddress(String address) {
-            this.address = address;
-        }
-
-        public Integer getPricePerHour() {
-            return pricePerHour;
-        }
-
-        public void setPricePerHour(Integer pricePerHour) {
-            this.pricePerHour = pricePerHour;
-        }
-
-        public String getDescription() {
-            return description;
-        }
-
-        public void setDescription(String description) {
-            this.description = description;
-        }
-
-        public String getPhoneNumber() {
-            return phoneNumber;
-        }
-
-        public void setPhoneNumber(String phoneNumber) {
-            this.phoneNumber = phoneNumber;
-        }
-
-        public String getImageUrl() {
-            return imageUrl;
-        }
-
-        public void setImageUrl(String imageUrl) {
-            this.imageUrl = imageUrl;
-        }
-
-        public List<String> getOperatingDays() {
-            return operatingDays;
-        }
-
-        public void setOperatingDays(List<String> operatingDays) {
-            this.operatingDays = operatingDays;
-        }
-
-        public Integer getOperatingStartHour() {
-            return operatingStartHour;
-        }
-
-        public void setOperatingStartHour(Integer operatingStartHour) {
-            this.operatingStartHour = operatingStartHour;
-        }
-
-        public Integer getOperatingEndHour() {
-            return operatingEndHour;
-        }
-
-        public void setOperatingEndHour(Integer operatingEndHour) {
-            this.operatingEndHour = operatingEndHour;
-        }
-
-        private List<String> operatingDays;
+        private List<String> operatingDays;        // 이 3개 필드를 위로 이동
         private Integer operatingStartHour;
         private Integer operatingEndHour;
 
+        // 🔹 기본 생성자
         public DetailResponse() {}
 
+        // 🔹 전체 매개변수 생성자
         public DetailResponse(Long cafeId, String name, String address, Integer pricePerHour,
                               String description, String phoneNumber, String imageUrl,
                               List<String> operatingDays, Integer operatingStartHour, Integer operatingEndHour) {
@@ -325,7 +139,6 @@ public class CafeDto {
             this.operatingEndHour = operatingEndHour;
         }
 
-        // Getters & Setters 생략
     }
 
 }

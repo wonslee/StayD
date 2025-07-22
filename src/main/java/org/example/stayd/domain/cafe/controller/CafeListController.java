@@ -15,6 +15,8 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.event.ActionEvent;
+import org.example.stayd.domain.cafe.service.CafeService;
+
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -90,6 +92,14 @@ public class CafeListController implements Initializable {
         public int getCafeId() { return cafeId; }
         public void setCafeId(int cafeId) { this.cafeId = cafeId; }
     }
+
+    private CafeService cafeService;
+
+    // 🔹 기본 생성자 (FXML용 - 필수!)
+    public CafeListController() {
+        this.cafeService = new CafeService();
+    }
+
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -329,8 +339,6 @@ public class CafeListController implements Initializable {
     @FXML
     private void onCafeCardClick(MouseEvent event) {
         VBox clickedCard = (VBox) event.getSource();
-
-        // 어떤 카페 카드인지 찾기
         int cardIndex = getCardIndexFromVBox(clickedCard);
 
         if (cardIndex >= 0) {
@@ -339,7 +347,14 @@ public class CafeListController implements Initializable {
             if (dataIndex < filteredCafes.size()) {
                 CafeData cafe = filteredCafes.get(dataIndex);
 
-                // 상세 페이지로 이동
+                // 🔍 디버깅 로그 추가
+                System.out.println("=== 카페 클릭 디버깅 ===");
+                System.out.println("클릭한 카드 인덱스: " + cardIndex);
+                System.out.println("데이터 인덱스: " + dataIndex);
+                System.out.println("전달할 카페 ID: " + cafe.getCafeId());
+                System.out.println("카페 이름: " + cafe.getName());
+                System.out.println("========================");
+
                 navigateToCafeDetail(cafe.getCafeId());
             }
         }
