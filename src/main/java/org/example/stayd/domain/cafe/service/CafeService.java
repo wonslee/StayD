@@ -227,8 +227,8 @@ public class CafeService {
 
         for (String day : operatingDays) {
             String dbDay = CafeDao.convertDayToDbFormat(day.trim());
-            if (!dbDay.isEmpty()) {
-                operatingHours.add(new CafeDto.OperatingHours(dbDay, startHour, endHour));
+            if (!day.isEmpty()) {
+                operatingHours.add(new CafeDto.OperatingHours(day, startHour, endHour));
             }
         }
 
@@ -274,42 +274,135 @@ public class CafeService {
 
 
     /**
-     * 모든 카페 목록 조회 (정렬 옵션 추가)
+     * 모든 카페 목록 조회 (PL/SQL 함수 사용)
      * @param sortByRating true: 평점순, false: 최신순
      * @return 카페 DTO 목록
      */
     public List<CafeDto.SimpleCafeDto> getAllCafes(boolean sortByRating) {
         try {
-            return cafeDao.findAllCafes(sortByRating);
+            System.out.println("\n=== PL/SQL 전체 카페 조회 시작 ===");
+
+            long totalStartTime = System.currentTimeMillis();
+
+            // PL/SQL 함수로 전체 카페 조회
+            List<CafeDto.SimpleCafeDto> results = cafeDao.findAllCafesWithPLSQL(sortByRating);
+
+            long totalEndTime = System.currentTimeMillis();
+
+            System.out.println("PL/SQL 전체 카페 조회 완료!");
+            System.out.println("성능 비교:");
+            System.out.println("   이전 (Java): 복잡한 JOIN 쿼리를 Java에서 처리");
+            System.out.println("      - SELECT + LEFT JOIN reservation");
+            System.out.println("      - GROUP BY + ORDER BY 처리");
+            System.out.println("      - 메모리에서 정렬 작업");
+            System.out.println("   현재 (PL/SQL): 모든 로직이 DB에서 최적화되어 처리");
+            System.out.println("      - 동적 쿼리 생성");
+            System.out.println("      - DB 엔진 레벨에서 정렬 최적화");
+            System.out.println("      - 인덱스 활용 극대화");
+            System.out.println("   총 소요 시간: " + (totalEndTime - totalStartTime) + "ms");
+            System.out.println("   결과: " + results.size() + "개");
+            System.out.println("=== PL/SQL 전체 카페 조회 완료 ===\n");
+
+            return results;
+
         } catch (SQLException e) {
             e.printStackTrace();
-            throw new RuntimeException("Error loading cafe list: " + e.getMessage());
+            System.out.println("PL/SQL 전체 카페 조회 실패: " + e.getMessage());
+            throw new RuntimeException("카페 목록 조회 중 오류 발생: " + e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("예상치 못한 오류: " + e.getMessage());
+            throw new RuntimeException("카페 목록 조회 중 예상치 못한 오류: " + e.getMessage());
         }
     }
 
     /**
-     * 카페 이름으로 검색 (정렬 옵션 추가)
+     * 카페 이름으로 검색 (PL/SQL 함수 사용)
      * @param keyword 검색 키워드
      * @param sortByRating true: 평점순, false: 최신순
      * @return 검색된 카페 DTO 목록
      */
     public List<CafeDto.SimpleCafeDto> searchCafesByName(String keyword, boolean sortByRating) {
         try {
+            System.out.println("\n=== PL/SQL 카페 검색 시작 ===");
+            System.out.println("검색어: " + (keyword != null && !keyword.trim().isEmpty() ? keyword : "전체"));
+            System.out.println("정렬: " + (sortByRating ? "평점순" : "최신순"));
+
+            long totalStartTime = System.currentTimeMillis();
+
+            List<CafeDto.SimpleCafeDto> results;
+
             if (keyword == null || keyword.trim().isEmpty()) {
-                return getAllCafes(sortByRating);
+                // 전체 조회 (PL/SQL 함수)
+                results = cafeDao.findAllCafesWithPLSQL(sortByRating);
+            } else {
+                // 키워드 검색 (PL/SQL 함수)
+                results = cafeDao.searchCafesByNameWithPLSQL(keyword.trim(), sortByRating);
             }
-            return cafeDao.searchCafesByName(keyword.trim(), sortByRating);
+
+            long totalEndTime = System.currentTimeMillis();
+
+            System.out.println("PL/SQL 카페 검색 완료!");
+            System.out.println("성능 비교:");
+            System.out.println("   이전 (Java): 여러 단계로 처리");
+            System.out.println("      1. 기본 SELECT 쿼리 실행");
+            System.out.println("      2. LIKE 조건으로 필터링");
+            System.out.println("      3. Java에서 정렬 로직 처리");
+            System.out.println("      4. 결과 매핑 및 변환");
+            System.out.println("   현재 (PL/SQL): 원스톱 처리");
+            System.out.println("      - 동적 WHERE 조건 생성");
+            System.out.println("      - 동적 ORDER BY 조건 생성");
+            System.out.println("      - 페이징까지 DB에서 처리");
+            System.out.println("      - 최적화된 실행 계획 사용");
+            System.out.println("   총 소요 시간: " + (totalEndTime - totalStartTime) + "ms");
+            System.out.println("   검색 결과: " + results.size() + "개");
+            System.out.println("=== PL/SQL 카페 검색 완료 ===\n");
+
+            return results;
+
         } catch (SQLException e) {
             e.printStackTrace();
-            throw new RuntimeException("Error searching cafes: " + e.getMessage());
+            System.out.println("PL/SQL 카페 검색 실패: " + e.getMessage());
+            throw new RuntimeException("카페 검색 중 오류 발생: " + e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("예상치 못한 오류: " + e.getMessage());
+            throw new RuntimeException("카페 검색 중 예상치 못한 오류: " + e.getMessage());
         }
     }
-
     /**
-     * 기존 searchCafesByName() 메서드 (하위 호환성)
+     * 페이징을 지원하는 카페 검색 (PL/SQL 함수 사용)
+     * @param keyword 검색 키워드
+     * @param sortByRating 정렬 방식
+     * @param pageNum 페이지 번호 (1부터 시작)
+     * @param pageSize 페이지 크기
+     * @return 검색된 카페 목록
      */
-    public List<CafeDto.SimpleCafeDto> searchCafesByName(String keyword) {
-        return searchCafesByName(keyword, false); // 기본값: 최신순
+    public List<CafeDto.SimpleCafeDto> searchCafesWithPaging(String keyword, boolean sortByRating,
+                                                             int pageNum, int pageSize) {
+        try {
+            System.out.println("\n=== PL/SQL 페이징 검색 시작 ===");
+            System.out.println("검색어: " + (keyword != null ? keyword : "전체"));
+            System.out.println("정렬: " + (sortByRating ? "평점순" : "최신순"));
+            System.out.println("페이지: " + pageNum + "/" + pageSize);
+
+            long startTime = System.currentTimeMillis();
+
+            List<CafeDto.SimpleCafeDto> results = cafeDao.searchCafesWithPLSQL(keyword, sortByRating, pageNum, pageSize);
+
+            long endTime = System.currentTimeMillis();
+
+            System.out.println("PL/SQL 페이징 검색 완료!");
+            System.out.println("   실행 시간: " + (endTime - startTime) + "ms");
+            System.out.println("   결과: " + results.size() + "개 (페이지 " + pageNum + ")");
+            System.out.println("=== PL/SQL 페이징 검색 완료 ===\n");
+
+            return results;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException("페이징 검색 중 오류 발생: " + e.getMessage());
+        }
     }
 
     /**

@@ -32,7 +32,7 @@ public class CafeDao {
         Connection connection = databaseConnection.getConnection();
 
         try {
-            System.out.println("🔄 PL/SQL 프로시저로 카페 생성 시작...");
+            System.out.println(" PL/SQL 프로시저로 카페 생성 시작...");
 
             // PL/SQL 프로시저 호출 (파라미터 11개)
             String sql = "{ call create_study_cafe(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) }";
@@ -48,16 +48,16 @@ public class CafeDao {
                 cstmt.setString(6, cafe.getPhoneNumber());
                 cstmt.setString(7, cafe.getImageUrl());
 
-                // 🔧 운영일을 문자열로 변환 ("월,화,수,목,금")
+                //  운영일을 문자열로 변환 ("월,화,수,목,금")
                 String operatingDaysString = createOperatingDaysString(operatingHours);
                 cstmt.setString(8, operatingDaysString);
-                System.out.println("🗓️ 운영일 문자열: " + operatingDaysString);
+                System.out.println("🗓 운영일 문자열: " + operatingDaysString);
 
                 // 운영시간 설정 (첫 번째 운영시간 사용)
                 if (!operatingHours.isEmpty()) {
                     cstmt.setInt(9, operatingHours.get(0).getOperationStart());
                     cstmt.setInt(10, operatingHours.get(0).getOperationEnd());
-                    System.out.println("⏰ 운영시간: " + operatingHours.get(0).getOperationStart() + ":00 - " + operatingHours.get(0).getOperationEnd() + ":00");
+                    System.out.println("운영시간: " + operatingHours.get(0).getOperationStart() + ":00 - " + operatingHours.get(0).getOperationEnd() + ":00");
                 } else {
                     throw new SQLException("운영시간이 설정되지 않았습니다.");
                 }
@@ -76,14 +76,14 @@ public class CafeDao {
                 if (result == 0) {
                     // 성공
                     Long cafeId = cstmt.getLong(11);
-                    System.out.println("🎉 PL/SQL 프로시저 실행 성공!");
+                    System.out.println(" PL/SQL 프로시저 실행 성공!");
                     System.out.println("   생성된 카페 ID: " + cafeId);
                     System.out.println("   실행 시간: " + (endTime - startTime) + "ms");
                     System.out.println("   네트워크 호출: 1번 (기존 20+번에서 대폭 감소!)");
                     return cafeId;
                 } else {
                     // 실패
-                    System.out.println("❌ PL/SQL 프로시저 실행 실패 (결과 코드: " + result + ")");
+                    System.out.println(" PL/SQL 프로시저 실행 실패 (결과 코드: " + result + ")");
                     throw new SQLException("카페 생성 프로시저 실행 실패");
                 }
             }
@@ -116,7 +116,7 @@ public class CafeDao {
         }
 
         String result = sb.toString();
-        System.out.println("🗓️ 운영일 문자열 생성: " + result);
+        System.out.println(" 운영일 문자열 생성: " + result);
         return result;
     }
 
@@ -165,7 +165,7 @@ public class CafeDao {
      * @return CafeModel 객체 (없으면 null)
      */
     public CafeDto.DetailResponse findById(Long cafeId) throws SQLException {
-        // 🔍 디버깅 로그 추가
+        // 디버깅 로그 추가
         System.out.println("=== DAO 디버깅 ===");
         System.out.println("조회할 카페 ID: " + cafeId);
 
@@ -179,7 +179,7 @@ public class CafeDao {
             cafeStmt.setLong(1, cafeId);
             ResultSet cafeRs = cafeStmt.executeQuery();
 
-            // 🔍 결과 확인
+            //  결과 확인
             System.out.println("SQL 쿼리 실행: " + cafeSql);
             System.out.println("파라미터: " + cafeId);
 
@@ -217,147 +217,6 @@ public class CafeDao {
     }
 
 
-    // CafeDao.java 파일에 다음 메서드들을 추가하세요
-
-    /**
-     * 모든 카페 목록 조회 (정렬 옵션 추가)
-     * @param sortByRating true: 평점순, false: 최신순
-     */
-    public List<CafeDto.SimpleCafeDto> findAllCafes(boolean sortByRating) throws SQLException {
-        String sql;
-
-        if (sortByRating) {
-            // 평점순 정렬 (평점 높은 순, 같으면 리뷰 수 많은 순)
-            sql = """
-            SELECT c.cafe_id, c.name, c.address, c.price_per_hour, c.description, 
-                   c.phone_number, c.image_url,
-                   COALESCE(AVG(r.rating), 0.0) as avg_rating,
-                   COUNT(CASE WHEN r.rating IS NOT NULL THEN 1 END) as review_count
-            FROM cafe c
-            LEFT JOIN reservation r ON c.cafe_id = r.cafe_id AND r.rating IS NOT NULL
-            GROUP BY c.cafe_id, c.name, c.address, c.price_per_hour, c.description, 
-                     c.phone_number, c.image_url
-            ORDER BY avg_rating DESC, review_count DESC, c.cafe_id DESC
-            """;
-        } else {
-            // 최신순 정렬 (기존과 동일)
-            sql = """
-            SELECT c.cafe_id, c.name, c.address, c.price_per_hour, c.description, 
-                   c.phone_number, c.image_url,
-                   COALESCE(AVG(r.rating), 0.0) as avg_rating,
-                   COUNT(CASE WHEN r.rating IS NOT NULL THEN 1 END) as review_count
-            FROM cafe c
-            LEFT JOIN reservation r ON c.cafe_id = r.cafe_id AND r.rating IS NOT NULL
-            GROUP BY c.cafe_id, c.name, c.address, c.price_per_hour, c.description, 
-                     c.phone_number, c.image_url
-            ORDER BY c.cafe_id DESC
-            """;
-        }
-
-        List<CafeDto.SimpleCafeDto> cafes = new ArrayList<>();
-
-        try (Connection conn = databaseConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql);
-             ResultSet rs = pstmt.executeQuery()) {
-
-            while (rs.next()) {
-                CafeDto.SimpleCafeDto cafe = new CafeDto.SimpleCafeDto();
-                cafe.setId(rs.getInt("cafe_id"));
-                cafe.setName(rs.getString("name"));
-                cafe.setAddress(rs.getString("address"));
-                cafe.setRating(rs.getDouble("avg_rating"));
-                cafe.setReviewCount(rs.getInt("review_count"));
-                cafe.setImageUrl(rs.getString("image_url"));
-                cafe.setPricePerHour(rs.getInt("price_per_hour"));
-                cafe.setDescription(rs.getString("description"));
-                cafe.setPhoneNumber(rs.getString("phone_number"));
-                cafe.setFavorite(false); // 기본값
-
-                cafes.add(cafe);
-            }
-        }
-
-        return cafes;
-    }
-
-    /**
-     * 기존 findAllCafes() 메서드 (하위 호환성)
-     */
-    public List<CafeDto.SimpleCafeDto> findAllCafes() throws SQLException {
-        return findAllCafes(false); // 기본값: 최신순
-    }
-
-    /**
-     * 카페 이름으로 검색 (정렬 옵션 추가)
-     * @param keyword 검색 키워드
-     * @param sortByRating true: 평점순, false: 최신순
-     */
-    public List<CafeDto.SimpleCafeDto> searchCafesByName(String keyword, boolean sortByRating) throws SQLException {
-        String sql;
-
-        if (sortByRating) {
-            sql = """
-            SELECT c.cafe_id, c.name, c.address, c.price_per_hour, c.description, 
-                   c.phone_number, c.image_url,
-                   COALESCE(AVG(r.rating), 0.0) as avg_rating,
-                   COUNT(CASE WHEN r.rating IS NOT NULL THEN 1 END) as review_count
-            FROM cafe c
-            LEFT JOIN reservation r ON c.cafe_id = r.cafe_id AND r.rating IS NOT NULL
-            WHERE c.name LIKE ?
-            GROUP BY c.cafe_id, c.name, c.address, c.price_per_hour, c.description, 
-                     c.phone_number, c.image_url
-            ORDER BY avg_rating DESC, review_count DESC, c.cafe_id DESC
-            """;
-        } else {
-            sql = """
-            SELECT c.cafe_id, c.name, c.address, c.price_per_hour, c.description, 
-                   c.phone_number, c.image_url,
-                   COALESCE(AVG(r.rating), 0.0) as avg_rating,
-                   COUNT(CASE WHEN r.rating IS NOT NULL THEN 1 END) as review_count
-            FROM cafe c
-            LEFT JOIN reservation r ON c.cafe_id = r.cafe_id AND r.rating IS NOT NULL
-            WHERE c.name LIKE ?
-            GROUP BY c.cafe_id, c.name, c.address, c.price_per_hour, c.description, 
-                     c.phone_number, c.image_url
-            ORDER BY c.cafe_id DESC
-            """;
-        }
-
-        List<CafeDto.SimpleCafeDto> cafes = new ArrayList<>();
-
-        try (Connection conn = databaseConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-
-            pstmt.setString(1, "%" + keyword + "%");
-
-            try (ResultSet rs = pstmt.executeQuery()) {
-                while (rs.next()) {
-                    CafeDto.SimpleCafeDto cafe = new CafeDto.SimpleCafeDto();
-                    cafe.setId(rs.getInt("cafe_id"));
-                    cafe.setName(rs.getString("name"));
-                    cafe.setAddress(rs.getString("address"));
-                    cafe.setRating(rs.getDouble("avg_rating"));
-                    cafe.setReviewCount(rs.getInt("review_count"));
-                    cafe.setImageUrl(rs.getString("image_url"));
-                    cafe.setPricePerHour(rs.getInt("price_per_hour"));
-                    cafe.setDescription(rs.getString("description"));
-                    cafe.setPhoneNumber(rs.getString("phone_number"));
-                    cafe.setFavorite(false); // 기본값
-
-                    cafes.add(cafe);
-                }
-            }
-        }
-
-        return cafes;
-    }
-
-    /**
-     * 기존 searchCafesByName() 메서드 (하위 호환성)
-     */
-    public List<CafeDto.SimpleCafeDto> searchCafesByName(String keyword) throws SQLException {
-        return searchCafesByName(keyword, false); // 기본값: 최신순
-    }
 
     /**
      * 카페 ID로 상세 정보 조회 (운영시간 포함)
@@ -402,6 +261,110 @@ public class CafeDao {
         }
 
         return null;
+    }
+    /**
+     * 카페 검색 (PL/SQL 함수 사용)
+     * @param keyword 검색 키워드 (null이면 전체 조회)
+     * @param sortByRating true: 평점순, false: 최신순
+     * @param pageNum 페이지 번호 (1부터 시작)
+     * @param pageSize 페이지 크기 (기본 8개)
+     * @return 검색된 카페 목록
+     * @throws SQLException SQL 예외
+     */
+    public List<CafeDto.SimpleCafeDto> searchCafesWithPLSQL(String keyword, boolean sortByRating,
+                                                            int pageNum, int pageSize) throws SQLException {
+        Connection connection = databaseConnection.getConnection();
+        List<CafeDto.SimpleCafeDto> cafes = new ArrayList<>();
+
+        try {
+            System.out.println("PL/SQL 함수로 카페 검색 시작...");
+            System.out.println("   키워드: " + (keyword != null ? keyword : "전체"));
+            System.out.println("   정렬: " + (sortByRating ? "평점순" : "최신순"));
+            System.out.println("   페이지: " + pageNum + " (크기: " + pageSize + ")");
+
+            // PL/SQL 함수 호출
+            String sql = "{ ? = call search_cafes_advanced(?, ?, ?, ?) }";
+
+            try (CallableStatement cstmt = connection.prepareCall(sql)) {
+
+                // 출력 파라미터 (커서)
+                cstmt.registerOutParameter(1, Types.REF_CURSOR);
+
+                // 입력 파라미터 설정
+                cstmt.setString(2, keyword); // null 허용
+                cstmt.setString(3, sortByRating ? "RATING" : "LATEST");
+                cstmt.setInt(4, pageNum);
+                cstmt.setInt(5, pageSize);
+
+                // 함수 실행 및 성능 측정
+                long startTime = System.currentTimeMillis();
+                cstmt.execute();
+                long endTime = System.currentTimeMillis();
+
+                // 커서에서 결과 읽기
+                try (ResultSet rs = (ResultSet) cstmt.getObject(1)) {
+                    while (rs.next()) {
+                        CafeDto.SimpleCafeDto cafe = new CafeDto.SimpleCafeDto();
+
+                        // 기본 정보 설정
+                        cafe.setId(rs.getInt("cafe_id"));
+                        cafe.setName(rs.getString("name"));
+                        cafe.setAddress(rs.getString("address"));
+                        cafe.setPricePerHour(rs.getInt("price_per_hour"));
+                        cafe.setDescription(rs.getString("description"));
+                        cafe.setPhoneNumber(rs.getString("phone_number"));
+                        cafe.setImageUrl(rs.getString("image_url"));
+
+                        // 평점 정보 설정
+                        cafe.setRating(rs.getDouble("avg_rating"));
+                        cafe.setReviewCount(rs.getInt("review_count"));
+
+                        // 기본값 설정
+                        cafe.setFavorite(false); // TODO: 찜하기 기능 연동 시 수정
+
+                        cafes.add(cafe);
+                    }
+                }
+
+                System.out.println("PL/SQL 검색 완료!");
+                System.out.println("   실행 시간: " + (endTime - startTime) + "ms");
+                System.out.println("   검색 결과: " + cafes.size() + "개");
+                System.out.println("   네트워크 호출: 1번 (복잡한 JOIN + 정렬 + 페이징이 DB에서 처리)");
+
+            }
+
+        } finally {
+            try {
+                connection.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return cafes;
+    }
+
+    /**
+     * 전체 카페 조회 (PL/SQL 함수 사용)
+     * @param sortByRating true: 평점순, false: 최신순
+     * @return 카페 목록
+     * @throws SQLException SQL 예외
+     */
+    public List<CafeDto.SimpleCafeDto> findAllCafesWithPLSQL(boolean sortByRating) throws SQLException {
+        // 첫 번째 페이지의 큰 사이즈로 전체 조회 (실제로는 페이징 처리 권장)
+        return searchCafesWithPLSQL(null, sortByRating, 1, 100);
+    }
+
+    /**
+     * 카페 이름으로 검색 (PL/SQL 함수 사용)
+     * @param keyword 검색 키워드
+     * @param sortByRating true: 평점순, false: 최신순
+     * @return 검색된 카페 목록
+     * @throws SQLException SQL 예외
+     */
+    public List<CafeDto.SimpleCafeDto> searchCafesByNameWithPLSQL(String keyword, boolean sortByRating) throws SQLException {
+        // 첫 번째 페이지의 큰 사이즈로 검색 (실제로는 페이징 처리 권장)
+        return searchCafesWithPLSQL(keyword, sortByRating, 1, 100);
     }
 
     /**
@@ -569,7 +532,7 @@ public class CafeDao {
         Connection connection = databaseConnection.getConnection();
 
         try {
-            System.out.println("🔄 PL/SQL 프로시저로 카페 삭제 시작...");
+            System.out.println(" PL/SQL 프로시저로 카페 삭제 시작...");
             System.out.println("   카페 ID: " + cafeId + ", 소유자 ID: " + ownerId);
 
             // PL/SQL 프로시저 호출
@@ -592,30 +555,30 @@ public class CafeDao {
                 // 결과 확인
                 int result = cstmt.getInt(3);
 
-                System.out.println("⏱️ PL/SQL 프로시저 실행 시간: " + (endTime - startTime) + "ms");
+                System.out.println(" PL/SQL 프로시저 실행 시간: " + (endTime - startTime) + "ms");
 
                 switch (result) {
                     case 0:
                         // 성공
-                        System.out.println("🎉 PL/SQL 카페 삭제 성공!");
+                        System.out.println(" PL/SQL 카페 삭제 성공!");
                         System.out.println("   네트워크 호출: 1번 (기존 4번에서 대폭 감소!)");
                         System.out.println("   처리된 작업: 소유자 확인 + 좌석 삭제 + 운영시간 삭제 + 카페 삭제");
                         break;
 
                     case 1:
                         // 권한 없음
-                        System.out.println("❌ 권한 없음: 소유자만 카페를 삭제할 수 있습니다.");
+                        System.out.println(" 권한 없음: 소유자만 카페를 삭제할 수 있습니다.");
                         throw new SQLException("본인이 소유한 카페만 삭제할 수 있습니다.");
 
                     case 3:
                         // 카페 없음
-                        System.out.println("❌ 존재하지 않는 카페입니다.");
+                        System.out.println(" 존재하지 않는 카페입니다.");
                         throw new SQLException("해당 카페를 찾을 수 없습니다.");
 
                     case 2:
                     default:
                         // 일반 실패
-                        System.out.println("❌ PL/SQL 프로시저 실행 실패 (결과 코드: " + result + ")");
+                        System.out.println(" PL/SQL 프로시저 실행 실패 (결과 코드: " + result + ")");
                         throw new SQLException("카페 삭제 프로시저 실행 실패");
                 }
             }
