@@ -193,5 +193,90 @@ public class CafeDto {
             this.operatingHours = operatingHours;
         }
     }
+    /**
+     * 카페 수정 요청 DTO
+     */
+    @Setter
+    @Getter
+    public static class UpdateRequest {
+        private Long cafeId;
+        private String name;
+        private String address;
+        private Integer pricePerHour;
+        private String description;
+        private String phoneNumber;
+        private String imageUrl;
+        private List<String> operatingDays;
+        private Integer operatingStartHour;
+        private Integer operatingEndHour;
+
+        public UpdateRequest() {}
+
+        @Override
+        public String toString() {
+            return "UpdateRequest{" +
+                    "cafeId=" + cafeId +
+                    ", name='" + name + '\'' +
+                    ", address='" + address + '\'' +
+                    ", pricePerHour=" + pricePerHour +
+                    ", description='" + description + '\'' +
+                    ", phoneNumber='" + phoneNumber + '\'' +
+                    ", imageUrl='" + imageUrl + '\'' +
+                    ", operatingDays=" + operatingDays +
+                    ", operatingStartHour=" + operatingStartHour +
+                    ", operatingEndHour=" + operatingEndHour +
+                    '}';
+        }
+    }
+
+    /**
+     * 카페 수정 응답 DTO
+     */
+    @Setter
+    @Getter
+    public static class UpdateResponse {
+        private boolean success;
+        private String message;
+
+        public UpdateResponse() {}
+
+        public UpdateResponse(boolean success, String message) {
+            this.success = success;
+            this.message = message;
+        }
+
+        @Override
+        public String toString() {
+            return "UpdateResponse{" +
+                    "success=" + success +
+                    ", message='" + message + '\'' +
+                    '}';
+        }
+    }
+
+    /**
+     * 카페 삭제 응답 DTO
+     */
+    @Setter
+    @Getter
+    public static class DeleteResponse {
+        private boolean success;
+        private String message;
+
+        public DeleteResponse() {}
+
+        public DeleteResponse(boolean success, String message) {
+            this.success = success;
+            this.message = message;
+        }
+
+        @Override
+        public String toString() {
+            return "DeleteResponse{" +
+                    "success=" + success +
+                    ", message='" + message + '\'' +
+                    '}';
+        }
+    }
 
 }

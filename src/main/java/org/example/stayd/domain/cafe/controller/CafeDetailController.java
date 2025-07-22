@@ -133,7 +133,7 @@ public class CafeDetailController implements Initializable {
         phoneLabel.setText(phoneNumber);
         descriptionLabel.setText(description);
 
-        // 🚀 비동기 이미지 로딩
+        // 비동기 이미지 로딩
         if (imageUrl != null && !imageUrl.trim().isEmpty()) {
             loadImageAsync(mainImageView, imageUrl);
         }

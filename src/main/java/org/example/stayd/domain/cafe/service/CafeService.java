@@ -75,6 +75,9 @@ public class CafeService {
         }
     }
 
+    // CafeService.java에서 기존 validateCreateRequest와 validateUpdateRequest를
+// 다음 코드로 교체하세요
+
     /**
      * 카페 생성 요청 검증
      * @param request 생성 요청
@@ -85,68 +88,122 @@ public class CafeService {
             throw new IllegalArgumentException("카페 생성 정보가 없습니다.");
         }
 
-        // 카페 이름 검증
-        if (request.getName() == null || request.getName().trim().isEmpty()) {
-            throw new IllegalArgumentException("카페 이름을 입력해주세요.");
-        }
-        if (request.getName().trim().length() > 50) {
-            throw new IllegalArgumentException("카페 이름은 50자 이하로 입력해주세요.");
-        }
-
-        // 주소 검증
-        if (request.getAddress() == null || request.getAddress().trim().isEmpty()) {
-            throw new IllegalArgumentException("카페 주소를 입력해주세요.");
-        }
-        if (request.getAddress().trim().length() > 100) {
-            throw new IllegalArgumentException("주소는 100자 이하로 입력해주세요.");
-        }
-
-        // 시간당 가격 검증
-        if (request.getPricePerHour() == null || request.getPricePerHour() < 1000) {
-            throw new IllegalArgumentException("시간당 가격은 1000원 이상이어야 합니다.");
-        }
-
-        // 설명 검증
-        if (request.getDescription() == null || request.getDescription().trim().isEmpty()) {
-            throw new IllegalArgumentException("카페 설명을 입력해주세요.");
-        }
-        if (request.getDescription().trim().length() > 100) {
-            throw new IllegalArgumentException("설명은 100자 이하로 입력해주세요.");
-        }
-
-        // 전화번호 검증
-        if (request.getPhoneNumber() == null || request.getPhoneNumber().trim().isEmpty()) {
-            throw new IllegalArgumentException("전화번호를 입력해주세요.");
-        }
-        if (!isValidPhoneNumber(request.getPhoneNumber())) {
-            throw new IllegalArgumentException("올바른 전화번호 형식이 아닙니다. (예: 02-123-4567, 010-1234-5678)");
-        }
-
-        // 영업일 검증
-        if (request.getOperatingDays() == null || request.getOperatingDays().isEmpty()) {
-            throw new IllegalArgumentException("영업일을 선택해주세요.");
-        }
-
-        // 운영시간 검증
-        if (request.getOperatingStartHour() == null || request.getOperatingEndHour() == null) {
-            throw new IllegalArgumentException("운영시간을 설정해주세요.");
-        }
-        if (request.getOperatingStartHour() < 0 || request.getOperatingStartHour() > 23) {
-            throw new IllegalArgumentException("시작 시간은 0~23시 사이여야 합니다.");
-        }
-        if (request.getOperatingEndHour() < 0 || request.getOperatingEndHour() > 23) {
-            throw new IllegalArgumentException("종료 시간은 0~23시 사이여야 합니다.");
-        }
-        if (request.getOperatingStartHour() >= request.getOperatingEndHour()) {
-            throw new IllegalArgumentException("종료 시간은 시작 시간보다 늦어야 합니다.");
-        }
+        // 공통 검증 로직 호출
+        validateCafeBasicInfo(
+                request.getName(),
+                request.getAddress(),
+                request.getPricePerHour(),
+                request.getDescription(),
+                request.getPhoneNumber(),
+                request.getOperatingDays(),
+                request.getOperatingStartHour(),
+                request.getOperatingEndHour(),
+                100 // 생성 시 설명 최대 길이
+        );
     }
 
     /**
-     * 전화번호 형식 검증
-     * @param phoneNumber 전화번호
-     * @return 유효성 여부
+     * 카페 수정 요청 검증
+     * @param request 수정 요청
+     * @throws IllegalArgumentException 검증 실패 시
      */
+    private void validateUpdateRequest(CafeDto.UpdateRequest request) {
+        if (request == null) {
+            throw new IllegalArgumentException("카페 수정 정보가 없습니다.");
+        }
+
+        if (request.getCafeId() == null) {
+            throw new IllegalArgumentException("카페 ID가 없습니다.");
+        }
+
+        // 공통 검증 로직 호출
+        validateCafeBasicInfo(
+                request.getName(),
+                request.getAddress(),
+                request.getPricePerHour(),
+                request.getDescription(),
+                request.getPhoneNumber(),
+                request.getOperatingDays(),
+                request.getOperatingStartHour(),
+                request.getOperatingEndHour(),
+                200 // 수정 시 설명 최대 길이
+        );
+    }
+
+    /**
+     * 카페 기본 정보 공통 검증
+     * @throws IllegalArgumentException 검증 실패 시
+     */
+    private void validateCafeBasicInfo(String name, String address, Integer pricePerHour,
+                                       String description, String phoneNumber,
+                                       List<String> operatingDays, Integer startHour,
+                                       Integer endHour, int descriptionMaxLength) {
+
+        validateCafeName(name);
+        validateCafeAddress(address);
+        validatePricePerHour(pricePerHour);
+        validateDescription(description, descriptionMaxLength);
+        validatePhoneNumber(phoneNumber);
+        validateOperatingDays(operatingDays);
+        validateOperatingHours(startHour, endHour);
+    }
+
+    private void validateCafeName(String name) {
+        if (name == null || name.trim().isEmpty()) {
+            throw new IllegalArgumentException("카페 이름을 입력해주세요.");
+        }
+        if (name.trim().length() > 50) {
+            throw new IllegalArgumentException("카페 이름은 50자 이하로 입력해주세요.");
+        }
+    }
+    private void validateCafeAddress(String address) {
+        if (address == null || address.trim().isEmpty()) {
+            throw new IllegalArgumentException("카페 주소를 입력해주세요.");
+        }
+        if (address.trim().length() > 100) {
+            throw new IllegalArgumentException("주소는 100자 이하로 입력해주세요.");
+        }
+    }
+    private void validatePricePerHour(Integer pricePerHour) {
+        if (pricePerHour == null || pricePerHour < 1000) {
+            throw new IllegalArgumentException("시간당 가격은 1000원 이상이어야 합니다.");
+        }
+    }
+    private void validateDescription(String description, int maxLength) {
+        if (description == null || description.trim().isEmpty()) {
+            throw new IllegalArgumentException("카페 설명을 입력해주세요.");
+        }
+        if (description.trim().length() > maxLength) {
+            throw new IllegalArgumentException("설명은 " + maxLength + "자 이하로 입력해주세요.");
+        }
+    }
+    private void validatePhoneNumber(String phoneNumber) {
+        if (phoneNumber == null || phoneNumber.trim().isEmpty()) {
+            throw new IllegalArgumentException("전화번호를 입력해주세요.");
+        }
+        if (!isValidPhoneNumber(phoneNumber)) {
+            throw new IllegalArgumentException("올바른 전화번호 형식이 아닙니다. (예: 02-123-4567, 010-1234-5678)");
+        }
+    }
+    private void validateOperatingDays(List<String> operatingDays) {
+        if (operatingDays == null || operatingDays.isEmpty()) {
+            throw new IllegalArgumentException("영업일을 선택해주세요.");
+        }
+    }
+    private void validateOperatingHours(Integer startHour, Integer endHour) {
+        if (startHour == null || endHour == null) {
+            throw new IllegalArgumentException("운영시간을 설정해주세요.");
+        }
+        if (startHour < 0 || startHour > 23) {
+            throw new IllegalArgumentException("시작 시간은 0~23시 사이여야 합니다.");
+        }
+        if (endHour < 0 || endHour > 23) {
+            throw new IllegalArgumentException("종료 시간은 0~23시 사이여야 합니다.");
+        }
+        if (startHour >= endHour) {
+            throw new IllegalArgumentException("종료 시간은 시작 시간보다 늦어야 합니다.");
+        }
+    }
     private boolean isValidPhoneNumber(String phoneNumber) {
         if (phoneNumber == null) return false;
 
@@ -277,4 +334,79 @@ public class CafeService {
         System.out.println("찜하기 기능은 추후 구현 예정 - 카페 ID: " + cafeId + ", 상태: " + isFavorite);
     }
 
+
+    /**
+     * 카페 정보 수정
+     * @param request 수정 요청 정보
+     * @param ownerId 카페 소유자 ID
+     * @return 수정 결과
+     */
+    public CafeDto.UpdateResponse updateCafe(CafeDto.UpdateRequest request, Long ownerId) {
+        try {
+            // 입력 검증
+            validateUpdateRequest(request);
+
+            // 카페 존재 여부 및 소유자 확인
+            if (!isOwnerOfCafe(request.getCafeId(), ownerId)) {
+                return new CafeDto.UpdateResponse(false, "본인이 소유한 카페만 수정할 수 있습니다.");
+            }
+
+            // 운영시간 생성
+            List<CafeDto.OperatingHours> operatingHours = createOperatingHours(
+                    request.getOperatingDays(),
+                    request.getOperatingStartHour(),
+                    request.getOperatingEndHour()
+            );
+
+            // 카페 정보 수정
+            cafeDao.updateCafe(request, operatingHours);
+
+            return new CafeDto.UpdateResponse(true, "카페 정보가 성공적으로 수정되었습니다.");
+
+        } catch (IllegalArgumentException e) {
+            return new CafeDto.UpdateResponse(false, e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new CafeDto.UpdateResponse(false, "카페 수정 중 오류가 발생했습니다: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 카페 삭제
+     * @param cafeId 삭제할 카페 ID
+     * @param ownerId 카페 소유자 ID
+     * @return 삭제 결과
+     */
+    public CafeDto.DeleteResponse deleteCafe(Long cafeId, Long ownerId) {
+        try {
+            // 카페 존재 여부 및 소유자 확인
+            if (!isOwnerOfCafe(cafeId, ownerId)) {
+                return new CafeDto.DeleteResponse(false, "본인이 소유한 카페만 삭제할 수 있습니다.");
+            }
+
+            // 카페 삭제 (관련 데이터도 함께 삭제)
+            cafeDao.deleteCafe(cafeId);
+
+            return new CafeDto.DeleteResponse(true, "카페가 성공적으로 삭제되었습니다.");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new CafeDto.DeleteResponse(false, "카페 삭제 중 오류가 발생했습니다: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 카페 소유자 확인
+     * @param cafeId 카페 ID
+     * @param ownerId 소유자 ID
+     * @return 소유자 여부
+     */
+    private boolean isOwnerOfCafe(Long cafeId, Long ownerId) {
+        try {
+            return cafeDao.isOwnerOfCafe(cafeId, ownerId);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 }

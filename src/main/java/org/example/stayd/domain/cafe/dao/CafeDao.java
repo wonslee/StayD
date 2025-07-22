@@ -419,4 +419,194 @@ public class CafeDao {
         return "";
     }
 
+    /**
+     * 카페 정보 수정
+     * @param request 수정 요청 정보
+     * @param operatingHours 운영시간 목록
+     * @throws SQLException SQL 예외
+     */
+    public void updateCafe(CafeDto.UpdateRequest request, List<CafeDto.OperatingHours> operatingHours) throws SQLException {
+        Connection connection = databaseConnection.getConnection();
+
+        try {
+            // 트랜잭션 시작
+            connection.setAutoCommit(false);
+
+            // 1. 카페 정보 수정
+            updateCafeInfo(connection, request);
+
+            // 2. 기존 운영시간 삭제
+            deleteOperatingHours(connection, request.getCafeId());
+
+            // 3. 새로운 운영시간 등록
+            insertOperatingHours(connection, request.getCafeId(), operatingHours);
+
+            // 트랜잭션 커밋
+            connection.commit();
+
+        } catch (SQLException e) {
+            // 롤백
+            try {
+                connection.rollback();
+            } catch (SQLException rollbackEx) {
+                rollbackEx.printStackTrace();
+            }
+            throw e;
+        } finally {
+            try {
+                connection.setAutoCommit(true);
+                connection.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     * 카페 정보만 수정
+     * @param connection DB 연결
+     * @param request 수정 요청
+     * @throws SQLException SQL 예외
+     */
+    private void updateCafeInfo(Connection connection, CafeDto.UpdateRequest request) throws SQLException {
+        String sql = """
+        UPDATE cafe 
+        SET name = ?, address = ?, price_per_hour = ?, description = ?, 
+            phone_number = ?, image_url = ?
+        WHERE cafe_id = ?
+        """;
+
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setString(1, request.getName().trim());
+            pstmt.setString(2, request.getAddress().trim());
+            pstmt.setInt(3, request.getPricePerHour());
+            pstmt.setString(4, request.getDescription().trim());
+            pstmt.setString(5, request.getPhoneNumber().trim());
+            pstmt.setString(6, request.getImageUrl() != null ? request.getImageUrl().trim() : null);
+            pstmt.setLong(7, request.getCafeId());
+
+            int affectedRows = pstmt.executeUpdate();
+            if (affectedRows == 0) {
+                throw new SQLException("카페 정보 수정에 실패했습니다.");
+            }
+        }
+    }
+
+    /**
+     * 기존 운영시간 삭제
+     * @param connection DB 연결
+     * @param cafeId 카페 ID
+     * @throws SQLException SQL 예외
+     */
+    private void deleteOperatingHours(Connection connection, Long cafeId) throws SQLException {
+        String sql = "DELETE FROM operation_hours WHERE cafe_id = ?";
+
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setLong(1, cafeId);
+            pstmt.executeUpdate();
+        }
+    }
+
+    /**
+     * 카페 삭제 (카페, 운영시간, 좌석 모두 삭제)
+     * @param cafeId 삭제할 카페 ID
+     * @throws SQLException SQL 예외
+     */
+    public void deleteCafe(Long cafeId) throws SQLException {
+        Connection connection = databaseConnection.getConnection();
+
+        try {
+            // 트랜잭션 시작
+            connection.setAutoCommit(false);
+
+            // 1. 좌석 삭제
+            deleteSeats(connection, cafeId);
+
+            // 2. 운영시간 삭제
+            deleteOperatingHours(connection, cafeId);
+
+            // 3. 카페 삭제
+            deleteCafeInfo(connection, cafeId);
+
+            // 트랜잭션 커밋
+            connection.commit();
+
+        } catch (SQLException e) {
+            // 롤백
+            try {
+                connection.rollback();
+            } catch (SQLException rollbackEx) {
+                rollbackEx.printStackTrace();
+            }
+            throw e;
+        } finally {
+            try {
+                connection.setAutoCommit(true);
+                connection.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     * 좌석 삭제
+     * @param connection DB 연결
+     * @param cafeId 카페 ID
+     * @throws SQLException SQL 예외
+     */
+    private void deleteSeats(Connection connection, Long cafeId) throws SQLException {
+        String sql = "DELETE FROM seat WHERE cafe_id = ?";
+
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setLong(1, cafeId);
+            pstmt.executeUpdate();
+        }
+    }
+
+    /**
+     * 카페 정보 삭제
+     * @param connection DB 연결
+     * @param cafeId 카페 ID
+     * @throws SQLException SQL 예외
+     */
+    private void deleteCafeInfo(Connection connection, Long cafeId) throws SQLException {
+        String sql = "DELETE FROM cafe WHERE cafe_id = ?";
+
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setLong(1, cafeId);
+
+            int affectedRows = pstmt.executeUpdate();
+            if (affectedRows == 0) {
+                throw new SQLException("카페 삭제에 실패했습니다.");
+            }
+        }
+    }
+
+    /**
+     * 카페 소유자 확인
+     * @param cafeId 카페 ID
+     * @param userId 사용자 ID
+     * @return 소유자 여부
+     * @throws SQLException SQL 예외
+     */
+    public boolean isOwnerOfCafe(Long cafeId, Long userId) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM cafe WHERE cafe_id = ? AND owner_id = ?";
+
+        try (Connection conn = databaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setLong(1, cafeId);
+            pstmt.setLong(2, userId);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        }
+
+        return false;
+    }
+
 }
