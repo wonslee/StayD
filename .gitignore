@@ -8,6 +8,7 @@ wrapper/
 native/
 caches/
 wrapper/dists/
+daemon/8.8/*.log
 
 ### IntelliJ IDEA ###
 .idea
