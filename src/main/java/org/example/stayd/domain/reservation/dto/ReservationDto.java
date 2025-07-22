@@ -13,8 +13,8 @@ public class ReservationDto {
     private int reservationId;
     private int userId;
     private int cafeId;
-    private Timestamp usageStartedAt;
-    private Timestamp usageEndedAt;
+    private int usageStartedAt;
+    private int usageEndedAt;
     private String dayOfWeek;
     private double originalPrice;
     private double discountPrice;

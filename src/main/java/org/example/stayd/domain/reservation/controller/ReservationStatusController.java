@@ -2,7 +2,9 @@ package org.example.stayd.domain.reservation.controller;
 
 import javafx.application.Application;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.chart.BarChart;
 import javafx.scene.chart.CategoryAxis;
@@ -12,6 +14,8 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.ProgressBar;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
@@ -20,9 +24,11 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import org.example.stayd.common.FXUtils;
 import org.example.stayd.common.SessionManager;
+import org.example.stayd.config.SceneConfig;
 import org.example.stayd.domain.reservation.dto.ReservationDto;
 import org.example.stayd.domain.reservation.service.ReservationService;
 
+import java.io.IOException;
 import java.sql.Date;
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -80,18 +86,14 @@ public class ReservationStatusController {
 
         // 각 예약 항목에 대해 시간대별로 예약 건수 증가
         for (ReservationDto reservation : reservationList) {
-            if (reservation.getUsageStartedAt() != null) {
-                int startHour = reservation.getUsageStartedAt().toLocalDateTime().getHour();
-                int endHour = reservation.getUsageEndedAt().toLocalDateTime().getHour();
+                int startHour = reservation.getUsageStartedAt();
+                int endHour = reservation.getUsageEndedAt();
 
-                // 시작 시간에서 종료 시간까지 모든 시간대에 대해 예약 건수 증가
                 if (startHour <= endHour) {
-                    // 종료 시간이 시작 시간과 같거나 나중인 경우 (한 날 내에서 예약)
                     for (int i = startHour; i <= endHour; i++) {
                         reservationCounts[i]++;
                     }
                 } else {
-                    // 예약이 자정을 넘는 경우 (예: 22:00 ~ 02:00)
                     for (int i = startHour; i < 24; i++) {
                         reservationCounts[i]++;
                     }
@@ -100,7 +102,6 @@ public class ReservationStatusController {
                     }
                 }
             }
-        }
 
         // x축에 24시간을 나열
         xAxis.setCategories(javafx.collections.FXCollections.observableArrayList(
@@ -165,5 +166,16 @@ public class ReservationStatusController {
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
+    }
+
+    @FXML
+    private void goToReservationSettings(MouseEvent event) {
+        try {
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            FXUtils.switchScene(stage, SceneConfig.RESERVATION_SETTINGS_FXML);  // 예약 설정 페이지로 이동
+        } catch (IOException e) {
+            e.printStackTrace();
+            showAlert(Alert.AlertType.WARNING, "날짜 선택", "예약 설정 페이지로 이동하는 중 오류가 발생했습니다.");
+        }
     }
 }

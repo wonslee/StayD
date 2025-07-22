@@ -53,11 +53,8 @@ public class ReservationDao {
                         int usageStartedAt = rs.getInt("usage_started_at");
                         int usageEndedAt = rs.getInt("usage_ended_at");
 
-                        Timestamp startedAt = convertToTimestamp(usageStartedAt);
-                        Timestamp endedAt = convertToTimestamp(usageEndedAt);
-
-                        reservation.setUsageStartedAt(startedAt);
-                        reservation.setUsageEndedAt(endedAt);
+                        reservation.setUsageStartedAt(usageStartedAt);
+                        reservation.setUsageEndedAt(usageEndedAt);
 
                         reservationList.add(reservation);
                     }

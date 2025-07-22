@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<?import javafx.scene.chart.NumberAxis?>
+<?import javafx.scene.chart.CategoryAxis?>
+<?import javafx.scene.chart.BarChart?>
+<?import javafx.scene.text.Text?>
+<AnchorPane prefHeight="768" prefWidth="1024" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="org.example.stayd.domain.discount.controller.DiscountController">
+    <!-- 고정된 헤더 -->
+    <fx:include source="../common/header.fxml"/>
+
+    <!-- 할인 기간 및 할인율 설정 -->
+    <VBox spacing="20" AnchorPane.topAnchor="140.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0">
+
+        <!-- 할인 설정 -->
+
+        <HBox spacing="10" alignment="CENTER">
+            <Text text="할인 날짜: "/>
+            <DatePicker fx:id="discountDate"/>
+        </HBox>
+
+        <!-- 할인 시작 시간 입력 -->
+        <HBox spacing="10" alignment="CENTER">
+            <Text text="시작 시간: "/>
+            <TextField fx:id="discountStartTime" promptText="HH:mm"/>
+        </HBox>
+
+        <!-- 할인 종료 시간 입력 -->
+        <HBox spacing="10" alignment="CENTER">
+            <Text text="종료 시간: "/>
+            <TextField fx:id="discountEndTime" promptText="HH:mm"/>
+        </HBox>
+
+        <!-- 할인율 입력 -->
+        <HBox spacing="10" alignment="CENTER">
+            <Text text="할인율 (%): "/>
+            <TextField fx:id="discountRate" promptText="할인율을 입력하세요"/>
+        </HBox>
+
+        <!-- 저장 버튼 -->
+        <HBox spacing="10" alignment="CENTER">
+            <Button text="할인 저장" onAction="#saveDiscountSettings"/>
+        </HBox>
+    </VBox>
+    <ScrollPane AnchorPane.topAnchor="360.0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0"
+                AnchorPane.bottomAnchor="0">
+        <VBox spacing="20">
+            <!-- 예약 현황을 BarChart로 표시 -->
+            <BarChart fx:id="reservationBarChart" prefWidth="1000" prefHeight="550">
+                <xAxis>
+                    <CategoryAxis fx:id="xAxis"/>
+                </xAxis>
+                <yAxis>
+                    <NumberAxis fx:id="yAxis"/>
+                </yAxis>
+            </BarChart>
+        </VBox>
+    </ScrollPane>
+</AnchorPane>
