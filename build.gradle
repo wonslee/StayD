@@ -4,6 +4,7 @@ plugins {
   id 'org.javamodularity.moduleplugin' version '1.8.12'
   id 'org.openjfx.javafxplugin' version '0.0.13'
   id 'org.beryx.jlink' version '2.25.0'
+  id 'io.freefair.lombok' version '6.6.1'
 }
 
 group 'org.example'
@@ -38,7 +39,27 @@ javafx {
 }
 
 dependencies {
+//  lombok
+  compileOnly 'org.projectlombok:lombok:1.18.30'
+  annotationProcessor 'org.projectlombok:lombok:1.18.30'
+  testCompileOnly 'org.projectlombok:lombok:1.18.30'
+  testAnnotationProcessor 'org.projectlombok:lombok:1.18.30'
+
+//  Oracle DB
   implementation 'com.oracle.database.jdbc:ojdbc11:21.7.0.0'
+
+//  Bean Validation
+  implementation 'jakarta.validation:jakarta.validation-api:3.0.2'
+  implementation 'org.hibernate.validator:hibernate-validator:8.0.0.Final'
+
+//  BCrypt 해시 라이브러리
+  implementation 'org.mindrot:jbcrypt:0.4'
+
+//  Jakarta EL 구현체 (Eclipse Expressly)
+  implementation 'org.glassfish.expressly:expressly:6.0.0'
+
+  // JavaMail (Jakarta Mail) API
+  implementation 'com.sun.mail:javax.mail:1.6.2'
 
   testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
   testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
