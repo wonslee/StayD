@@ -6,6 +6,7 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.IntStream;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -34,6 +35,17 @@ import org.example.stayd.domain.user.service.UserService;
 public class ReservationCreateController {
     private UserService userService = new UserService();
 
+    /* 주입될 DTO */
+    private CafeDto.DetailResponse cafe;
+
+    /* 서비스 & 상태 */
+    private final ReservationService service = new ReservationService();
+    private Seat selectedSeat;
+
+    public ReservationCreateController(DetailResponse cafe) {
+        this.cafe = cafe;
+    }
+
     /* FXML */
     @FXML
     private DatePicker datePicker;
@@ -46,30 +58,43 @@ public class ReservationCreateController {
     @FXML
     private Button reserveBtn;
 
-    /* 주입될 DTO */
-    private CafeDto.DetailResponse cafe;
-
-    /* 서비스 & 상태 */
-    private final ReservationService service = new ReservationService();
-    private Seat selectedSeat;
-
-    public ReservationCreateController(DetailResponse cafe) {
-        this.cafe = cafe;
-    }
 
     /* 초기화는 FXML 로드 직후 호출 */
     @FXML
     public void initialize() {
         initTimeCombos();
-        datePicker.setOnAction(e -> recalc());
-        startCombo.valueProperty().addListener((obs, o, n) -> recalc());
-        endCombo.valueProperty().addListener((obs, o, n) -> recalc());
-        reserveBtn.setOnAction(e -> makeReservation());
-
-//        TODO: cafe 존재하지 않을 경우 예외 처리
-
         if (cafe != null) {
             loadSeats();
+            recalc();
+        }
+    }
+
+    @FXML
+    public void handleDateChange(ActionEvent event) {
+        recalc();
+    }
+
+    @FXML
+    public void handleStartComboChange(ActionEvent event) {
+        recalc();
+    }
+
+    @FXML
+    public void handleEndComboChange(ActionEvent event) {
+        recalc();
+    }
+
+    @FXML
+    public void handleReserve(ActionEvent event) {
+        makeReservation();
+    }
+
+    public void setCafe(CafeDto.DetailResponse cafe) {
+        this.cafe = cafe;
+        // If FXML fields are injected, update UI
+        if (seatGrid != null) {
+            loadSeats();
+            recalc();
         }
     }
 
@@ -136,12 +161,13 @@ public class ReservationCreateController {
             totalPriceLabel.setText("0");
             return;
         }
+        // TODO: 할인 기간 가져와야 함.
         int total = (eh - sh) * cafe.getPricePerHour();
         totalPriceLabel.setText(String.format("%,d", total));
     }
 
     /* ───────── 예약 실행 ───────── */
-//    TODO: 예약 직후 예약 상세로 리다이렉션
+//    TODO: 예약 정상 완료 -> 마이페이지 예약 상세로 리다이렉션
     private void makeReservation() {
         if (cafe == null) {
             return;
