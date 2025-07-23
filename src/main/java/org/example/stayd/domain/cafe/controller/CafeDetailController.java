@@ -299,6 +299,27 @@ public class CafeDetailController implements Initializable {
 
             reviewTabContent.setVisible(false);
             reviewTabContent.setManaged(false);
+            reservationTabContent.setVisible(true);
+            reservationTabContent.setManaged(true);
+
+            if (!reservationLoaded) {
+                try {
+                    // CHANGED: Use classic FXML loading with fx:controller
+                    FXMLLoader loader = new FXMLLoader(
+                            getClass().getResource("/org/example/stayd/reservation/reservation-view.fxml"));
+                    Node reservationView = loader.load();
+
+                    // CHANGED: Get controller and inject cafe data after loading
+                    ReservationCreateController controller = loader.getController();
+                    DetailResponse cafeDto = cafeService.getCafeDetail(17L); // or actual selected cafe
+                    controller.setCafe(cafeDto);
+
+                    reservationTabContent.getChildren().setAll(reservationView);
+                    reservationLoaded = true;
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
         }
     }
 
