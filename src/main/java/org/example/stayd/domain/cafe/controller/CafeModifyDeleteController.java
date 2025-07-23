@@ -1,15 +1,21 @@
 package org.example.stayd.domain.cafe.controller;
 
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
+import org.example.stayd.common.SessionManager;
 import org.example.stayd.domain.cafe.dto.CafeDto;
 import org.example.stayd.domain.cafe.service.CafeService;
 
+import javax.mail.Session;
+import java.io.IOException;
 import java.net.URL;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -60,7 +66,9 @@ public class CafeModifyDeleteController implements Initializable {
     private final Map<ToggleButton, String> dayButtonMap = new HashMap<>();
     private CafeService cafeService;
     private Long currentCafeId; // 현재 카페 ID
-    private final Long DUMMY_OWNER_ID = 5L; // 더미 사용자 ID
+//    private final Long DUMMY_OWNER_ID = 5L; // 더미 사용자 ID
+    private final Long OWNER_ID = (long) SessionManager.getInstance().getLoggedInUser().getUser_id();
+
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -68,8 +76,8 @@ public class CafeModifyDeleteController implements Initializable {
         initializeDayButtons();
         initializeCharacterCount();
 
-        // 테스트용 카페 데이터 로드 (실제로는 외부에서 setCafeId 호출)
-        loadCafeData(28L); // DB에 있는 카페 ID로 테스트
+//        // 테스트용 카페 데이터 로드 (실제로는 외부에서 setCafeId 호출)
+//        loadCafeData(28L); // DB에 있는 카페 ID로 테스트
 
         // 기본값 설정
         charCountLabel.setText("0/200");
@@ -88,13 +96,15 @@ public class CafeModifyDeleteController implements Initializable {
      * @param cafeId 카페 ID
      */
     public void loadCafeData(Long cafeId) {
+        System.out.println("=== loadCafeData 시작 ===");
+        System.out.println("전달받은 cafeId: " + cafeId);
         try {
             currentCafeId = cafeId;
             cafeIdField.setText(String.valueOf(cafeId));
-
+            System.out.println("cafeService.getCafeDetail 호출 전");
             // DB에서 카페 데이터 가져오기
             CafeDto.DetailResponse cafe = cafeService.getCafeDetail(cafeId);
-
+            System.out.println("cafeService.getCafeDetail 호출 후, 결과: " + (cafe != null ? "성공" : "null"));
             if (cafe == null) {
                 showAlert(Alert.AlertType.ERROR, "오류", "해당 카페를 찾을 수 없습니다.");
                 return;
@@ -301,11 +311,12 @@ public class CafeModifyDeleteController implements Initializable {
             request.setOperatingEndHour(endTime.getHour());
 
             // Service를 통해 카페 정보 수정
-            CafeDto.UpdateResponse response = cafeService.updateCafe(request, DUMMY_OWNER_ID);
+            CafeDto.UpdateResponse response = cafeService.updateCafe(request, OWNER_ID);
 
             if (response.isSuccess()) {
                 showAlert(Alert.AlertType.INFORMATION, "수정 완료", response.getMessage());
-                closeWindow(); // 창닫기
+//                closeWindow(); // 창닫기
+                navigateToReservationStatus();
             } else {
                 showAlert(Alert.AlertType.ERROR, "수정 실패", response.getMessage());
             }
@@ -328,11 +339,12 @@ public class CafeModifyDeleteController implements Initializable {
         if (result.isPresent() && result.get() == ButtonType.OK) {
             try {
                 // Service를 통해 카페 삭제
-                CafeDto.DeleteResponse response = cafeService.deleteCafe(currentCafeId, DUMMY_OWNER_ID);
+                CafeDto.DeleteResponse response = cafeService.deleteCafe(currentCafeId, OWNER_ID);
 
                 if (response.isSuccess()) {
                     showAlert(Alert.AlertType.INFORMATION, "삭제 완료", response.getMessage());
-                    closeWindow(); // 창닫기
+//                    closeWindow(); // 창닫기
+                    navigateToReservationStatus();
                 } else {
                     showAlert(Alert.AlertType.ERROR, "삭제 실패", response.getMessage());
                 }
@@ -430,5 +442,25 @@ public class CafeModifyDeleteController implements Initializable {
     private void closeWindow() {
         Stage stage = (Stage) modifyButton.getScene().getWindow();
         stage.close();
+    }
+    // 화면 이동 메서드 추가 (closeWindow() 메서드 뒤에 추가)
+    private void navigateToReservationStatus() {
+        try {
+            // FXML 파일 로드 (실제 경로에 맞게 수정)
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/stayd/reservation/reservationStatus.fxml"));
+            Parent root = loader.load();
+
+            // 현재 Stage 가져오기
+            Stage stage = (Stage) modifyButton.getScene().getWindow();
+
+            // 새로운 Scene 생성 및 설정
+            Scene scene = new Scene(root);
+            stage.setScene(scene);
+            stage.show();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            showAlert(Alert.AlertType.ERROR, "화면 이동 오류", "화면을 불러올 수 없습니다: " + e.getMessage());
+        }
     }
 }

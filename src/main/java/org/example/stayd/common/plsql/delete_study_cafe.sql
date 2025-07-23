@@ -1,12 +1,14 @@
--- 스터디 카페 삭제 프로시저
+-- 스터디 카페 삭제 프로시저 (수정 버전)
 CREATE OR REPLACE PROCEDURE delete_study_cafe(
     p_cafe_id IN NUMBER,
     p_owner_id IN NUMBER,
     p_result OUT NUMBER  -- 0:성공, 1:권한없음, 2:실패, 3:카페없음
 ) AS
     v_owner_count NUMBER;
+    v_reservations_deleted NUMBER;
     v_seats_deleted NUMBER;
     v_hours_deleted NUMBER;
+    v_discount_deleted NUMBER;
     v_cafe_deleted NUMBER;
 BEGIN
     -- 디버깅 로그
@@ -41,14 +43,31 @@ END IF;
 
         DBMS_OUTPUT.PUT_LINE(' 소유자 확인 완료');
 
-        -- 2. 연관 데이터 삭제 (외래키 순서대로 - 4개 테이블만)
+        -- 2. 연관 데이터 삭제 (외래키 순서대로)
 
-        -- 2-1. 좌석 삭제
+        -- 2-1. 예약 삭제 (가장 먼저 삭제해야 함)
+DELETE FROM reservation WHERE cafe_id = p_cafe_id;
+v_reservations_deleted := SQL%ROWCOUNT;
+        DBMS_OUTPUT.PUT_LINE(' 예약 ' || v_reservations_deleted || '개 삭제 완료');
+
+        -- 2-2. 좌석 삭제
 DELETE FROM seat WHERE cafe_id = p_cafe_id;
 v_seats_deleted := SQL%ROWCOUNT;
         DBMS_OUTPUT.PUT_LINE(' 좌석 ' || v_seats_deleted || '개 삭제 완료');
 
-        -- 2-2. 운영시간 삭제
+        -- 2-3. 할인시간 삭제 (있다면)
+BEGIN
+DELETE FROM discount_hours WHERE cafe_id = p_cafe_id;
+v_discount_deleted := SQL%ROWCOUNT;
+            DBMS_OUTPUT.PUT_LINE(' 할인시간 ' || v_discount_deleted || '개 삭제 완료');
+EXCEPTION
+            WHEN OTHERS THEN
+                -- 할인시간 테이블이 없거나 오류가 있어도 계속 진행
+                v_discount_deleted := 0;
+                DBMS_OUTPUT.PUT_LINE(' 할인시간 테이블 처리 스킵');
+END;
+
+        -- 2-4. 운영시간 삭제
 DELETE FROM operation_hours WHERE cafe_id = p_cafe_id;
 v_hours_deleted := SQL%ROWCOUNT;
         DBMS_OUTPUT.PUT_LINE(' 운영시간 ' || v_hours_deleted || '개 삭제 완료');
@@ -64,7 +83,9 @@ v_cafe_deleted := SQL%ROWCOUNT;
 
             DBMS_OUTPUT.PUT_LINE(' 카페 삭제 완료!');
             DBMS_OUTPUT.PUT_LINE('   카페 ID: ' || p_cafe_id);
+            DBMS_OUTPUT.PUT_LINE('   삭제된 예약: ' || v_reservations_deleted || '개');
             DBMS_OUTPUT.PUT_LINE('   삭제된 좌석: ' || v_seats_deleted || '개');
+            DBMS_OUTPUT.PUT_LINE('   삭제된 할인시간: ' || v_discount_deleted || '개');
             DBMS_OUTPUT.PUT_LINE('   삭제된 운영시간: ' || v_hours_deleted || '개');
 ELSE
             -- 카페 삭제 실패

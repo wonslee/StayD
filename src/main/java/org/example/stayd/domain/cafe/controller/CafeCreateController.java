@@ -1,12 +1,17 @@
 package org.example.stayd.domain.cafe.controller;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -16,6 +21,8 @@ import javafx.scene.control.ToggleButton;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.text.Font;
+import javafx.stage.Stage;
+import org.example.stayd.common.SessionManager;
 import org.example.stayd.domain.cafe.dto.CafeDto;
 import org.example.stayd.domain.cafe.service.CafeService;
 
@@ -224,7 +231,8 @@ public class CafeCreateController implements Initializable {
             CafeDto.CreateRequest request = createCafeRequest();
 
             // 더미 오너 ID 가져오기 (실제로는 현재 로그인한 사용자 ID)
-            Long ownerId = cafeService.getDummyOwnerId();
+//            Long ownerId = cafeService.getDummyOwnerId();
+            Long ownerId = (long) SessionManager.getInstance().getLoggedInUser().getUser_id();
 
             // 카페 생성 서비스 호출
             CafeDto.CreateResponse response = cafeService.createCafe(request, ownerId);
@@ -234,11 +242,13 @@ public class CafeCreateController implements Initializable {
                 showAlert(Alert.AlertType.INFORMATION, "생성 성공",
                         "카페 ID: " + response.getCafeId() + "\n" + response.getMessage());
                 clearForm();
+
             } else {
                 // 실패 시
                 showAlert(Alert.AlertType.ERROR, "생성 실패", response.getMessage());
             }
-
+            // reservationStatus.fxml로 화면 이동
+            navigateToReservationStatus(event);
         } catch (Exception e) {
             e.printStackTrace();
             showAlert(Alert.AlertType.ERROR, "오류 발생", "예상치 못한 오류가 발생했습니다: " + e.getMessage());
@@ -323,5 +333,26 @@ public class CafeCreateController implements Initializable {
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
+    }
+
+    // 화면 이동 메서드
+    private void navigateToReservationStatus(ActionEvent event) {
+        try {
+            // FXML 파일 로드 (경로는 실제 파일 위치에 맞게 수정)
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/stayd/reservation/reservationStatus.fxml"));
+            Parent root = loader.load();
+
+            // 현재 Stage 가져오기
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+
+            // 새로운 Scene 생성 및 설정
+            Scene scene = new Scene(root);
+            stage.setScene(scene);
+            stage.show();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            showAlert(Alert.AlertType.ERROR, "화면 이동 오류", "화면을 불러올 수 없습니다: " + e.getMessage());
+        }
     }
 }

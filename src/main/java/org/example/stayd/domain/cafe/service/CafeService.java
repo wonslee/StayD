@@ -252,10 +252,10 @@ public class CafeService {
      * CAFE_OWNER 권한을 가진 더미 사용자
      * @return 더미 사용자 ID
      */
-    public Long getDummyOwnerId() {
-        // TODO: 실제 사용자 모듈 완성 후 제거
-        return 5L; // 더미 카페 오너 ID
-    }
+//    public Long getDummyOwnerId() {
+//        // TODO: 실제 사용자 모듈 완성 후 제거
+//        return 5L; // 더미 카페 오너 ID
+//    }
 
     /**
      * 카페 오너 권한 검증 (추후 구현)
@@ -451,6 +451,20 @@ public class CafeService {
         } catch (Exception e) {
             e.printStackTrace();
             return false;
+        }
+    }
+
+    /**
+     * 특정 오너의 가장 최신 카페 ID 조회
+     * @param ownerId 카페 오너 ID
+     * @return 가장 최근에 생성된 카페 ID (없으면 null)
+     */
+    public Long getLatestCafeIdByOwnerId(Long ownerId) {
+        try {
+            return cafeDao.findLatestCafeIdByOwnerId(ownerId);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
         }
     }
 }
