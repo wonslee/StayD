@@ -19,7 +19,46 @@ public class ReservationDao {
         this.connection = new DatabaseConnection().getConnection();
     }
 
-    // 로그인한 유저의 cafe_id와 선택된 날짜에 해당하는 예약 현황 조회
+    // 요일별 예약 데이터를 가져오는 메서드
+    public List<ReservationDTO> getReservationStatusByDay(String dayOfWeek) throws SQLException {
+        List<ReservationDTO> reservationList = new ArrayList<>();
+        UserDTO loggedInUser = SessionManager.getInstance().getLoggedInUser();
+        if (loggedInUser != null) {
+            System.out.println("Logged-in User ID: " + loggedInUser);
+        } else {
+            System.out.println("No user is logged in.");
+        }
+
+        // 로그인한 유저의 user_id 가져오기
+        int userId = SessionManager.getInstance().getLoggedInUser().getUser_id();
+
+        // 유저의 cafe_id 가져오기
+        int cafeId = getCafeIdByUserId(userId);
+
+        // 유효한 cafe_id가 있는 경우, 해당 cafe_id와 선택된 요일로 예약 현황 조회
+        if (cafeId != -1) {
+            String query = "SELECT usage_started_at, usage_ended_at, day_of_week FROM reservation WHERE cafe_id = ? AND day_of_week = ? AND is_canceled IS NULL";
+
+            try (PreparedStatement stmt = connection.prepareStatement(query)) {
+                stmt.setInt(1, cafeId);  // cafe_id로 필터링
+                stmt.setString(2, dayOfWeek);  // 요일 값으로 필터링
+
+                try (ResultSet rs = stmt.executeQuery()) {
+                    while (rs.next()) {
+                        ReservationDTO reservation = ReservationDTO.builder()
+                                .usageStartedAt(rs.getInt("usage_started_at"))
+                                .usageEndedAt(rs.getInt("usage_ended_at"))
+                                .build();
+
+                        reservationList.add(reservation);
+                    }
+                }
+            }
+        }
+        return reservationList;
+    }
+
+    // 날짜에 해당하는 예약 현황 조회
     public List<ReservationDTO> getReservationStatusByLoggedInUser(Date selectedDate) throws SQLException {
         List<ReservationDTO> reservationList = new ArrayList<>();
 
@@ -60,48 +99,6 @@ public class ReservationDao {
         }
         return reservationList;
     }
-
-//    public List<ReservationDTO> getReservationStatusByLoggedInUserDay() throws SQLException {
-//        List<ReservationDTO> reservationList = new ArrayList<>();
-//
-//        UserDTO loggedInUser = SessionManager.getInstance().getLoggedInUser();
-//        if (loggedInUser != null) {
-//            System.out.println("Logged-in User ID: " + loggedInUser);
-//        } else {
-//            System.out.println("No user is logged in.");
-//        }
-//
-//        int userId = loggedInUser.getUser_id();
-//        System.out.println("Logged-in User ID: " + userId);
-//
-//        int cafeId = getCafeIdByUserId(userId);
-//        System.out.println("Cafe ID for User " + userId + ": " + cafeId);
-//
-//        if (cafeId != -1) {
-//            String query = "SELECT DAYOFWEEK(usage_started_at) AS day_of_week, COUNT(*) AS reservation_count " +
-//                    "FROM reservation WHERE cafe_id = ? AND is_canceled IS NULL " +
-//                    "GROUP BY DAYOFWEEK(usage_started_at) ORDER BY day_of_week";
-//
-//            try (PreparedStatement stmt = connection.prepareStatement(query)) {
-//                stmt.setInt(1, cafeId);  // cafe_id로 필터링
-//
-//                try (ResultSet rs = stmt.executeQuery()) {
-//                    while (rs.next()) {
-//                        int dayOfWeek = rs.getInt("day_of_week");
-//                        int reservationCount = rs.getInt("reservation_count");
-//
-//                        // 예약 현황을 ReservationDTO에 저장
-//                        ReservationDTO reservation = ReservationDTO.builder()
-//                                .dayOfWeek(dayOfWeek)
-//                                .reservationCount(reservationCount)
-//                                .build();
-//                        reservationList.add(reservation);
-//                    }
-//                }
-//            }
-//        }
-//        return reservationList;
-//    }
 
     // 숫자를 시간으로 변환하여 Timestamp 객체로 변환하는 메서드
     private Timestamp convertToTimestamp(int time) {

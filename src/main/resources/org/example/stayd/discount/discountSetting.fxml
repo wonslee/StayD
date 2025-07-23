@@ -8,8 +8,10 @@
 
 <?import javafx.scene.text.Text?>
 <AnchorPane prefHeight="768" prefWidth="1024" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.stayd.domain.discount.controller.DiscountController">
-    <VBox spacing="30">
+    <VBox>
         <fx:include source="../common/header.fxml" />
+        <!-- 고정된 네브바 -->
+        <fx:include source="../common/navbar.fxml" AnchorPane.topAnchor="130.0" />
 
         <!-- Discount Date -->
         <HBox spacing="10" alignment="CENTER">

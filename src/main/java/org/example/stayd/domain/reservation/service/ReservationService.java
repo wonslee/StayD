@@ -31,8 +31,14 @@ public class ReservationService {
         this.reservationDAO = new ReservationWDAO();
     }
 
+    // 날짜별 예약 현황을 가져오는 메서드
     public List<ReservationDTO> getReservationStatusByLoggedInUser(Date selectedDate) throws SQLException {
         return reservationDao.getReservationStatusByLoggedInUser(selectedDate);  // 로그인한 유저의 cafe_id로 필터링된 데이터 반환
+    }
+
+    // 요일별 예약 현황을 가져오는 메서드
+    public List<ReservationDTO> getReservationStatusByDay(String selectedDay) throws SQLException {
+        return reservationDao.getReservationStatusByDay(selectedDay);
     }
 
     /**

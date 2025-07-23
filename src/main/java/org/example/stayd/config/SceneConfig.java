@@ -9,7 +9,10 @@ public class SceneConfig {
     public static final String HOME_FXML = "/org/example/stayd/cafe/cafeListView.fxml";
     public static final String MY_PAGE_FXML = "/org/example/stayd/mypage/mypage.fxml";
     public static final String RESERVATION_STATUS_FXML = "/org/example/stayd/reservation/reservationStatus.fxml";
+    public static final String RESERVATION_STATUS_DAY_FXML = "/org/example/stayd/reservation/reservationStatusDay.fxml";
     public static final String DISCOUNT_SETTINGS_FXML = "/org/example/stayd/discount/discountSetting.fxml";
+    public static final String CAFE_CREATE_FXML = "/org/example/stayd/cafe/cafeCreateView.fxml";
+    public static final String CAFE_Modify_Delete_FXML = "/org/example/stayd/cafe/cafeModifyDelete.fxml";
 
     public static final double WIDTH       = 1024;
     public static final double HEIGHT      = 768;
