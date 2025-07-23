@@ -10,9 +10,14 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+import org.example.stayd.common.DatabaseConnection;
 import org.example.stayd.common.YesNullableConverter;
+import org.example.stayd.domain.reservation.dto.ReservationDTO;
 import org.example.stayd.domain.reservation.model.DayOfWeek;
 import org.example.stayd.domain.reservation.model.Reservation;
+
+
 
 public class ReservationWDAO {
     // TODO: 특정 스터디카페 전체 좌석 조회
@@ -146,7 +151,7 @@ public class ReservationWDAO {
                        created_at,
                        is_canceled,
                        canceled_at,
-                       rating,
+                       rating,  
                        content,
                        review_created_at
                   FROM reservation
@@ -182,6 +187,97 @@ public class ReservationWDAO {
                 }
             }
         }
+        return list;
+    }
+    // 리뷰 작성 가능한 예약 목록 조회 (리뷰 작성 안 했고, 취소되지 않은 예약)
+    public List<ReservationDTO> findWritableReservationsByUserId(int userId) {
+        List<ReservationDTO> list = new ArrayList<>();
+        String sql = """
+                SELECT reservation_id,
+                       user_id,
+                       cafe_id,
+                       reservation_date,
+                       usage_started_at,
+                       usage_ended_at
+                  FROM reservation
+                 WHERE user_id = ?
+                   AND is_canceled = 'N'
+                   AND review_created_at IS NULL
+                ORDER BY reservation_date DESC
+                """;
+
+        try (Connection conn = new DatabaseConnection().getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql))  {
+
+            ps.setInt(1, userId);
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                ReservationDTO dto = ReservationDTO.builder()
+                        .reservationId(rs.getLong("reservation_id"))
+                        .userId(rs.getLong("user_id"))
+                        .cafeId(rs.getLong("cafe_id"))
+                        .reservationDate(rs.getDate("reservation_date").toLocalDate())
+                        .usageStartedAt(rs.getInt("usage_started_at"))
+                        .usageEndedAt(rs.getInt("usage_ended_at"))
+                        .build();
+
+                list.add(dto);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+
+    // ✅ 특정 유저의 예약 리스트를 ReservationDTO로 반환하는 메서드
+    public List<ReservationDTO> findByUserId(int userId) throws SQLException {
+        List<ReservationDTO> list = new ArrayList<>();
+
+        String sql = """
+        SELECT r.reservation_id,
+               r.cafe_id,
+               c.name AS cafe_name,
+               r.reservation_date,
+               r.usage_started_at,
+               r.usage_ended_at,
+               r.original_price,
+               r.discount_price,
+               r.review_created_at,
+               r.rating,
+               r.content
+        FROM reservation r
+        JOIN cafe c ON r.cafe_id = c.cafe_id
+        WHERE r.user_id = ?
+        ORDER BY r.reservation_date DESC
+        """;
+
+        try (Connection conn = new DatabaseConnection().getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, userId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    ReservationDTO dto = ReservationDTO.builder()
+                            .reservationId(rs.getLong("reservation_id"))
+                            .cafeId(rs.getLong("cafe_id"))
+                            .cafeName(rs.getString("cafe_name"))
+                            .reservationDate(rs.getDate("reservation_date").toLocalDate())
+                            .usageStartedAt(rs.getInt("usage_started_at"))
+                            .usageEndedAt(rs.getInt("usage_ended_at"))
+                            .originalPrice(rs.getInt("original_price"))
+                            .discountPrice(rs.getInt("discount_price"))
+                            .reviewCreatedAt(rs.getTimestamp("REVIEW_CREATED_AT").toLocalDateTime())
+                            .rating(rs.getInt("rating"))
+                            .content(rs.getString("content"))
+                            .build();
+
+                    list.add(dto);
+                }
+            }
+        }
+
         return list;
     }
 

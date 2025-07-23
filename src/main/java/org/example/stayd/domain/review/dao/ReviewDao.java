@@ -29,7 +29,8 @@ public interface ReviewDao {
 
     /** 트랜잭션 커밋 (insert/update/delete 이후 호출 필수) */
     void commitIfNeeded() throws SQLException;
-
+    /** 특정 유저가 작성한 모든 리뷰 조회 */
+    List<ReviewDto> findAllByUserId(int userId) throws SQLException;
     /*
      TODO (통합 시)
      1. insert/update/delete 모두 SessionContext를 통해 로그인 유저 정보 (userId) 주입 필요

@@ -8,139 +8,153 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.layout.Region;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
+import org.example.stayd.common.SessionManager;
 import org.example.stayd.domain.review.dao.ReviewDao;
 import org.example.stayd.domain.review.dao.ReviewDaoImpl;
+import org.example.stayd.domain.review.dto.ReviewDto;
 import org.example.stayd.domain.review.dto.ReviewListDto;
-// import org.example.stayd.global.SessionContext;
 
 import java.io.IOException;
 
 /**
- * 리뷰 목록의 개별 셀 (리스트에서 한 줄)
- * - 본인 리뷰일 경우 '삭제', '수정' 버튼 노출
- * - 수정 시 reviewEdit.fxml 새 창으로 열림
+ * 리뷰 목록의 개별 셀 컨트롤러
+ * - 본인 리뷰에만 수정/삭제 버튼 노출
+ * - 삭제 시 확인창 표시
+ * - 수정 시 팝업 열기
  */
 public class ReviewListCell extends ListCell<ReviewListDto> {
 
-    @FXML private Label nameLabel, ratingLabel, contentLabel, dateLabel;
-    @FXML private Button deleteBtn, editButton;
+    // FXML 요소들
+    @FXML private Label nameLabel;
+    @FXML private Label ratingLabel;
+    @FXML private Label contentLabel;
+    @FXML private Label dateLabel;
+    @FXML private Button deleteBtn;
+    @FXML private Button editButton;
+
     private Parent root;
-
-    private final ReviewDao dao = new ReviewDaoImpl();
-
-    /** 현재 로그인 사용자 이름 (임시 하드코딩) */
-    private static final int loginUserId = 66; // TODO: SessionContext 로 교체 예정
-
-    public ReviewListCell() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/stayd/review/reviewListCell.fxml"));
-            loader.setController(this);
-            root = loader.load();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+    private final ReviewDao dao = new ReviewDaoImpl();  // DAO 초기화
 
     @Override
-    protected void updateItem(ReviewListDto dto, boolean empty) {
-        super.updateItem(dto, empty);
+    protected void updateItem(ReviewListDto review, boolean empty) {
+        super.updateItem(review, empty);
 
-        if (empty || dto == null) {
+        if (empty || review == null) {
+            setText(null);
             setGraphic(null);
-        } else {
-            nameLabel.setText(dto.getReviewerName());
-            ratingLabel.setText("★ " + dto.getRating());
-            contentLabel.setText(dto.getContent());
-            dateLabel.setText(dto.getCreatedAt().toLocalDate().toString());
+            return;
+        }
 
-            contentLabel.setWrapText(true);
-            contentLabel.setMaxWidth(getListView().getWidth() - 40);
+        try {
+            // FXML 로딩 및 컨트롤러 설정
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/stayd/reviewListCell.fxml"));
+            loader.setController(this);
+            root = loader.load();
 
-            boolean isMine = dto.getReviewerId() == loginUserId;
-            deleteBtn.setVisible(isMine);
-            editButton.setVisible(isMine);
+            // UI에 데이터 표시
+            nameLabel.setText(review.getReviewerName());
+            contentLabel.setText(review.getContent());
+            ratingLabel.setText("★".repeat(review.getRating()) + "☆".repeat(5 - review.getRating()));
+            dateLabel.setText(review.getCreatedAt().toString());
 
-            deleteBtn.setOnAction(e -> handleDelete(dto.getReservationId()));
-            editButton.setOnAction(this::handleEdit);
+            // 현재 로그인 사용자 ID 조회
+            int loginUserId = SessionManager.getInstance().getLoggedInUser().getUser_id();
+
+            // 본인 리뷰 여부 판단
+            boolean isMyReview = loginUserId == review.getReviewerId();
+
+            // 본인 리뷰인 경우에만 버튼 노출
+            editButton.setVisible(isMyReview);
+            editButton.setManaged(isMyReview);
+            deleteBtn.setVisible(isMyReview);
+            deleteBtn.setManaged(isMyReview);
+
+            // 버튼 이벤트 등록
+            deleteBtn.setOnAction(e -> handleDelete(review));
+            editButton.setOnAction(e -> openEditPopup(review));
 
             setGraphic(root);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            setText("오류 발생");
         }
     }
 
-    /** 삭제 처리 */
-    private void handleDelete(int reservationId) {
+    /**
+     * 리뷰 삭제 전 확인창 표시 후, 삭제 수행
+     */
+    private void handleDelete(ReviewListDto review) {
         Alert confirm = new Alert(AlertType.CONFIRMATION, "정말로 삭제하시겠습니까?", ButtonType.YES, ButtonType.NO);
         confirm.setHeaderText(null);
-
         confirm.showAndWait().ifPresent(resp -> {
             if (resp == ButtonType.YES) {
                 try {
-                    int result = dao.delete(reservationId, getLoginUserId());
+                    int loginUserId = SessionManager.getInstance().getLoggedInUser().getUser_id();
+                    int result = dao.delete(review.getReservationId(), loginUserId); // ✅ 메서드 및 파라미터 수정
                     dao.commitIfNeeded();
                     if (result == 1) {
-                        getListView().getItems().remove(getItem());
-                        showInfo("리뷰가 삭제되었습니다.");
+                        getListView().getItems().remove(review); // UI에서도 제거
+                        showAlert("리뷰가 삭제되었습니다.");
                     } else {
-                        showInfo("삭제 실패: 리뷰를 찾을 수 없습니다.");
+                        showAlert("삭제에 실패했습니다.");
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
-                    showInfo("삭제 중 오류: " + e.getMessage());
+                    showAlert("삭제 중 오류 발생: " + e.getMessage());
                 }
             }
         });
     }
 
-    /** 수정 버튼 클릭 시 */
-    @FXML
-    private void handleEdit(ActionEvent event) {
-        ReviewListDto dto = getItem();
-
+    /**
+     * 수정 팝업 창 열기
+     */
+    private void openEditPopup(ReviewListDto reviewListDto) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/stayd/review/reviewEdit.fxml"));
-            Parent root = loader.load();
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/stayd/reviewEdit.fxml"));
+            Parent popupRoot = loader.load();
 
             ReviewEditController controller = loader.getController();
-            controller.setReview(dto);
 
-            // 수정 완료 후 콜백 → reviewList.fxml 다시 열기
-            controller.setOnReviewUpdated(() -> {
-                try {
-                    ((Stage) editButton.getScene().getWindow()).close();
+            // ReviewListDto → ReviewDto 변환
+            ReviewDto reviewDto = new ReviewDto();
+            reviewDto.setReviewerId(reviewListDto.getReviewerId());
+            reviewDto.setContent(reviewListDto.getContent());
+            reviewDto.setRating(reviewListDto.getRating());
+            reviewDto.setReservationId(reviewListDto.getReservationId());
+            reviewDto.setCafeId(reviewListDto.getCafeId());
 
-                    FXMLLoader listLoader = new FXMLLoader(getClass().getResource("/org/example/stayd/review/reviewList.fxml"));
-                    Parent listRoot = listLoader.load();
-                    Stage listStage = new Stage();
-                    listStage.setScene(new Scene(listRoot));
-                    listStage.setTitle("리뷰 목록");
-                    listStage.show();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    showInfo("리뷰 목록 새로고침 중 오류 발생");
-                }
+            // 콜백 등록 (수정 완료 시 목록 새로고침)
+            controller.setReviewData(reviewDto, () -> {
+                getListView().refresh();
             });
 
+            // 팝업 창 표시
             Stage stage = new Stage();
-            stage.setScene(new Scene(root));
+            stage.setScene(new Scene(popupRoot));
+            stage.initModality(Modality.APPLICATION_MODAL);
             stage.setTitle("리뷰 수정");
+            stage.setResizable(false);
             stage.show();
 
-        } catch (IOException e) {
-            e.printStackTrace();
-            showInfo("수정 화면을 불러오는 데 실패했습니다.");
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            showAlert("리뷰 수정 창을 여는 데 실패했습니다.");
         }
     }
 
-    private void showInfo(String msg) {
-        Alert alert = new Alert(AlertType.INFORMATION, msg, ButtonType.OK);
+    /**
+     * 정보 알림창 표시
+     */
+    private void showAlert(String msg) {
+        Alert alert = new Alert(AlertType.INFORMATION);
+        alert.setTitle("알림");
         alert.setHeaderText(null);
+        alert.setContentText(msg);
         alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
         alert.showAndWait();
-    }
-
-    // [테스트용] 로그인된 유저의 ID를 반환
-    private int getLoginUserId() {
-        return 66; // TODO: 통합 시 SessionContext.getCurrentUserId() 로 교체
     }
 }

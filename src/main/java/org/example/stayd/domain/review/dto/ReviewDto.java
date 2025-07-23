@@ -1,8 +1,6 @@
 package org.example.stayd.domain.review.dto;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
@@ -10,9 +8,12 @@ import java.time.LocalDateTime;
  * 리뷰 작성/조회용 데이터 전송 객체 (DTO)
  * reviewerId, cafeId는 외부(controller)에서 세션 기반으로 주입됨
  */
+@NoArgsConstructor
+@AllArgsConstructor
 @Getter
 @Setter
 @ToString
+@Builder
 public class ReviewDto {
 
     private int reservationId;   // 리뷰 대상 예약 ID

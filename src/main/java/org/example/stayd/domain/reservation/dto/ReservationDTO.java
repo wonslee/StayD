@@ -5,11 +5,14 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 import org.example.stayd.domain.reservation.model.DayOfWeek;
 import org.example.stayd.domain.reservation.model.Reservation;
 
+
 @Getter
 @Builder
+@Setter
 public class ReservationDTO {
 
     private Long reservationId;
@@ -21,7 +24,10 @@ public class ReservationDTO {
     private int usageStartedAt;
     private int usageEndedAt;
     private DayOfWeek dayOfWeek;
-
+    private String cafeName;
+    public String getCafeName() {
+        return cafeName;
+    }
     private int originalPrice;
     private int discountPrice;
 
@@ -50,6 +56,7 @@ public class ReservationDTO {
                 .discountPrice(reservation.getDiscountPrice())
                 .createdAt(reservation.getCreatedAt())
                 .canceledAt(reservation.getCanceledAt())
+                .canceled(reservation.isCanceled())
                 .rating(reservation.getRating())
                 .content(reservation.getContent())
                 .reviewCreatedAt(reservation.getReviewCreatedAt())

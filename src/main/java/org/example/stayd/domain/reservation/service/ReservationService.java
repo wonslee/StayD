@@ -8,9 +8,7 @@ import java.sql.Connection;
 import java.sql.Date;
 import java.sql.SQLException;
 import java.util.List;
-import org.example.stayd.domain.reservation.dto.ReservationDto;
-import org.example.stayd.domain.reservation.dao.ReservationDao;
-import org.example.stayd.domain.reservation.dto.ReservationDto;
+import java.util.Optional;
 import org.example.stayd.common.DatabaseConnection;
 import org.example.stayd.domain.reservation.dao.ReservationWDAO;
 import org.example.stayd.domain.reservation.dao.ReservationDao;
@@ -22,7 +20,7 @@ import org.example.stayd.domain.reservation.model.Seat;
 
 public class ReservationService {
 
-//    TODO: reservationDAO 하나로 합치기
+    //    TODO: reservationDAO 하나로 합치기
     private final ReservationDao reservationDao;
     private final ReservationWDAO reservationDAO;
     private final SeatDAO seatDAO = new SeatDAO();
@@ -130,10 +128,14 @@ public class ReservationService {
     }
 
     /**
-     * 특정 유저 예약 목록
+     * 특정 유저의 예약 목록 조회
      */
-
-}
-public interface ReservationService {
-    ReservationDto latestFinished(int userId);
+    public List<ReservationDTO> findByUser(int userId) {
+        try {
+            return reservationDAO.findByUserId(userId);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return List.of();
+        }
+    }
 }

@@ -6,105 +6,133 @@ package org.example.stayd.domain.review.controller;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.Node;
 import javafx.scene.control.*;
-import javafx.stage.Stage;
-
-import org.example.stayd.domain.reservation.dto.ReservationDto;
-import org.example.stayd.domain.reservation.service.ReservationService;
-import org.example.stayd.domain.reservation.service.ReservationServiceImpl;
+import javafx.scene.text.Text;
+import org.example.stayd.domain.reservation.dao.ReservationWDAO;
 import org.example.stayd.domain.review.dao.ReviewDao;
 import org.example.stayd.domain.review.dao.ReviewDaoImpl;
+import org.example.stayd.domain.reservation.dto.ReservationDTO;
 import org.example.stayd.domain.review.dto.ReviewDto;
-// import org.example.stayd.global.SessionContext; // TODO: 나중에 주석 해제 - 로그인 정보 연동 시 필요
+import org.example.stayd.common.SessionManager;
 
-import java.time.format.DateTimeFormatter;
+import java.sql.SQLException;
+import java.util.List;
 
 public class ReviewController {
 
-    // ────── FXML 컴포넌트 바인딩 ──────
-    @FXML private Label cafeName, avgScore;
-    @FXML private Label useDate, useTime;
-    // @FXML private Label seat;  // 좌석 정보 추후 구현 시 사용
-    @FXML private ToggleButton star1, star2, star3, star4, star5;
-    @FXML private TextArea reviewTextArea;
+    // FXML 컴포넌트: 별점 버튼 5개
+    @FXML private ToggleButton star1;
+    @FXML private ToggleButton star2;
+    @FXML private ToggleButton star3;
+    @FXML private ToggleButton star4;
+    @FXML private ToggleButton star5;
 
+    // FXML 컴포넌트: 예약 정보 및 리뷰 입력란
+    @FXML private Text useDate;
+    @FXML private Text useTime;
+    @FXML private TextArea reviewTextArea;
+    @FXML private Label cafeName, avgScore;  // 선택적으로 화면에 표시할 수 있는 카페 정보
+
+    // 별점 버튼 배열로 저장
     private ToggleButton[] stars;
 
-    /** 테스트용 사용자 ID (임시) */
-    private int userId = 66; // TODO: 나중에 제거 → 아래 SessionContext 방식으로 교체할 것
+    // 로그인 사용자 ID
+    private int userId;
 
-    // private int userId = SessionContext.getCurrentUserId(); // TODO: 나중에 주석 해제 → 실제 로그인 사용자 연동
+    // 리뷰 작성 대상 예약 정보
+    private ReservationDTO resInfo;
 
-    private ReservationDto resInfo; // 이용 완료된 예약 정보 캐시
-
+    // 리뷰 DAO
     private final ReviewDao reviewDao = new ReviewDaoImpl();
-    private final ReservationService resSvc = new ReservationServiceImpl();
 
-    // ─────────────────────────────────────────
+    // 예약 DAO (팀원이 만든 ReservationWDAO 사용)
+    private final ReservationWDAO reservationDao = new ReservationWDAO();
 
+    // 초기화 메서드: 로그인 정보 불러오고, 별점 버튼 셋업, 예약 정보 불러오기
     @FXML
     private void initialize() {
-        // 별점 버튼 배열 초기화 & 클릭 이벤트 연결
+        // 현재 로그인한 사용자 ID 가져오기
+        userId = SessionManager.getInstance().getLoggedInUser().getUser_id();
+
+        // 별점 버튼 클릭 이벤트 설정
         stars = new ToggleButton[]{star1, star2, star3, star4, star5};
         for (int i = 0; i < stars.length; i++) {
             final int idx = i;
-            stars[i].setOnAction(e -> fillStars(idx));
+            stars[i].setOnAction(e -> fillStars(idx));  // 해당 인덱스까지 별 채우기
         }
-        // 예약 정보 로드 → 화면 바인딩
+
+        // 예약 정보 불러오기
         loadReservation();
     }
 
-    /** 최근 완료 예약 1건 로드 & 화면 바인딩 */
+    // 사용자가 작성 가능한 예약 1건 불러오기 (리뷰 미작성인 예약)
     private void loadReservation() {
-        // 👉 여기에 넣으면 됨
-        System.out.println("📌 리뷰용 예약 불러오는 중... userId=" + userId);
-        resInfo = resSvc.latestFinished(userId);
-        if (resInfo != null) System.out.println("✅ 예약 ID: " + resInfo.getReservationId());
-        else System.out.println("❌ 예약 없음");
+        try {
+            int userId = SessionManager.getInstance().getLoggedInUser().getUser_id();
+            List<ReservationDTO> list = reservationDao.findWritableReservationsByUserId(userId);
 
-        if (resInfo == null) {
-            alert("이용 완료된 예약이 없습니다. 리뷰를 작성할 수 없습니다.");
-            disableForm();
-            return;
+
+            // 리뷰가 아직 작성되지 않은 예약 1건 찾기
+            for (ReservationDTO dto : list) {
+                if (dto.getRating() == null && dto.getUserId() == userId) {
+                    resInfo = dto;
+                    break;
+                }
+            }
+
+            // 없으면 안내 메시지
+            if (resInfo == null) {
+                alert("작성 가능한 리뷰가 없습니다.");
+            } else {
+                // 화면에 예약 정보 표시
+                useDate.setText(resInfo.getReservationDate().toString());
+                useTime.setText(resInfo.getUsageStartedAt() + " ~ " + resInfo.getUsageEndedAt());
+                if (cafeName != null) cafeName.setText(resInfo.getCafeName());
+                if (avgScore != null) avgScore.setText(resInfo.getRating() != null ? String.valueOf(resInfo.getRating()) : "-");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            alert("예약 정보 불러오기 오류");
         }
-        cafeName.setText(resInfo.getCafeName());
-        avgScore.setText(String.valueOf(resInfo.getAvgScore()));
-
-        DateTimeFormatter dFmt = DateTimeFormatter.ofPattern("yyyy년 MM월 dd일");
-        DateTimeFormatter tFmt = DateTimeFormatter.ofPattern("HH:mm");
-
-        useDate.setText(resInfo.getUsageStart().format(dFmt));
-        useTime.setText(String.format("%s - %s",
-                resInfo.getUsageStart().format(tFmt),
-                resInfo.getUsageEnd().format(tFmt)));
     }
 
-    /** 별점 채우기 */
-    private void fillStars(int idx) {
-        for (int i = 0; i < stars.length; i++) stars[i].setSelected(i <= idx);
+    // 선택한 별점 채우기 (0~4까지 선택하면 해당 인덱스까지 활성화)
+    private void fillStars(int index) {
+        for (int i = 0; i < stars.length; i++) {
+            stars[i].setSelected(i <= index);
+        }
     }
 
+    // 현재 선택된 별점 계산
     private int getRating() {
-        int r = 0;
-        for (ToggleButton b : stars) if (b.isSelected()) r++;
-        return r;
+        int rating = 0;
+        for (ToggleButton star : stars) {
+            if (star.isSelected()) rating++;
+        }
+        return rating;
     }
 
-    // ────── 버튼 핸들러 ──────
-    @FXML private void handleCancel(ActionEvent e) { close(e); }
-
+    // 리뷰 저장 버튼 클릭 시 호출
     @FXML
     private void handleSubmit(ActionEvent e) {
-        if (resInfo == null) return; // 안전망
+        if (resInfo == null) {
+            alert("작성 가능한 예약이 없습니다.");
+            return;
+        }
 
         // 유효성 체크
-        if (getRating() == 0) { alert("별점을 선택해 주세요."); return; }
-        if (reviewTextArea.getText().isBlank()) { alert("리뷰 내용을 입력해 주세요."); return; }
+        if (getRating() == 0) {
+            alert("별점을 선택해 주세요.");
+            return;
+        }
+        if (reviewTextArea.getText().isBlank()) {
+            alert("리뷰 내용을 입력해 주세요.");
+            return;
+        }
 
-        // ✅ 예약당 리뷰 1개 제한 체크
+        // 예약당 리뷰 1개 제한 체크
         try {
-            if (((ReviewDaoImpl) reviewDao).existsByReservation(resInfo.getReservationId(), userId)) {
+            if (((ReviewDaoImpl) reviewDao).existsByReservation(resInfo.getReservationId().intValue(), userId)) {
                 alert("이 예약에는 이미 리뷰를 작성하셨습니다.");
                 return;
             }
@@ -114,59 +142,52 @@ public class ReviewController {
             return;
         }
 
-        // DTO 구성
+        // 리뷰 DTO 생성 및 정보 세팅
         ReviewDto dto = new ReviewDto();
         dto.setReviewerId(userId);
-        dto.setCafeId(resInfo.getCafeId());
-        dto.setReservationId(resInfo.getReservationId());
+        dto.setCafeId(resInfo.getCafeId().intValue());
+        dto.setReservationId(resInfo.getReservationId().intValue());
         dto.setRating(getRating());
         dto.setContent(reviewTextArea.getText().trim());
 
         try {
-            if (reviewDao.insert(dto) == 1) {
+            int result = reviewDao.insert(dto);
+            if (result == 1) {
                 reviewDao.commitIfNeeded();
                 alert("리뷰가 저장되었습니다.");
-                close(e);
-            } else alert("리뷰 저장 실패");
-
-        } catch (java.sql.SQLException ex) {
+                close(e);  // 창 닫기
+            } else {
+                alert("리뷰 저장 실패");
+            }
+        } catch (SQLException ex) {
             if (ex.getErrorCode() == 1) {
                 alert("리뷰는 한 카페당 한 번만 작성 가능합니다.");
-            } else alert("DB 오류: " + ex.getMessage());
-            ex.printStackTrace();
-
+            } else {
+                ex.printStackTrace();
+                alert("리뷰 저장 중 오류: " + ex.getMessage());
+            }
         } catch (Exception ex) {
             ex.printStackTrace();
-            alert("알 수 없는 오류: " + ex.getMessage());
+            alert("리뷰 저장 중 오류: " + ex.getMessage());
         }
     }
 
-    // ────── 공용 유틸 ──────
-    private void disableForm() {
-        for (ToggleButton b : stars) b.setDisable(true);
-        reviewTextArea.setDisable(true);
+    // 취소 버튼 클릭 시 창 닫기
+    @FXML
+    private void handleCancel(ActionEvent e) {
+        close(e);
     }
 
-    private void close(ActionEvent e) {
-        ((Stage) ((Node) e.getSource()).getScene().getWindow()).close();
-    }
-
+    // 알림창 출력
     private void alert(String msg) {
-        Alert a = new Alert(Alert.AlertType.INFORMATION, msg, ButtonType.OK);
-        a.setHeaderText(null);
-        a.showAndWait();
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("알림");
+        alert.setContentText(msg);
+        alert.showAndWait();
+    }
+
+    // 현재 창 닫기
+    private void close(ActionEvent e) {
+        ((Button) e.getSource()).getScene().getWindow().hide();
     }
 }
-
-/*
-  TODO (통합 시)
-  1. userId → SessionContext.getCurrentUserId() 등 실제 로그인 정보 연동
-     - 현재 테스트용 userId 하드코딩 사용 중
-     - 실제 연동 시:
-         - import org.example.stayd.global.SessionContext;
-         - private int userId = SessionContext.getCurrentUserId();
-         - 하드코딩 라인 제거 필요
-
-  2. 좌석 seatNumber 컬럼이 추가되면 ReservationDto·FXML 바인딩 확장
-  3. 리뷰 작성 후 ReviewList 화면 새로고침 이벤트 연결
-*/

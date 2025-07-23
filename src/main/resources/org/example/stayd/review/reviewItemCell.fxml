@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<HBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="org.example.stayd.domain.review.controller.ReviewItemCellController"
+      spacing="10" alignment="CENTER_LEFT"
+      prefHeight="60.0"
+      style="-fx-padding: 10 15; -fx-border-color: #eee; -fx-border-width: 0 0 1 0;">
+
+    <!-- 왼쪽: 내용, 별점 -->
+    <VBox alignment="CENTER_LEFT" spacing="5">
+        <Label fx:id="contentLabel" style="-fx-font-size: 14px;" />
+        <Label fx:id="starLabel" style="-fx-text-fill: #666; -fx-font-size: 14px;" />
+    </VBox>
+
+    <!-- 가운데 공간 채우기 -->
+    <Pane HBox.hgrow="ALWAYS" />
+
+    <!-- 오른쪽: 수정/삭제 버튼 -->
+    <Button fx:id="editButton" text="수정" onAction="#handleEdit" />
+    <Button fx:id="deleteButton" text="삭제" onAction="#handleDelete" />
+
+</HBox>
