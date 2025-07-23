@@ -2,198 +2,172 @@ package org.example.stayd.domain.mypage;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.layout.VBox;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import org.example.stayd.common.DatabaseConnection;
 import org.example.stayd.common.SessionManager;
-import org.example.stayd.domain.reservation.dao.ReservationDaoImpl;
+import org.example.stayd.domain.reservation.controller.ReservationItemCellController;
 import org.example.stayd.domain.reservation.dao.ReservationWDAO;
-import org.example.stayd.domain.reservation.dto.ReservationDTO;
-import org.example.stayd.domain.review.controller.ReviewEditController;
+import org.example.stayd.domain.reservation.dto.ReservationWithCafeDTO;
+import org.example.stayd.domain.review.controller.ReviewController;
 import org.example.stayd.domain.review.controller.ReviewItemCellController;
-import org.example.stayd.domain.review.dto.ReviewDto;
-import org.example.stayd.domain.reservation.service.ReservationService;
-import org.example.stayd.domain.review.service.ReviewService;
-import org.example.stayd.domain.review.service.ReviewServiceImpl;
-import org.example.stayd.domain.user.controller.ResetPwController;
-import org.example.stayd.domain.user.dto.PasswordResetDTO;
-import org.example.stayd.domain.user.dto.UserDTO;
+import org.example.stayd.domain.review.dao.ReviewListDao;
+import org.example.stayd.domain.review.dto.ReviewDTO;
+
 import java.io.IOException;
-import java.sql.SQLException;
-import java.time.LocalDate;
-import java.time.LocalTime;
+import java.net.URL;
+import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ResourceBundle;
 
-public class MypageController {
+public class MypageController implements Initializable {
 
-    @FXML private Label loginIdLabel;
-    @FXML private Label emailLabel;
-    @FXML private VBox usageListContainer;
-    @FXML private VBox reviewListContainer;
-    @FXML private Button usageMoreBtn;
-    @FXML private Button reviewMoreBtn;
-    @FXML private Button btnChangePw;
+    @FXML private AnchorPane headerPlaceholder;
 
-    // ✅ 그냥 생성자 사용 (익명 클래스 제거)
-    private final ReservationService reservationService = new ReservationService();
+    @FXML private ListView<ReservationWithCafeDTO> reservationListView;
+    @FXML private ListView<ReviewDTO> reviewListView;
 
-    private final ReviewService reviewService = new ReviewServiceImpl();
+    private final ReservationWDAO reservationWDAO = new ReservationWDAO();
+    private final ReviewListDao reviewListDao = new ReviewListDao();
 
-    private final int PAGE_SIZE = 5;
-    private int usageLoadedCount = 0;
-    private int reviewLoadedCount = 0;
+    private List<ReservationWithCafeDTO> fullReservationList = new ArrayList<>();
+    private List<ReviewDTO> fullReviewList = new ArrayList<>();
 
-    private List<ReservationDTO> allReservations = new ArrayList<>();
-    private List<ReviewDto> allReviews = new ArrayList<>();
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+        loadHeader();            // 헤더 삽입
+        loadReservationList();   // 예약 불러오기
+        refreshReviewList();     // 리뷰 불러오기
 
-    @FXML
-    public void initialize() {
-        UserDTO loginUser = SessionManager.getInstance().getLoggedInUser();
-        if (loginUser == null) return;
-
-        loginIdLabel.setText(loginUser.getLogin_id());
-        emailLabel.setText("email: " + loginUser.getEmail());
-
-        int userId = loginUser.getUser_id();
-        allReservations = reservationService.findByUser(userId);  // 내부에서 try-catch 처리돼 있음
-        try {
-            allReviews = reviewService.findAllByUserId(userId);
-        } catch (SQLException e) {
-            e.printStackTrace();
-            allReviews = List.of();
-        }
-
-        loadMoreUsageItems();
-        loadMoreReviewItems();
+        System.out.println("로그인 유저: " + SessionManager.getInstance().getLoggedInUser());
     }
 
-    @FXML
-    private void handleChangePassword() {
+    private void loadHeader() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/stayd/user/resetPw.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/stayd/common/header.fxml"));
+            HBox header = loader.load();
+            headerPlaceholder.getChildren().add(header);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void loadReservationList() {
+        try (Connection conn = new DatabaseConnection().getConnection()) {
+            long userId = SessionManager.getInstance().getLoggedInUser().getUserId();
+            try {
+                fullReservationList = reservationWDAO.findWithCafeByUser(conn, userId);
+            } catch (Exception e) {
+                System.out.println("예약 목록 가져오는 중 예외 발생");
+                e.printStackTrace();
+            }
+
+            System.out.println("예약 개수: " + fullReservationList.size());
+
+            reservationListView.getItems().setAll(fullReservationList);
+
+            reservationListView.setCellFactory(listView -> new ListCell<>() {
+                @Override
+                protected void updateItem(ReservationWithCafeDTO reservation, boolean empty) {
+                    super.updateItem(reservation, empty);
+
+                    System.out.println("📦 updateItem() 호출됨 → empty = " + empty + ", reservation = " + reservation);
+
+                    if (empty || reservation == null) {
+                        setGraphic(null);
+                    } else {
+                        try {
+                            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/stayd/mypage/reservationCell.fxml"));
+                            Parent cellRoot = loader.load();
+
+                            ReservationItemCellController controller = loader.getController();
+                            controller.setData(reservation);
+                            controller.setMypageController(MypageController.this);
+
+                            setGraphic(cellRoot);
+
+                            System.out.println("✅ 셀 생성 완료: " + reservation.getCafeName());
+
+                        } catch (Exception e) {
+                            System.out.println("❌ FXML 로딩 실패");
+                            e.printStackTrace();
+                            setGraphic(null);
+                        }
+                    }
+                }
+            });
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("예약 불러오기 중 오류 발생");
+        }
+    }
+
+    public void refreshReviewList() {
+        try (Connection conn = new DatabaseConnection().getConnection()) {
+            long userId = SessionManager.getInstance().getLoggedInUser().getUserId();
+            fullReviewList = reviewListDao.findByUserId(conn, userId);
+
+            reviewListView.getItems().setAll(fullReviewList);
+
+            reviewListView.setCellFactory(listView -> new ListCell<>() {
+                @Override
+                protected void updateItem(ReviewDTO dto, boolean empty) {
+                    super.updateItem(dto, empty);
+
+                    if (empty || dto == null) {
+                        setText(null);
+                        setGraphic(null);
+                    } else {
+                        try {
+                            System.out.println("리뷰 셀 생성: " + dto.getContent());
+
+                            FXMLLoader loader = new FXMLLoader(getClass().getResource(
+                                    "/org/example/stayd/review/reviewItemCell.fxml"));
+                            Parent cellRoot = loader.load();
+
+                            ReviewItemCellController controller = loader.getController();
+                            controller.setData(dto);
+                            controller.setMypageController(MypageController.this);
+
+                            setGraphic(cellRoot);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            });
+
+            System.out.println("리뷰 개수: " + fullReviewList.size());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void handleWriteReviewButton(ReservationWithCafeDTO reservation) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/stayd/review/review.fxml"));
             Parent root = loader.load();
-            ResetPwController controller = loader.getController();
-            UserDTO user = SessionManager.getInstance().getLoggedInUser();
-            PasswordResetDTO dto = new PasswordResetDTO(user.getLogin_id(), user.getEmail());
-            controller.initData(dto);
-            btnChangePw.getScene().setRoot(root);
+
+            ReviewController controller = loader.getController();
+            controller.setReservation(reservation);
+            controller.setOnReviewSubmittedCallback(v -> refreshReviewList());
+
+            Stage stage = new Stage();
+            stage.setTitle("리뷰 작성");
+            stage.setScene(new Scene(root));
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.show();
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    @FXML private void handleLoadMoreUsage() {
-        loadMoreUsageItems();
-    }
-
-    @FXML private void handleLoadMoreReviews() {
-        loadMoreReviewItems();
-    }
-
-    private void loadMoreUsageItems() {
-        int end = Math.min(usageLoadedCount + PAGE_SIZE, allReservations.size());
-        for (int i = usageLoadedCount; i < end; i++) {
-            ReservationDTO res = allReservations.get(i);
-            LocalDate date = res.getCreatedAt().toLocalDate();
-            LocalTime startTime = LocalTime.of(res.getUsageStartedAt(), 0);
-            LocalTime endTime = LocalTime.of(res.getUsageEndedAt(), 0);
-            String content = "📍 " + res.getCafeName() + " | " + date + " " + startTime + " ~ " + endTime;
-            addUsageItem(content, -1);
-        }
-        usageLoadedCount = end;
-        if (usageLoadedCount >= allReservations.size()) {
-            usageMoreBtn.setVisible(false);
-            usageMoreBtn.setManaged(false);
-        }
-    }
-
-    private void loadMoreReviewItems() {
-        int end = Math.min(reviewLoadedCount + PAGE_SIZE, allReviews.size());
-        for (int i = reviewLoadedCount; i < end; i++) {
-            ReviewDto review = allReviews.get(i);
-            addReviewItem(review);
-        }
-        reviewLoadedCount = end;
-        if (reviewLoadedCount >= allReviews.size()) {
-            reviewMoreBtn.setVisible(false);
-            reviewMoreBtn.setManaged(false);
-        }
-    }
-
-    private void addReviewItem(ReviewDto review) {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/stayd/review/reviewItemCell.fxml"));
-            Parent cell = loader.load();
-            ReviewItemCellController controller = loader.getController();
-            controller.setData(review);  // ✅ ReviewDto 그대로 넘김
-
-            controller.setOnEdit(() -> handleEditReview(review));
-            controller.setOnDelete(() -> handleDeleteReview(review.getReservationId(), review.getReviewerId(), cell));
-
-            reviewListContainer.getChildren().add(cell);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void addUsageItem(String content, int rating) {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/stayd/review/reviewItemCell.fxml"));
-            Parent cell = loader.load();
-            ReviewItemCellController controller = loader.getController();
-            controller.setData(content, rating);
-            usageListContainer.getChildren().add(cell);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void handleEditReview(ReviewDto review) {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/stayd/review/reviewEdit.fxml"));
-            Parent root = loader.load();
-            ReviewEditController controller = loader.getController();
-
-            controller.setReviewData(review, this::refreshReviews);
-
-            Stage popup = new Stage();
-            popup.setTitle("리뷰 수정");
-            popup.initModality(Modality.WINDOW_MODAL);
-            popup.initOwner(reviewListContainer.getScene().getWindow());
-            popup.setScene(new Scene(root));
-            popup.show();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void handleDeleteReview(int reservationId, int userId, Parent cell) {
-        boolean success = reviewService.deleteReview(reservationId, userId);
-        if (success) {
-            reviewListContainer.getChildren().remove(cell);
-            System.out.println("리뷰 삭제 성공");
-        } else {
-            System.out.println("리뷰 삭제 실패");
-        }
-    }
-
-    private void refreshReviews() {
-        reviewListContainer.getChildren().clear();
-        reviewLoadedCount = 0;
-
-        try {
-            int userId = SessionManager.getInstance().getLoggedInUser().getUser_id();
-            allReviews = reviewService.findAllByUserId(userId);
-        } catch (SQLException e) {
-            e.printStackTrace();
-            allReviews = List.of();
-        }
-
-        loadMoreReviewItems();
     }
 }

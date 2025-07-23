@@ -128,14 +128,7 @@ public class ReservationService {
     }
 
     /**
-     * 특정 유저의 예약 목록 조회
+     * 특정 유저 예약 목록
      */
-    public List<ReservationDTO> findByUser(int userId) {
-        try {
-            return reservationDAO.findByUserId(userId);
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return List.of();
-        }
-    }
+
 }

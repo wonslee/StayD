@@ -81,16 +81,16 @@
 
     <!-- ─── 리뷰 입력 영역 ─── -->
     <Label layoutX="150.0" layoutY="400.0" style="-fx-font-size:16; -fx-font-weight:bold;" text="리뷰" />
+    <!-- ToggleGroup 객체 선언 -->
 
-    <!-- 별점 (ToggleButton 다섯 개로 구성) -->
+    <!-- 별점 버튼들 -->
     <HBox fx:id="ratingBox" layoutX="200.0" layoutY="395.0" spacing="8">
-        <ToggleButton fx:id="star1" styleClass="star-btn" text="★" />
-        <ToggleButton fx:id="star2" styleClass="star-btn" text="★" />
-        <ToggleButton fx:id="star3" styleClass="star-btn" text="★" />
-        <ToggleButton fx:id="star4" styleClass="star-btn" text="★" />
-        <ToggleButton fx:id="star5" styleClass="star-btn" text="★" />
+        <ToggleButton fx:id="star1" text="★" />
+        <ToggleButton fx:id="star2" text="★" />
+        <ToggleButton fx:id="star3" text="★" />
+        <ToggleButton fx:id="star4" text="★" />
+        <ToggleButton fx:id="star5" text="★" />
     </HBox>
-
     <!-- 리뷰 텍스트 입력 -->
     <TextArea fx:id="reviewTextArea" layoutX="150.0" layoutY="430.0" prefHeight="145" prefWidth="725" promptText="리뷰를 작성해주세요. 악의적인 리뷰는 블랙리스트 대상이 될 수 있습니다." style="-fx-border-color:#e0e0e0; -fx-border-radius:10; -fx-background-radius:10;" wrapText="true" />
 

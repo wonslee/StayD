@@ -4,58 +4,52 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane xmlns:fx="http://javafx.com/fxml" prefWidth="1024.0" prefHeight="768.0">
+<BorderPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="org.example.stayd.domain.mypage.MypageController"
+            prefWidth="1024" prefHeight="768"
+            style="-fx-background-color: white;">
 
-    <StackPane prefWidth="1024.0" prefHeight="768.0">
+    <!-- TOP 영역: 헤더 -->
+    <top>
+        <AnchorPane fx:id="headerPlaceholder" prefHeight="80.0"
+                    style="-fx-background-color: transparent;"
+                    AnchorPane.leftAnchor="0.0"
+                    AnchorPane.rightAnchor="0.0"
+                    AnchorPane.topAnchor="0.0" />
+    </top>
 
-        <VBox alignment="TOP_CENTER" spacing="30.0">
+    <!-- CENTER 영역: 콘텐츠 -->
+    <center>
+        <HBox spacing="50" alignment="TOP_CENTER">
             <padding>
-                <Insets top="130.0" />
+                <Insets top="40" bottom="40" left="60" right="60"/>
             </padding>
 
-            <VBox spacing="30.0" maxWidth="500.0" alignment="TOP_CENTER">
-
-                <!-- 사용자 정보 -->
-                <VBox spacing="10.0" alignment="TOP_LEFT">
-                    <Label text="haedeune" style="-fx-font-size: 22px; -fx-font-weight: bold;" />
-
-                    <HBox spacing="10.0" alignment="CENTER_LEFT">
-                        <Label text="pw: ***************" />
-                        <Button text="비밀번호 변경"
-                                style="-fx-background-color: #4CAF4F; -fx-text-fill: white;" />
-                    </HBox>
-
-                    <Label text="email: kosa@gmail.com" />
-                </VBox>
-
-                <Separator />
-
-                <!-- 이용 내역 -->
-                <VBox spacing="10.0" alignment="TOP_LEFT">
-                    <Label text="이용 내역" style="-fx-font-size: 16px; -fx-font-weight: bold;" />
-                    <Label text="작심스터디카페 혜화점" style="-fx-text-fill: #888;" />
-                    <Label text="작심스터디카페 혜화점" style="-fx-text-fill: #888;" />
-                    <Label text="작심스터디카페 혜화점" style="-fx-text-fill: #888;" />
-                    <Label text="작심스터디카페 혜화점" style="-fx-text-fill: #888;" />
-                    <Label text="작심스터디카페 혜화점" style="-fx-text-fill: #888;" />
-                    <Button text="더보기" style="-fx-background-color: #4CAF4F; -fx-text-fill: white;" />
-                </VBox>
-
-                <Separator />
-
-                <!-- 내가 쓴 리뷰 -->
-                <VBox spacing="10.0" alignment="TOP_LEFT">
-                    <Label text="내가 쓴 리뷰" style="-fx-font-size: 16px; -fx-font-weight: bold;" />
-                    <Label text="카페가 너무 좋아요" />
-                    <Label text="분위기가 조금 소소스러워서 공부하기가 어렵네요" />
-                    <Label text="최영준 최고..." />
-                    <Label text="최영준 뽀에버!!!!" />
-                    <Button text="더보기" style="-fx-background-color: #4CAF4F; -fx-text-fill: white;" />
-                </VBox>
-
+            <!-- 왼쪽: 프로필 -->
+            <VBox spacing="10" alignment="TOP_CENTER">
+                <Label text="👤" style="-fx-font-size: 48px;" />
+                <Label fx:id="nicknameLabel" text="haedeune" style="-fx-font-weight: bold; -fx-font-size: 16px;" />
+                <Label fx:id="emailLabel" text="email: haedeune@gmail.com" />
+                <Label fx:id="passwordLabel" text="pw: ***************" />
+                <Button fx:id="changePasswordButton" text="비밀번호 변경"
+                        style="-fx-background-color: #4CAF50; -fx-text-fill: white;" />
+            </VBox>
+            <!-- 가운데: 이용 내역 -->
+            <VBox spacing="10" prefWidth="350" HBox.hgrow="ALWAYS">
+                <Label text="이용 내역" style="-fx-font-size: 16px; -fx-font-weight: bold;" />
+                <ListView fx:id="reservationListView"
+                          prefHeight="400"
+                          VBox.vgrow="ALWAYS"
+                          style="-fx-background-color: transparent; -fx-border-color: transparent;" />
             </VBox>
 
-        </VBox>
-    </StackPane>
+            <!-- 오른쪽: 내가 쓴 리뷰 -->
+            <VBox spacing="10" prefWidth="350" VBox.vgrow="ALWAYS">
+                <Label text="내가 쓴 리뷰" style="-fx-font-size: 16px; -fx-font-weight: bold;" />
+                <ListView fx:id="reviewListView" VBox.vgrow="ALWAYS"
+                          style="-fx-background-color: transparent; -fx-border-color: transparent;" />
+            </VBox>
 
-</AnchorPane>
+        </HBox>
+    </center>
+</BorderPane>

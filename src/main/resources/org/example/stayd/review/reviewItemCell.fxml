@@ -3,24 +3,31 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<HBox xmlns="http://javafx.com/javafx"
-      xmlns:fx="http://javafx.com/fxml"
+<HBox xmlns:fx="http://javafx.com/fxml"
       fx:controller="org.example.stayd.domain.review.controller.ReviewItemCellController"
-      spacing="10" alignment="CENTER_LEFT"
-      prefHeight="60.0"
-      style="-fx-padding: 10 15; -fx-border-color: #eee; -fx-border-width: 0 0 1 0;">
+      spacing="20"
+      style="-fx-padding: 10;">
 
-    <!-- 왼쪽: 내용, 별점 -->
-    <VBox alignment="CENTER_LEFT" spacing="5">
-        <Label fx:id="contentLabel" style="-fx-font-size: 14px;" />
-        <Label fx:id="starLabel" style="-fx-text-fill: #666; -fx-font-size: 14px;" />
+    <!-- ─── 헤더 자리 (공통 컴포넌트 들어올 위치) ─── -->
+    <AnchorPane fx:id="headerPlaceholder" prefHeight="130.0"
+                AnchorPane.leftAnchor="0.0"
+                AnchorPane.rightAnchor="0.0"
+                AnchorPane.topAnchor="0.0" />
+
+    <!-- 리뷰 정보 -->
+    <VBox spacing="5">
+        <Label fx:id="cafeNameLabel" text="카페 이름" style="-fx-font-weight: bold;" />
+        <Label fx:id="ratingLabel" text="⭐ 5점" />
+        <Label fx:id="contentLabel" text="리뷰 내용 내용" wrapText="true" />
+        <Label fx:id="dateLabel" text="작성일: 2025-07-20" />
     </VBox>
 
-    <!-- 가운데 공간 채우기 -->
-    <Pane HBox.hgrow="ALWAYS" />
+    <Pane HBox.hgrow="ALWAYS"/>
 
-    <!-- 오른쪽: 수정/삭제 버튼 -->
-    <Button fx:id="editButton" text="수정" onAction="#handleEdit" />
-    <Button fx:id="deleteButton" text="삭제" onAction="#handleDelete" />
+    <!-- 수정/삭제 버튼 -->
+    <VBox spacing="5" alignment="CENTER_RIGHT">
+        <Button fx:id="editReviewButton" text="수정" onAction="#onEditClicked"/>
+        <Button fx:id="deleteReviewButton" text="삭제" onAction="#onDeleteClicked"/>
+    </VBox>
 
 </HBox>

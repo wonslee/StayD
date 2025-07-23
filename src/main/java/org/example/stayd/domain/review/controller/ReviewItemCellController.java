@@ -1,112 +1,97 @@
 package org.example.stayd.domain.review.controller;
 
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Label;
-import org.example.stayd.common.SessionManager;
-import org.example.stayd.domain.review.dto.ReviewDto;
-import org.example.stayd.domain.review.dto.ReviewListDto;
+import javafx.scene.control.Button;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
+import org.example.stayd.domain.review.controller.ReviewEditController;
+import org.example.stayd.domain.review.dto.ReviewDTO;
+import org.example.stayd.domain.reservation.dao.ReservationWDAO;
+import org.example.stayd.domain.mypage.MypageController;
+import org.example.stayd.common.DatabaseConnection;
 
-/**
- * 마이페이지 - 내가 쓴 리뷰 셀 컨트롤러
- * - 리뷰 내용 및 별점 표시
- * - 본인 리뷰일 경우에만 수정/삭제 버튼 노출
- * - 별점이 유효한 경우에만 표시
- */
+import java.sql.Connection;
+
 public class ReviewItemCellController {
 
+    @FXML private Label ratingLabel;
     @FXML private Label contentLabel;
-    @FXML private Label starLabel;
-    @FXML private Button editButton;
-    @FXML private Button deleteButton;
+    @FXML private Label dateLabel;
+    @FXML private Button editReviewButton;
+    @FXML private Button deleteReviewButton;
 
-    private Runnable onEdit;
-    private Runnable onDelete;
+    private ReviewDTO review;
+    private MypageController mypageController;
 
-    /**
-     * 셀에 데이터 설정 - ReviewListDto 버전
-     */
-    public void setData(ReviewListDto review) {
-        setCommonData(review.getContent(), review.getRating(), review.getReviewerId());
+    public void setData(ReviewDTO dto) {
+        this.review = dto;
+
+        ratingLabel.setText("\u2B50 " + dto.getRating() + "점");
+        contentLabel.setText(dto.getContent());
+        dateLabel.setText("작성일: " + dto.getReviewCreatedAt().toLocalDate());
     }
 
-    /**
-     * 셀에 데이터 설정 - ReviewDto 버전 (⭐추가한 부분)
-     */
-    public void setData(ReviewDto review) {
-        setCommonData(review.getContent(), review.getRating(), review.getReviewerId());
+    public void setMypageController(MypageController controller) {
+        this.mypageController = controller;
     }
 
-    /**
-     * 공통 렌더링 로직
-     */
-    private void setCommonData(String content, int rating, int reviewerId) {
-        contentLabel.setText(content);
+    @FXML
+    private void onEditClicked() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/stayd/view/reviewEdit.fxml"));
+            Parent root = loader.load();
 
-        // 별점 유효성 검사
-        if (rating >= 0 && rating <= 5) {
-            // 별점 표시 (예: ★★★☆☆)
-            starLabel.setText("★".repeat(rating) + "☆".repeat(5 - rating));
-            starLabel.setVisible(true);
-            starLabel.setManaged(true);
+            ReviewEditController controller = loader.getController();
+            controller.setReview(review);
 
-            // 로그인 사용자와 작성자 비교
-            int loginUserId = SessionManager.getInstance().getLoggedInUser().getUser_id();
-            boolean isMyReview = (loginUserId == reviewerId);
-
-            // 본인 리뷰일 경우만 수정/삭제 버튼 표시
-            editButton.setVisible(isMyReview);
-            editButton.setManaged(isMyReview);
-            deleteButton.setVisible(isMyReview);
-            deleteButton.setManaged(isMyReview);
-        } else {
-            // 유효하지 않은 별점일 경우 전부 숨김
-            starLabel.setText("");
-            starLabel.setVisible(false);
-            starLabel.setManaged(false);
-            editButton.setVisible(false);
-            editButton.setManaged(false);
-            deleteButton.setVisible(false);
-            deleteButton.setManaged(false);
+            Stage stage = new Stage();
+            stage.setTitle("리뷰 수정");
+            stage.setScene(new Scene(root));
+            stage.show();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
-    /**
-     * 수정 콜백 설정
-     */
-    public void setOnEdit(Runnable onEdit) {
-        this.onEdit = onEdit;
-        editButton.setOnAction(e -> {
-            if (onEdit != null) onEdit.run();
+    @FXML
+    private void onDeleteClicked() {
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+        confirm.setTitle("리뷰 삭제");
+        confirm.setHeaderText(null);
+        confirm.setContentText("정말 이 리뷰를 삭제하시겠습니까?");
+
+        confirm.showAndWait().ifPresent(result -> {
+            if (result == ButtonType.OK) {
+                try (Connection conn = new DatabaseConnection().getConnection()) {
+                    boolean success = new ReservationWDAO().deleteReview(conn, review.getReservationId());
+                    if (success) {
+                        Alert successAlert = new Alert(Alert.AlertType.INFORMATION);
+                        successAlert.setContentText("리뷰가 삭제되었습니다.");
+                        successAlert.showAndWait();
+
+                        if (mypageController != null) {
+                            mypageController.refreshReviewList();
+                        }
+                    } else {
+                        showError("삭제에 실패했습니다.");
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    showError("오류가 발생했습니다.");
+                }
+            }
         });
     }
 
-    /**
-     * 삭제 콜백 설정
-     */
-    public void setOnDelete(Runnable onDelete) {
-        this.onDelete = onDelete;
-        deleteButton.setOnAction(e -> {
-            if (onDelete != null) onDelete.run();
-        });
+    private void showError(String msg) {
+        Alert error = new Alert(Alert.AlertType.ERROR);
+        error.setHeaderText(null);
+        error.setContentText(msg);
+        error.showAndWait();
     }
-    public void setData(String content, int rating) {
-        contentLabel.setText(content);
-
-        if (rating >= 0 && rating <= 5) {
-            starLabel.setText("★".repeat(rating) + "☆".repeat(5 - rating));
-            starLabel.setVisible(true);
-            starLabel.setManaged(true);
-        } else {
-            starLabel.setVisible(false);
-            starLabel.setManaged(false);
-        }
-
-        // 사용 내역은 리뷰 작성자 여부 필요 없음 → 버튼 숨김
-        editButton.setVisible(false);
-        editButton.setManaged(false);
-        deleteButton.setVisible(false);
-        deleteButton.setManaged(false);
-    }
-
 }
