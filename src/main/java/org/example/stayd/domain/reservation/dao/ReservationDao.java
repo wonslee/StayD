@@ -1,4 +1,75 @@
 package org.example.stayd.domain.reservation.dao;
 
+import org.example.stayd.common.DatabaseConnection;
+import org.example.stayd.common.SessionManager;
+import org.example.stayd.domain.reservation.dto.ReservationDTO;
+import org.example.stayd.domain.user.dto.UserDTO;
+
+import java.sql.*;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+
 public class ReservationDao {
+    private Connection connection;
+
+    public ReservationDao() {
+        this.connection = new DatabaseConnection().getConnection();
+    }
+
+    // 로그인한 유저의 cafe_id를 기준으로 예약 현황 조회
+    public List<ReservationDTO> getReservationStatusByLoggedInUser() throws SQLException {
+        List<ReservationDTO> reservationList = new ArrayList<>();
+
+        UserDTO loggedInUser = SessionManager.getInstance().getLoggedInUser();
+        if (loggedInUser != null) {
+            System.out.println("Logged-in User ID: " + loggedInUser);
+        } else {
+            System.out.println("No user is logged in.");
+        }
+
+        // 로그인한 유저의 user_id 가져오기
+        int userId = SessionManager.getInstance().getLoggedInUser().getUser_id();
+        System.out.println("Logged-in User ID: " + userId);
+
+        // 유저의 cafe_id 가져오기
+        int cafeId = getCafeIdByUserId(userId);
+        System.out.println("Cafe ID for User " + userId + ": " + cafeId);
+
+        // 유효한 cafe_id가 있는 경우, 해당 cafe_id로 예약 현황 조회
+        if (cafeId != -1) {
+            String query = "SELECT usage_started_at, usage_ended_at FROM reservation WHERE cafe_id = ? AND is_canceled IS NULL";
+
+            try (PreparedStatement stmt = connection.prepareStatement(query)) {
+                stmt.setInt(1, cafeId);  // cafe_id로 필터링
+
+                try (ResultSet rs = stmt.executeQuery()) {
+                    while (rs.next()) {
+                        ReservationDTO reservation = ReservationDTO.builder()
+                                .usageStartedAt(rs.getInt("usage_started_at"))
+                                .usageEndedAt(rs.getInt("usage_ended_at"))
+                                .build();
+                        reservationList.add(reservation);
+                    }
+                }
+            }
+        }
+        return reservationList;
+    }
+
+    // 유저의 cafe_id를 가져오는 메서드
+    private int getCafeIdByUserId(int userId) throws SQLException {
+        String query = "SELECT cafe_id FROM cafe WHERE owner_id = ?";
+
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setInt(1, userId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("cafe_id");
+                }
+            }
+        }
+
+        return -1; // cafe_id가 없으면 -1 반환
+    }
 }

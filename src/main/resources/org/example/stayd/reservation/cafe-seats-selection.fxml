@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="org.example.stayd.domain.reservation.controller.SeatSelectionController"
+            prefWidth="716" prefHeight="538"
+            styleClass="popup-container">
+
+    <VBox alignment="TOP_CENTER" spacing="25"
+          AnchorPane.topAnchor="20" AnchorPane.bottomAnchor="20"
+          AnchorPane.leftAnchor="20" AnchorPane.rightAnchor="20">
+
+        <Label text="seats information"/>
+
+        <!-- *** 좌석 버튼은 코드에서 동적 생성 *** -->
+        <HBox alignment="CENTER" spacing="16">
+
+        <GridPane fx:id="seatGrid" hgap="12" vgap="12"/>
+        </HBox>
+
+        <HBox alignment="CENTER" spacing="16">
+            <Label text="●" style="-fx-text-fill:#BDBDBD;"/><Label text="Available"/>
+            <Label text="●" style="-fx-text-fill:#F44336;"/><Label text="Reserved"/>
+            <Label text="●" style="-fx-text-fill:#4CAF50;"/><Label text="Selected"/>
+        </HBox>
+
+        <Button fx:id="selectBtn" text="select " prefWidth="160" prefHeight="42"/>
+    </VBox>
+</AnchorPane>

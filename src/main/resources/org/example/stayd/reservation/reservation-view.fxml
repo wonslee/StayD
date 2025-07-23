@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns:fx="http://javafx.com/fxml"
+      spacing="28">
+    <padding>
+        <Insets top="40" left="40" right="40" bottom="40"/>
+    </padding>
+
+    <!-- ── 입력 ── -->
+    <GridPane hgap="18" vgap="14">
+        <columnConstraints>
+            <ColumnConstraints minWidth="90" halignment="RIGHT"/>
+            <ColumnConstraints minWidth="160" halignment="LEFT"/>
+            <ColumnConstraints minWidth="90" halignment="RIGHT"/>
+            <ColumnConstraints minWidth="160" halignment="LEFT"/>
+            <ColumnConstraints minWidth="90" halignment="RIGHT"/>
+            <ColumnConstraints minWidth="120" halignment="LEFT"/>
+        </columnConstraints>
+
+        <Label text="날짜" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+        <DatePicker fx:id="datePicker" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+
+        <Label text="시작 시간" GridPane.rowIndex="0" GridPane.columnIndex="2"/>
+        <ComboBox fx:id="startCombo" prefWidth="100"
+                  GridPane.rowIndex="0" GridPane.columnIndex="3"/>
+
+        <Label text="종료 시간" GridPane.rowIndex="0" GridPane.columnIndex="4"/>
+        <ComboBox fx:id="endCombo" prefWidth="100"
+                  GridPane.rowIndex="0" GridPane.columnIndex="5"/>
+
+        <Label text="총 금액" style="-fx-font-weight:bold;"
+               GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+        <Label fx:id="totalPriceLabel"
+               style="-fx-text-fill:#009688; -fx-font-weight:bold;"
+               GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+    </GridPane>
+
+    <Separator/>
+
+    <!-- ── 좌석 ── -->
+    <VBox alignment="CENTER" spacing="24">
+        <Label text="좌석 정보" style="-fx-font-size:16; -fx-font-weight:bold;"/>
+<!--        TODO: UI 이쁘게 만들기 -->
+        <GridPane fx:id="seatGrid" alignment="CENTER" hgap="8" vgap="8"/>
+
+        <HBox spacing="16" alignment="CENTER">
+            <Label text="●" style="-fx-text-fill:#BDBDBD;"/><Label text="이용 가능"/>
+            <Label text="●" style="-fx-text-fill:#F44336;"/><Label text="예약됨"/>
+            <Label text="●" style="-fx-text-fill:#4CAF50;"/><Label text="선택됨"/>
+        </HBox>
+
+        <Button text="예약" fx:id="reserveBtn" prefWidth="180" prefHeight="40"/>
+    </VBox>
+    <Label fx:id="statusLabel" wrapText="true" style="-fx-text-fill:#e91e63;"/>
+</VBox>

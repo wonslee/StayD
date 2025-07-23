@@ -1,20 +1,24 @@
 package org.example.stayd.domain.cafe.controller;
 
+import java.net.URL;
+import java.util.ResourceBundle;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
-import javafx.event.ActionEvent;
 import javafx.stage.Stage;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import lombok.Getter;
 import org.example.stayd.domain.cafe.dto.CafeDto;
+import org.example.stayd.domain.cafe.dto.CafeDto.DetailResponse;
 import org.example.stayd.domain.cafe.service.CafeService;
 import org.example.stayd.common.PerformanceMonitor;
 
@@ -22,36 +26,55 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
+import org.example.stayd.domain.reservation.controller.ReservationCreateController;
 
 public class CafeDetailController implements Initializable {
 
     // 상단 정보
-    @FXML private Label cafeNameLabel;
-    @FXML private Label ratingLabel;
-    @FXML private Button favoriteButton;
-    @FXML private ImageView favoriteIcon;
+    @FXML
+    private Label cafeNameLabel;
+    @FXML
+    private Label ratingLabel;
+    @FXML
+    private Button favoriteButton;
+    @FXML
+    private ImageView favoriteIcon;
 
     // 네비게이션 버튼들
-    @FXML private Button detailButton;
-    @FXML private Button reservationButton;
-    @FXML private Button reviewButton;
+    @FXML
+    private Button detailButton;
+    @FXML
+    private Button reservationButton;
+    @FXML
+    private Button reviewButton;
 
     // 목록 페이지 버튼
-    @FXML private Button backButton;
+    @FXML
+    private Button backButton;
 
     // 상세 정보 요소들
-    @FXML private ImageView mainImageView;
-    @FXML private Label locationLabel;
-    @FXML private Label businessDaysLabel;
-    @FXML private Label operatingHoursLabel;
-    @FXML private Label priceLabel;
-    @FXML private Label phoneLabel;
-    @FXML private Label descriptionLabel;
+    @FXML
+    private ImageView mainImageView;
+    @FXML
+    private Label locationLabel;
+    @FXML
+    private Label businessDaysLabel;
+    @FXML
+    private Label operatingHoursLabel;
+    @FXML
+    private Label priceLabel;
+    @FXML
+    private Label phoneLabel;
+    @FXML
+    private Label descriptionLabel;
 
     // 탭 컨텐츠
-    @FXML private VBox detailTabContent;
-    @FXML private VBox reservationTabContent;
-    @FXML private VBox reviewTabContent;
+    @FXML
+    private VBox detailTabContent;
+    @FXML
+    private VBox reservationTabContent;
+    @FXML
+    private VBox reviewTabContent;
 
     // 상태 변수들
     private boolean isFavorite = false;
@@ -61,6 +84,7 @@ public class CafeDetailController implements Initializable {
      */
     @Getter
     private String currentTab = "detail";
+    private boolean reservationLoaded = false;
 
     // 카페 데이터
     private String cafeName;
@@ -72,7 +96,7 @@ public class CafeDetailController implements Initializable {
     private String description;
     private String imageUrl;
     private double rating;
-
+    /* … */
     private CafeService cafeService;
 
     // 🚀 이미지 캐시 추가
@@ -82,6 +106,7 @@ public class CafeDetailController implements Initializable {
     public CafeDetailController() {
         this.cafeService = new CafeService();
     }
+
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -202,7 +227,8 @@ public class CafeDetailController implements Initializable {
         isFavorite = !isFavorite;
 
         if (isFavorite) {
-            favoriteButton.setStyle("-fx-background-color: #4CAF4F; -fx-border-color: #4CAF4F; -fx-border-radius: 5; -fx-background-radius: 5;");
+            favoriteButton.setStyle(
+                    "-fx-background-color: #4CAF4F; -fx-border-color: #4CAF4F; -fx-border-radius: 5; -fx-background-radius: 5;");
             // 찜한 상태의 아이콘으로 변경 (하트 채움)
             try {
                 favoriteIcon.setImage(new Image("@../../../../images/cafeImages/HeartFilled.png"));
@@ -211,7 +237,8 @@ public class CafeDetailController implements Initializable {
                 System.out.println("찜 아이콘 로드 실패");
             }
         } else {
-            favoriteButton.setStyle("-fx-background-color: white; -fx-border-color: #4CAF4F; -fx-border-radius: 5; -fx-background-radius: 5;");
+            favoriteButton.setStyle(
+                    "-fx-background-color: white; -fx-border-color: #4CAF4F; -fx-border-radius: 5; -fx-background-radius: 5;");
             // 찜하지 않은 상태의 아이콘으로 변경 (하트 비움)
             try {
                 favoriteIcon.setImage(new Image("@../../../../images/cafeImages/Heart.png"));
@@ -234,7 +261,8 @@ public class CafeDetailController implements Initializable {
 
             // 버튼 스타일 변경
             detailButton.setStyle("-fx-background-color: #4CAF4F; -fx-background-radius: 0; -fx-font-weight: bold;");
-            reservationButton.setStyle("-fx-background-color: #A8D6AA; -fx-background-radius: 0; -fx-font-weight: bold;");
+            reservationButton.setStyle(
+                    "-fx-background-color: #A8D6AA; -fx-background-radius: 0; -fx-font-weight: bold;");
             reviewButton.setStyle("-fx-background-color: #A8D6AA; -fx-background-radius: 0; -fx-font-weight: bold;");
 
             // 탭 컨텐츠 표시/숨김
@@ -284,7 +312,8 @@ public class CafeDetailController implements Initializable {
 
             // 버튼 스타일 변경
             detailButton.setStyle("-fx-background-color: #A8D6AA; -fx-background-radius: 0; -fx-font-weight: bold;");
-            reservationButton.setStyle("-fx-background-color: #A8D6AA; -fx-background-radius: 0; -fx-font-weight: bold;");
+            reservationButton.setStyle(
+                    "-fx-background-color: #A8D6AA; -fx-background-radius: 0; -fx-font-weight: bold;");
             reviewButton.setStyle("-fx-background-color: #4CAF4F; -fx-background-radius: 0; -fx-font-weight: bold;");
 
             // 탭 컨텐츠 표시/숨김
@@ -330,6 +359,13 @@ public class CafeDetailController implements Initializable {
     private void saveFavoriteStatus() {
         // TODO: 데이터베이스에 찜하기 상태 저장 로직 구현
         System.out.println("찜하기 상태 저장: " + isFavorite);
+    }
+
+    /**
+     * 현재 표시된 탭 반환
+     */
+    public String getCurrentTab() {
+        return currentTab;
     }
 
     /**
