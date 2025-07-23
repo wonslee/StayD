@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<?import javafx.scene.text.Text?>
+<AnchorPane prefHeight="768" prefWidth="1024" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.stayd.domain.discount.controller.DiscountController">
+    <VBox spacing="30">
+        <fx:include source="../common/header.fxml" />
+
+        <!-- Discount Date -->
+        <HBox spacing="10" alignment="CENTER">
+            <Text text="할인 날짜:"/>
+            <DatePicker fx:id="discountDate"/>
+        </HBox>
+
+        <!-- Discount Start Time -->
+        <HBox spacing="10" alignment="CENTER">
+            <Text text="시작 시간:"/>
+            <ComboBox fx:id="discountStartTime" promptText="시작 시간"/>
+        </HBox>
+
+        <!-- Discount End Time -->
+        <HBox spacing="10" alignment="CENTER">
+            <Text text="종료 시간:"/>
+            <ComboBox fx:id="discountEndTime" promptText="종료 시간"/>
+        </HBox>
+
+        <!-- Discount Rate -->
+        <HBox spacing="10" alignment="CENTER">
+            <Text text="할인율 (%):"/>
+            <TextField fx:id="discountRate" promptText="0 ~ 100"/>
+        </HBox>
+
+        <!-- Save and Cancel Buttons -->
+        <HBox spacing="10" alignment="CENTER">
+            <Button text="저장" onAction="#saveDiscountSettings"/>
+        </HBox>
+    </VBox>
+</AnchorPane>

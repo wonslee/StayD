@@ -6,6 +6,8 @@ import org.example.stayd.domain.reservation.dto.ReservationDTO;
 import org.example.stayd.domain.user.dto.UserDTO;
 
 import java.sql.*;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,8 +19,8 @@ public class ReservationDao {
         this.connection = new DatabaseConnection().getConnection();
     }
 
-    // 로그인한 유저의 cafe_id를 기준으로 예약 현황 조회
-    public List<ReservationDTO> getReservationStatusByLoggedInUser() throws SQLException {
+    // 로그인한 유저의 cafe_id와 선택된 날짜에 해당하는 예약 현황 조회
+    public List<ReservationDTO> getReservationStatusByLoggedInUser(Date selectedDate) throws SQLException {
         List<ReservationDTO> reservationList = new ArrayList<>();
 
         UserDTO loggedInUser = SessionManager.getInstance().getLoggedInUser();
@@ -36,12 +38,13 @@ public class ReservationDao {
         int cafeId = getCafeIdByUserId(userId);
         System.out.println("Cafe ID for User " + userId + ": " + cafeId);
 
-        // 유효한 cafe_id가 있는 경우, 해당 cafe_id로 예약 현황 조회
+        // 유효한 cafe_id가 있는 경우, 해당 cafe_id와 선택된 날짜로 예약 현황 조회
         if (cafeId != -1) {
-            String query = "SELECT usage_started_at, usage_ended_at FROM reservation WHERE cafe_id = ? AND is_canceled IS NULL";
+            String query = "SELECT usage_started_at, usage_ended_at, RESERVATION_DATE FROM reservation WHERE cafe_id = ? AND RESERVATION_DATE = ? AND is_canceled IS NULL";
 
             try (PreparedStatement stmt = connection.prepareStatement(query)) {
                 stmt.setInt(1, cafeId);  // cafe_id로 필터링
+                stmt.setDate(2, selectedDate);  // 선택된 날짜로 필터링
 
                 try (ResultSet rs = stmt.executeQuery()) {
                     while (rs.next()) {
@@ -49,12 +52,69 @@ public class ReservationDao {
                                 .usageStartedAt(rs.getInt("usage_started_at"))
                                 .usageEndedAt(rs.getInt("usage_ended_at"))
                                 .build();
+
                         reservationList.add(reservation);
                     }
                 }
             }
         }
         return reservationList;
+    }
+
+//    public List<ReservationDTO> getReservationStatusByLoggedInUserDay() throws SQLException {
+//        List<ReservationDTO> reservationList = new ArrayList<>();
+//
+//        UserDTO loggedInUser = SessionManager.getInstance().getLoggedInUser();
+//        if (loggedInUser != null) {
+//            System.out.println("Logged-in User ID: " + loggedInUser);
+//        } else {
+//            System.out.println("No user is logged in.");
+//        }
+//
+//        int userId = loggedInUser.getUser_id();
+//        System.out.println("Logged-in User ID: " + userId);
+//
+//        int cafeId = getCafeIdByUserId(userId);
+//        System.out.println("Cafe ID for User " + userId + ": " + cafeId);
+//
+//        if (cafeId != -1) {
+//            String query = "SELECT DAYOFWEEK(usage_started_at) AS day_of_week, COUNT(*) AS reservation_count " +
+//                    "FROM reservation WHERE cafe_id = ? AND is_canceled IS NULL " +
+//                    "GROUP BY DAYOFWEEK(usage_started_at) ORDER BY day_of_week";
+//
+//            try (PreparedStatement stmt = connection.prepareStatement(query)) {
+//                stmt.setInt(1, cafeId);  // cafe_id로 필터링
+//
+//                try (ResultSet rs = stmt.executeQuery()) {
+//                    while (rs.next()) {
+//                        int dayOfWeek = rs.getInt("day_of_week");
+//                        int reservationCount = rs.getInt("reservation_count");
+//
+//                        // 예약 현황을 ReservationDTO에 저장
+//                        ReservationDTO reservation = ReservationDTO.builder()
+//                                .dayOfWeek(dayOfWeek)
+//                                .reservationCount(reservationCount)
+//                                .build();
+//                        reservationList.add(reservation);
+//                    }
+//                }
+//            }
+//        }
+//        return reservationList;
+//    }
+
+    // 숫자를 시간으로 변환하여 Timestamp 객체로 변환하는 메서드
+    private Timestamp convertToTimestamp(int time) {
+        // 예를 들어 time=9이면 09:00:00, time=16이면 16:00:00으로 변환
+        String timeString = String.format("%02d:00:00", time); // "09:00:00" 형식으로 변환
+        try {
+            SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss");
+            java.util.Date parsedDate = format.parse(timeString);
+            return new Timestamp(parsedDate.getTime()); // Timestamp 객체로 변환
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     // 유저의 cafe_id를 가져오는 메서드
@@ -69,7 +129,6 @@ public class ReservationDao {
                 }
             }
         }
-
         return -1; // cafe_id가 없으면 -1 반환
     }
 }
