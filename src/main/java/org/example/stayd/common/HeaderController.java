@@ -33,25 +33,15 @@ public class HeaderController {
     // 유저 프로필 클릭 시 동작
     @FXML
     private void goToUserPage(MouseEvent event) {
+        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+
         // 로그인 상태 확인
         if (userService.isUserLoggedIn()) {
             // 로그인 되어있으면 마이페이지로 이동
-            try {
-                Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-                switchScene(stage, SceneConfig.MY_PAGE_FXML);  // 마이페이지로 이동
-            } catch (IOException e) {
-                e.printStackTrace();
-                showAlert(((Node) event.getSource()).getScene().getWindow(), Alert.AlertType.ERROR, "화면 전환 오류", "마이페이지로 이동하는 중 오류가 발생했습니다.");
-            }
+            FXUtils.navigateToPage(stage, SceneConfig.MY_PAGE_FXML, "마이페이지로 이동하는 중 오류가 발생했습니다.");
         } else {
             // 로그인 되어있지 않으면 로그인 페이지로 이동
-            try {
-                Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-                switchScene(stage, SceneConfig.LOGIN_FXML);  // 로그인 페이지로 이동
-            } catch (IOException e) {
-                e.printStackTrace();
-                showAlert(((Node) event.getSource()).getScene().getWindow(), Alert.AlertType.ERROR, "화면 전환 오류", "로그인 화면으로 이동하는 중 오류가 발생했습니다.");
-            }
+            FXUtils.navigateToPage(stage, SceneConfig.LOGIN_FXML, "로그인 화면으로 이동하는 중 오류가 발생했습니다.");
         }
     }
 }
