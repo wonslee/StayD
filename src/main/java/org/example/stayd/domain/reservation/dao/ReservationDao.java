@@ -2,7 +2,7 @@ package org.example.stayd.domain.reservation.dao;
 
 import org.example.stayd.common.DatabaseConnection;
 import org.example.stayd.common.SessionManager;
-import org.example.stayd.domain.reservation.dto.ReservationDto;
+import org.example.stayd.domain.reservation.dto.ReservationDTO;
 import org.example.stayd.domain.user.dto.UserDTO;
 
 import java.sql.*;
@@ -18,8 +18,8 @@ public class ReservationDao {
     }
 
     // 로그인한 유저의 cafe_id를 기준으로 예약 현황 조회
-    public List<ReservationDto> getReservationStatusByLoggedInUser() throws SQLException {
-        List<ReservationDto> reservationList = new ArrayList<>();
+    public List<ReservationDTO> getReservationStatusByLoggedInUser() throws SQLException {
+        List<ReservationDTO> reservationList = new ArrayList<>();
 
         UserDTO loggedInUser = SessionManager.getInstance().getLoggedInUser();
         if (loggedInUser != null) {
@@ -45,9 +45,10 @@ public class ReservationDao {
 
                 try (ResultSet rs = stmt.executeQuery()) {
                     while (rs.next()) {
-                        ReservationDto reservation = new ReservationDto();
-                        reservation.setUsageStartedAt(rs.getTimestamp("usage_started_at"));
-                        reservation.setUsageEndedAt(rs.getTimestamp("usage_ended_at"));
+                        ReservationDTO reservation = ReservationDTO.builder()
+                                .usageStartedAt(rs.getInt("usage_started_at"))
+                                .usageEndedAt(rs.getInt("usage_ended_at"))
+                                .build();
                         reservationList.add(reservation);
                     }
                 }
