@@ -6,16 +6,22 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.IntStream;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.ToggleButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
+import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
+import org.example.stayd.common.FXUtils;
 import org.example.stayd.common.SessionManager;
+import org.example.stayd.config.SceneConfig;
 import org.example.stayd.domain.cafe.dto.CafeDto;
 import org.example.stayd.domain.cafe.dto.CafeDto.DetailResponse;
 import org.example.stayd.domain.reservation.dto.ReservationDTO;
@@ -23,9 +29,22 @@ import org.example.stayd.domain.reservation.model.DayOfWeek;
 import org.example.stayd.domain.reservation.model.Reservation;
 import org.example.stayd.domain.reservation.model.Seat;
 import org.example.stayd.domain.reservation.service.ReservationService;
+import org.example.stayd.domain.user.service.UserService;
 
 @NoArgsConstructor
 public class ReservationCreateController {
+    private UserService userService = new UserService();
+
+    /* 주입될 DTO */
+    private CafeDto.DetailResponse cafe;
+
+    /* 서비스 & 상태 */
+    private final ReservationService service = new ReservationService();
+    private Seat selectedSeat;
+
+    public ReservationCreateController(DetailResponse cafe) {
+        this.cafe = cafe;
+    }
 
     /* FXML */
     @FXML
@@ -39,30 +58,43 @@ public class ReservationCreateController {
     @FXML
     private Button reserveBtn;
 
-    /* 주입될 DTO */
-    private CafeDto.DetailResponse cafe;
-
-    /* 서비스 & 상태 */
-    private final ReservationService service = new ReservationService();
-    private Seat selectedSeat;
-
-    public ReservationCreateController(DetailResponse cafe) {
-        this.cafe = cafe;
-    }
 
     /* 초기화는 FXML 로드 직후 호출 */
     @FXML
     public void initialize() {
         initTimeCombos();
-        datePicker.setOnAction(e -> recalc());
-        startCombo.valueProperty().addListener((obs, o, n) -> recalc());
-        endCombo.valueProperty().addListener((obs, o, n) -> recalc());
-        reserveBtn.setOnAction(e -> makeReservation());
-
-//        TODO: cafe 존재하지 않을 경우 예외 처리
-
         if (cafe != null) {
             loadSeats();
+            recalc();
+        }
+    }
+
+    @FXML
+    public void handleDateChange(ActionEvent event) {
+        recalc();
+    }
+
+    @FXML
+    public void handleStartComboChange(ActionEvent event) {
+        recalc();
+    }
+
+    @FXML
+    public void handleEndComboChange(ActionEvent event) {
+        recalc();
+    }
+
+    @FXML
+    public void handleReserve(ActionEvent event) {
+        makeReservation();
+    }
+
+    public void setCafe(CafeDto.DetailResponse cafe) {
+        this.cafe = cafe;
+        // If FXML fields are injected, update UI
+        if (seatGrid != null) {
+            loadSeats();
+            recalc();
         }
     }
 
@@ -129,14 +161,26 @@ public class ReservationCreateController {
             totalPriceLabel.setText("0");
             return;
         }
+        // TODO: 할인 기간 가져와야 함.
         int total = (eh - sh) * cafe.getPricePerHour();
         totalPriceLabel.setText(String.format("%,d", total));
     }
 
     /* ───────── 예약 실행 ───────── */
-//    TODO: 예약 직후 예약 상세로 리다이렉션
+//    TODO: 예약 정상 완료 -> 마이페이지 예약 상세로 리다이렉션
     private void makeReservation() {
         if (cafe == null) {
+            return;
+        }
+
+        // 유저 로그인 여부 확인 - 안 되어있을 경우
+        Stage stage = (Stage) reserveBtn.getScene().getWindow();
+        if (!userService.isUserLoggedIn()) {
+            FXUtils.navigateToPage(
+                    stage,
+                    SceneConfig.LOGIN_FXML,
+                    "유저가 로그인하지 않았습니다."
+            );
             return;
         }
 
@@ -176,6 +220,19 @@ public class ReservationCreateController {
         } catch (Exception ex) {
             statusLabel.setStyle("-fx-text-fill:#e91e63;");
             statusLabel.setText("예약 실패: " + ex.getMessage());
+        }
+    }
+
+    private void checkIfUserLoggedIn(MouseEvent event) {
+        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+
+        // 로그인 상태 확인
+        if (userService.isUserLoggedIn()) {
+            // TODO: 정상 케이스 - 유저가 로그인되어있으면 마이페이지 - 예약 상세 페이지로 이동
+            FXUtils.navigateToPage(stage, SceneConfig.MY_PAGE_FXML, "마이페이지로 이동하는 중 오류가 발생했습니다.");
+        } else {
+            // 비전상 케이스 - 유저가 로그인 되어있지 않으면 로그인 페이지로 이동
+            FXUtils.navigateToPage(stage, SceneConfig.LOGIN_FXML, "로그인 화면으로 이동하는 중 오류가 발생했습니다.");
         }
     }
 }
