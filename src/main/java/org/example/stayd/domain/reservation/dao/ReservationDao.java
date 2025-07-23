@@ -100,20 +100,6 @@ public class ReservationDao {
         return reservationList;
     }
 
-    // 숫자를 시간으로 변환하여 Timestamp 객체로 변환하는 메서드
-    private Timestamp convertToTimestamp(int time) {
-        // 예를 들어 time=9이면 09:00:00, time=16이면 16:00:00으로 변환
-        String timeString = String.format("%02d:00:00", time); // "09:00:00" 형식으로 변환
-        try {
-            SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss");
-            java.util.Date parsedDate = format.parse(timeString);
-            return new Timestamp(parsedDate.getTime()); // Timestamp 객체로 변환
-        } catch (ParseException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
     // 유저의 cafe_id를 가져오는 메서드
     private int getCafeIdByUserId(int userId) throws SQLException {
         String query = "SELECT cafe_id FROM cafe WHERE owner_id = ?";
