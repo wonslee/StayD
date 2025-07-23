@@ -1,6 +1,7 @@
 package org.example.stayd.domain.cafe.dao;
 
 import org.example.stayd.common.DatabaseConnection;
+import org.example.stayd.common.DayOfWeekConverter;
 import org.example.stayd.domain.cafe.dto.CafeDto;
 import org.example.stayd.domain.cafe.model.CafeModel;
 
@@ -94,9 +95,9 @@ public class CafeDao {
     }
 
     /**
-     * 운영시간 목록을 문자열로 변환 ("월,화,수,목,금")
-     * @param operatingHours 운영시간 목록
-     * @return 쉼표로 구분된 요일 문자열
+     * 운영시간 목록을 영어 요일 문자열로 변환 ("MON,TUE,WED,THU,FRI")
+     * @param operatingHours 운영시간 목록 (한글 요일 포함)
+     * @return 쉼표로 구분된 영어 요일 문자열
      */
     private String createOperatingDaysString(List<CafeDto.OperatingHours> operatingHours) {
         if (operatingHours == null || operatingHours.isEmpty()) {
@@ -108,11 +109,17 @@ public class CafeDao {
             if (i > 0) {
                 sb.append(",");
             }
-            sb.append(operatingHours.get(i).getDayOfWeek());
+
+            // 한글 요일을 영어 요일로 변환
+            String koreanDay = operatingHours.get(i).getDayOfWeek();
+            String englishDay = DayOfWeekConverter.toEnglish(koreanDay);
+            sb.append(englishDay);
+
+            System.out.println("요일 변환: " + koreanDay + " → " + englishDay);
         }
 
         String result = sb.toString();
-        System.out.println(" 운영일 문자열 생성: " + result);
+        System.out.println("영어 운영일 문자열 생성: " + result);
         return result;
     }
 
@@ -156,15 +163,26 @@ public class CafeDao {
     }
 
     /**
-     * 카페 ID로 카페 단건 조회
-     * @param cafeId 조회할 카페 ID
-     * @return CafeModel 객체 (없으면 null)
+     * 카페 ID로 카페 단건 조회 (요일 순서 정렬 버전)
      */
     public CafeDto.DetailResponse findById(Long cafeId) throws SQLException {
-        // 디버깅 로그 추가
-
         String cafeSql = "SELECT * FROM cafe WHERE cafe_id = ?";
-        String opSql = "SELECT * FROM operation_hours WHERE cafe_id = ?";
+
+        // 요일 순서를 보장하는 SQL (월요일부터 일요일 순서)
+        String opSql = """
+        SELECT * FROM operation_hours 
+        WHERE cafe_id = ? 
+        ORDER BY 
+            CASE day_of_week 
+                WHEN 'MON' THEN 1
+                WHEN 'TUE' THEN 2  
+                WHEN 'WED' THEN 3
+                WHEN 'THU' THEN 4
+                WHEN 'FRI' THEN 5
+                WHEN 'SAT' THEN 6
+                WHEN 'SUN' THEN 7
+            END
+        """;
 
         try (Connection conn = databaseConnection.getConnection();
              PreparedStatement cafeStmt = conn.prepareStatement(cafeSql);
@@ -173,16 +191,15 @@ public class CafeDao {
             cafeStmt.setLong(1, cafeId);
             ResultSet cafeRs = cafeStmt.executeQuery();
 
-            //  결과 확인
             System.out.println("SQL query: " + cafeSql);
             System.out.println("Parameter: " + cafeId);
 
             if (!cafeRs.next()) {
                 System.out.println("No result");
-                throw new SQLException(" Not find cafe with id: " + cafeId);
+                throw new SQLException("Not find cafe with id: " + cafeId);
             }
 
-            System.out.println("✅ 카페 찾음!");
+            System.out.println("카페 찾음!");
 
             // 카페 기본 정보 추출
             String name = cafeRs.getString("name");
@@ -192,21 +209,28 @@ public class CafeDao {
             String phone = cafeRs.getString("phone_number");
             String imageUrl = cafeRs.getString("image_url");
 
-            // 운영시간 추출
+            // 운영시간 추출 (영어 → 한글 변환, 순서 보장됨)
             opStmt.setLong(1, cafeId);
             ResultSet opRs = opStmt.executeQuery();
 
-            List<String> days = new ArrayList<>();
+            List<String> koreanDays = new ArrayList<>();
             Integer start = null;
             Integer end = null;
 
             while (opRs.next()) {
-                days.add(opRs.getString("day_of_week"));
+                String englishDay = opRs.getString("day_of_week");
+                String koreanDay = DayOfWeekConverter.toKorean(englishDay);
+                koreanDays.add(koreanDay);
+
+                System.out.println("DB에서 조회된 요일 변환 (순서대로): " + englishDay + " → " + koreanDay);
+
                 if (start == null) start = opRs.getInt("operation_start");
                 if (end == null) end = opRs.getInt("operation_end");
             }
 
-            return new CafeDto.DetailResponse(cafeId, name, address, pricePerHour, description, phone, imageUrl, days, start, end);
+            System.out.println("최종 요일 순서: " + koreanDays);
+
+            return new CafeDto.DetailResponse(cafeId, name, address, pricePerHour, description, phone, imageUrl, koreanDays, start, end);
         }
     }
 
@@ -355,10 +379,24 @@ public class CafeDao {
     }
 
     /**
-     * 운영시간 문자열 조회
+     * 운영시간 문자열 조회 (요일 순서 정렬)
      */
     private String getOperatingHoursString(int cafeId) throws SQLException {
-        String sql = "SELECT day_of_week, operation_start, operation_end FROM operation_hours WHERE cafe_id = ? ORDER BY day_of_week";
+        String sql = """
+        SELECT day_of_week, operation_start, operation_end 
+        FROM operation_hours 
+        WHERE cafe_id = ? 
+        ORDER BY 
+            CASE day_of_week 
+                WHEN 'MON' THEN 1
+                WHEN 'TUE' THEN 2  
+                WHEN 'WED' THEN 3
+                WHEN 'THU' THEN 4
+                WHEN 'FRI' THEN 5
+                WHEN 'SAT' THEN 6
+                WHEN 'SUN' THEN 7
+            END
+        """;
 
         StringBuilder sb = new StringBuilder();
 
@@ -382,24 +420,28 @@ public class CafeDao {
         return sb.toString();
     }
 
+    // extractOperatingDays 메서드도 수정
     /**
-     * 운영일 추출 (월,화,수,목,금)
+     * 운영일 추출 (영어 → 한글 변환)
      */
     private String extractOperatingDays(String operatingInfo) {
         if (operatingInfo == null || operatingInfo.isEmpty()) return "";
 
-        StringBuilder days = new StringBuilder();
+        StringBuilder koreanDays = new StringBuilder();
         String[] parts = operatingInfo.split(",");
 
         for (String part : parts) {
             String[] dayHour = part.split(":");
             if (dayHour.length >= 1) {
-                if (days.length() > 0) days.append(",");
-                days.append(dayHour[0].trim()); // 한글 요일 그대로 사용
+                if (koreanDays.length() > 0) koreanDays.append(",");
+
+                String englishDay = dayHour[0].trim();
+                String koreanDay = DayOfWeekConverter.toKorean(englishDay);
+                koreanDays.append(koreanDay);
             }
         }
 
-        return days.toString();
+        return koreanDays.toString();
     }
 
     /**

@@ -17,7 +17,6 @@ public class CafeDto {
     @Setter
     @Getter
     public static class CreateRequest {
-        // Getters and Setters
         private String name;
         private String address;
         private Integer pricePerHour;
@@ -53,7 +52,6 @@ public class CafeDto {
     @Setter
     @Getter
     public static class CreateResponse {
-        // Getters and Setters
         private Long cafeId;
         private String message;
         private boolean success;
@@ -82,7 +80,6 @@ public class CafeDto {
     @Setter
     @Getter
     public static class OperatingHours {
-        // Getters and Setters
         private String dayOfWeek; // MON, TUE, WED, THU, FRI, SAT, SUN
         private Integer operationStart;
         private Integer operationEnd;
@@ -108,8 +105,6 @@ public class CafeDto {
     @Setter
     @Getter
     public static class DetailResponse {
-        // 🔹 모든 getter/setter 메소드들
-        // 🔹 모든 필드를 맨 위에 선언
         private Long cafeId;
         private String name;
         private String address;

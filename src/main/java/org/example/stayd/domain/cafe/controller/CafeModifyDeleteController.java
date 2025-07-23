@@ -69,7 +69,7 @@ public class CafeModifyDeleteController implements Initializable {
         initializeCharacterCount();
 
         // 테스트용 카페 데이터 로드 (실제로는 외부에서 setCafeId 호출)
-        loadCafeData(27L); // DB에 있는 카페 ID로 테스트
+        loadCafeData(28L); // DB에 있는 카페 ID로 테스트
 
         // 기본값 설정
         charCountLabel.setText("0/200");
