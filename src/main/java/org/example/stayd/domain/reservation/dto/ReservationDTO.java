@@ -1,11 +1,10 @@
 package org.example.stayd.domain.reservation.dto;
 
-import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import lombok.Builder;
 import lombok.Getter;
-import org.example.stayd.domain.reservation.model.DayOfWeek;
+import org.example.stayd.domain.cafe.model.DayOfWeek;
 import org.example.stayd.domain.reservation.model.Reservation;
 
 @Getter
