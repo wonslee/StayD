@@ -539,6 +539,7 @@ public class CafeListController implements Initializable {
 
                 // DB에서 가져온 실제 데이터 전달
                 detailController.setCafeData(
+                        cafeId,
                         cafeDetail.getName(),
                         cafeDetail.getAddress(),
                         cafeDetail.getOperatingDays(),

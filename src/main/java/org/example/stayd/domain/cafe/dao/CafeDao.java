@@ -445,19 +445,39 @@ public class CafeDao {
     }
 
     /**
-     * 운영시간 추출 (09:00-18:00)
+     * 운영시간 추출
      */
     private String extractOperatingHours(String operatingInfo) {
-        if (operatingInfo == null || operatingInfo.isEmpty()) return "";
+        System.out.println("=== extractOperatingHours 수정 버전 ===");
+        System.out.println("입력된 operatingInfo: " + operatingInfo);
 
-        String[] parts = operatingInfo.split(",");
-        if (parts.length > 0) {
-            String[] dayHour = parts[0].split(":");
-            if (dayHour.length >= 2) {
-                return dayHour[1]; // 첫 번째 운영시간 반환
-            }
+        if (operatingInfo == null || operatingInfo.isEmpty()) {
+            System.out.println("operatingInfo가 null이거나 비어있음");
+            return "";
         }
 
+        String[] parts = operatingInfo.split(",");
+        System.out.println("쉼표로 분리된 parts 개수: " + parts.length);
+
+        if (parts.length > 0) {
+            String firstPart = parts[0].trim(); // "FRI:05:00-20:00"
+            System.out.println("첫 번째 part: " + firstPart);
+
+            // 첫 번째 콜론의 위치를 찾아서 요일 부분을 제거
+            int colonIndex = firstPart.indexOf(":");
+            if (colonIndex > 0 && colonIndex < firstPart.length() - 1) {
+                String timeRange = firstPart.substring(colonIndex + 1); // "05:00-20:00"
+                System.out.println("추출된 운영시간: " + timeRange);
+                System.out.println("=== extractOperatingHours 완료 ===");
+                return timeRange;
+            } else {
+                System.out.println("콜론을 찾을 수 없거나 잘못된 형식");
+            }
+        } else {
+            System.out.println("parts 배열이 비어있음");
+        }
+
+        System.out.println("=== extractOperatingHours 실패 ===");
         return "";
     }
 

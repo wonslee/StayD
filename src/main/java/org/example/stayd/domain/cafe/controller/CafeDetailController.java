@@ -82,11 +82,12 @@ public class CafeDetailController implements Initializable {
      * -- GETTER --
      *  현재 표시된 탭 반환
      */
-    @Getter
+//    @Getter
     private String currentTab = "detail";
     private boolean reservationLoaded = false;
 
     // 카페 데이터
+    private int cafeId;
     private String cafeName;
     private String location;
     private String businessDays;
@@ -99,7 +100,7 @@ public class CafeDetailController implements Initializable {
     /* … */
     private CafeService cafeService;
 
-    // 🚀 이미지 캐시 추가
+    // 이미지 캐시 추가
     private final Map<String, Image> imageCache = new HashMap<>();
 
     // 🔹 기본 생성자 (FXML용 - 필수!)
@@ -311,7 +312,7 @@ public class CafeDetailController implements Initializable {
 
                     // CHANGED: Get controller and inject cafe data after loading
                     ReservationCreateController controller = loader.getController();
-                    DetailResponse cafeDto = cafeService.getCafeDetail(17L); // or actual selected cafe
+                    DetailResponse cafeDto = cafeService.getCafeDetail((long) cafeId); // or actual selected cafe
                     controller.setCafe(cafeDto);
 
                     reservationTabContent.getChildren().setAll(reservationView);
@@ -350,15 +351,16 @@ public class CafeDetailController implements Initializable {
     }
 
     /**
-     * 🚀 외부에서 카페 데이터를 설정하는 메소드 (최적화됨)
+     * 외부에서 카페 데이터를 설정하는 메소드 (최적화됨)
      * (다른 페이지에서 카페 상세 정보를 전달받을 때 사용)
      */
-    public void setCafeData(String cafeName, String location, String businessDays,
+    public void setCafeData(int cafeId, String cafeName, String location, String businessDays,
                             String operatingHours, int hourlyPrice, String phoneNumber,
                             String description, String imageUrl, double rating) {
 
 //        PerformanceMonitor.measureTime("Detail - Set Cafe Data", () -> {
             // 데이터 설정
+            this.cafeId = cafeId;
             this.cafeName = cafeName;
             this.location = location;
             this.businessDays = businessDays;
@@ -369,7 +371,7 @@ public class CafeDetailController implements Initializable {
             this.imageUrl = imageUrl;
             this.rating = rating;
 
-            // 🚀 즉시 UI 업데이트 (DB 호출 없이)
+            // 즉시 UI 업데이트 (DB 호출 없이)
             updateUI();
 //        });
     }
