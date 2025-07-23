@@ -4,13 +4,12 @@ import org.example.stayd.common.DayOfWeekConverter;
 import org.example.stayd.domain.cafe.dao.CafeDao;
 import org.example.stayd.domain.cafe.dto.CafeDto;
 import org.example.stayd.domain.cafe.model.CafeModel;
+import org.example.stayd.domain.cafe.model.OperationHours;
+import org.example.stayd.domain.cafe.model.DiscountHours;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-
-
-import org.example.stayd.common.PerformanceMonitor;
 
 /**
  * 스터디 카페 생성 비즈니스 로직 서비스
@@ -451,6 +450,67 @@ public class CafeService {
         } catch (Exception e) {
             e.printStackTrace();
             return false;
+        }
+    }
+
+    public int calculateCafePrice(long cafeId, String dayOfWeek, int startHour, int endHour) {
+        try {
+            CafeDto.DetailResponse cafe = cafeDao.findById(cafeId);
+            int pricePerHour = cafe.getPricePerHour();
+
+            List<OperationHours> opHours = cafeDao.getOperationHours(cafeId);
+            List<DiscountHours> discountHours = cafeDao.getDiscountHours(cafeId);
+
+            // Find operation hours for the selected day
+            OperationHours op = opHours.stream()
+                .filter(o -> o.dayOfWeek().toStringValue().equalsIgnoreCase(dayOfWeek))
+                .findFirst().orElse(null);
+            if (op == null || startHour < op.operationStart() || endHour > op.operationEnd()) {
+                throw new IllegalArgumentException("선택한 시간이 운영시간을 벗어납니다.");
+            }
+
+            // Find discount hours for the selected day (may be none)
+            DiscountHours discount = discountHours.stream()
+                .filter(d -> d.dayOfWeek().toStringValue().equalsIgnoreCase(dayOfWeek))
+                .findFirst().orElse(null);
+
+            int discounted = 0, nonDiscounted = 0;
+            double discountRate = 0.0;
+            if (discount != null) {
+                discountRate = discount.discountRate(); // percent, e.g. 20.0
+                for (int h = startHour; h < endHour; h++) {
+                    if (h >= discount.discountStart() && h < discount.discountEnd()) discounted++;
+                    else nonDiscounted++;
+                }
+            } else {
+                nonDiscounted = endHour - startHour;
+            }
+
+            return (int) Math.round(
+                pricePerHour * nonDiscounted +
+                pricePerHour * discounted * (1 - discountRate / 100.0)
+            );
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
+    public java.util.List<OperationHours> getOperationHours(long cafeId) {
+        try {
+            return cafeDao.getOperationHours(cafeId);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return java.util.Collections.emptyList();
+        }
+    }
+
+    public java.util.List<DiscountHours> getDiscountHours(long cafeId) {
+        try {
+            return cafeDao.getDiscountHours(cafeId);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return java.util.Collections.emptyList();
         }
     }
 }

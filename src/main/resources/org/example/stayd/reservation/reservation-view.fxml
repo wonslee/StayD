@@ -18,6 +18,7 @@
     </padding>
 
     <!-- ── 입력 ── -->
+
     <GridPane hgap="18" vgap="14">
         <columnConstraints>
             <ColumnConstraints minWidth="90" halignment="RIGHT"/>
@@ -26,7 +27,11 @@
             <ColumnConstraints minWidth="160" halignment="LEFT"/>
             <ColumnConstraints minWidth="90" halignment="RIGHT"/>
             <ColumnConstraints minWidth="120" halignment="LEFT"/>
+            <ColumnConstraints minWidth="120" halignment="LEFT"/>
+            <ColumnConstraints minWidth="200" halignment="LEFT"/>
         </columnConstraints>
+
+
 
         <Label text="날짜" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
         <DatePicker fx:id="datePicker" onAction="#handleDateChange" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
@@ -39,18 +44,27 @@
         <ComboBox fx:id="endCombo" onAction="#handleEndComboChange" prefWidth="100"
                   GridPane.rowIndex="0" GridPane.columnIndex="5"/>
 
-        <Label text="총 금액" style="-fx-font-weight:bold;"
+        <padding>
+            <Insets top="10"/>
+        </padding>
+
+        <Label text="할인시간" style="-fx-font-weight:bold;"
                GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+        <Label fx:id="discountHoursLabel"
+               style="-fx-text-fill:#e67e22; -fx-font-weight:bold;"
+               GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+        <Label text="총 금액" style="-fx-font-weight:bold;"
+               GridPane.rowIndex="1" GridPane.columnIndex="2"/>
         <Label fx:id="totalPriceLabel"
                style="-fx-text-fill:#009688; -fx-font-weight:bold;"
-               GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+               GridPane.rowIndex="1" GridPane.columnIndex="3"/>
     </GridPane>
 
     <Separator/>
 
     <!-- ── 좌석 ── -->
-    <Label text="seats information" style="-fx-font-size:16; -fx-font-weight:bold;"/>
-    <GridPane fx:id="seatGrid" hgap="8" vgap="8"/>
+    <Label text="좌석 현황"  style="-fx-font-size:16; -fx-font-weight:bold;"/>
+    <GridPane fx:id="seatGrid"  hgap="8" vgap="8"/>
 
     <HBox spacing="16" alignment="CENTER">
         <Label text="●" style="-fx-text-fill:#BDBDBD;"/><Label text="Available"/>
@@ -58,7 +72,7 @@
         <Label text="●" style="-fx-text-fill:#4CAF50;"/><Label text="Selected"/>
     </HBox>
 
-    <Button text="select" fx:id="reserveBtn" prefWidth="180" prefHeight="40" onAction="#handleReserve"/>
+    <Button text="예약" fx:id="reserveBtn" prefWidth="180" prefHeight="40" onAction="#handleReserve"/>
 
     <Label fx:id="statusLabel" wrapText="true" style="-fx-text-fill:#e91e63;"/>
 </VBox>
