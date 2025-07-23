@@ -1,44 +1,66 @@
 package org.example.stayd.domain.cafe.controller;
 
-import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
-import javafx.scene.control.*;
-import javafx.scene.text.Font;
-import javafx.event.ActionEvent;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseEvent;
-
-import org.example.stayd.domain.cafe.dto.CafeDto;
-import org.example.stayd.domain.cafe.service.CafeService;
-
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleButton;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.text.Font;
+import org.example.stayd.domain.cafe.dto.CafeDto;
+import org.example.stayd.domain.cafe.service.CafeService;
 
 public class CafeCreateController implements Initializable {
 
-    @FXML private TextField cafeNameField;
-    @FXML private TextField locationField;
-    @FXML private TextField selectedDaysField;
-    @FXML private TextField startTimeField;
-    @FXML private TextField endTimeField;
-    @FXML private TextField priceField;
-    @FXML private TextField phoneField;
-    @FXML private TextField imageUrlField;
-    @FXML private TextArea descriptionArea;
-    @FXML private Label charCountLabel;
-    @FXML private Button registerButton;
-    @FXML private Font registerButtonFont;
+    @FXML
+    private TextField cafeNameField;
+    @FXML
+    private TextField locationField;
+    @FXML
+    private TextField selectedDaysField;
+    @FXML
+    private TextField startTimeField;
+    @FXML
+    private TextField endTimeField;
+    @FXML
+    private TextField priceField;
+    @FXML
+    private TextField phoneField;
+    @FXML
+    private TextField imageUrlField;
+    @FXML
+    private TextArea descriptionArea;
+    @FXML
+    private Label charCountLabel;
+    @FXML
+    private Button registerButton;
+    @FXML
+    private Font registerButtonFont;
 
     // 요일 버튼들
-    @FXML private ToggleButton mondayButton;
-    @FXML private ToggleButton tuesdayButton;
-    @FXML private ToggleButton wednesdayButton;
-    @FXML private ToggleButton thursdayButton;
-    @FXML private ToggleButton fridayButton;
-    @FXML private ToggleButton saturdayButton;
-    @FXML private ToggleButton sundayButton;
+    @FXML
+    private ToggleButton mondayButton;
+    @FXML
+    private ToggleButton tuesdayButton;
+    @FXML
+    private ToggleButton wednesdayButton;
+    @FXML
+    private ToggleButton thursdayButton;
+    @FXML
+    private ToggleButton fridayButton;
+    @FXML
+    private ToggleButton saturdayButton;
+    @FXML
+    private ToggleButton sundayButton;
 
     private int currentPrice = 1000;
     private int startHour = 9;
@@ -183,13 +205,15 @@ public class CafeCreateController implements Initializable {
     // 등록 버튼 마우스 진입
     @FXML
     private void onRegisterButtonEnter(MouseEvent event) {
-        registerButton.setStyle("-fx-background-color: white; -fx-font-weight: bold; -fx-background-radius: 10; -fx-font-size: 16px;");
+        registerButton.setStyle(
+                "-fx-background-color: white; -fx-font-weight: bold; -fx-background-radius: 10; -fx-font-size: 16px;");
     }
 
     // 등록 버튼 마우스 나가기
     @FXML
     private void onRegisterButtonExit(MouseEvent event) {
-        registerButton.setStyle("-fx-background-color: white; -fx-font-weight: bold; -fx-background-radius: 10; -fx-font-size: 14px;");
+        registerButton.setStyle(
+                "-fx-background-color: white; -fx-font-weight: bold; -fx-background-radius: 10; -fx-font-size: 14px;");
     }
 
     // 카페 생성 버튼 클릭 (백엔드 연동)
@@ -223,6 +247,7 @@ public class CafeCreateController implements Initializable {
 
     /**
      * 입력 데이터로부터 카페 생성 요청 DTO 생성
+     *
      * @return 카페 생성 요청 DTO
      */
     private CafeDto.CreateRequest createCafeRequest() {
@@ -287,9 +312,10 @@ public class CafeCreateController implements Initializable {
 
     /**
      * 알림 다이얼로그 표시
+     *
      * @param alertType 알림 타입
-     * @param title 제목
-     * @param message 메시지
+     * @param title     제목
+     * @param message   메시지
      */
     private void showAlert(Alert.AlertType alertType, String title, String message) {
         Alert alert = new Alert(alertType);

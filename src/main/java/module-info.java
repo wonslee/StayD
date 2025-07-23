@@ -17,6 +17,7 @@ module org.example.stayd {
     opens org.example.stayd.domain.reservation.controller to javafx.fxml;
     opens org.example.stayd.domain.review.controller to javafx.fxml;
     opens org.example.stayd.domain.user.dto to org.hibernate.validator;
+    opens org.example.stayd.domain.reservation.model to org.hibernate.validator;
 
     exports org.example.stayd;
 
