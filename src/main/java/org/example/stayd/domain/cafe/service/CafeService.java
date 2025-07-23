@@ -370,40 +370,6 @@ public class CafeService {
             throw new RuntimeException("카페 검색 중 예상치 못한 오류: " + e.getMessage());
         }
     }
-    /**
-     * 페이징을 지원하는 카페 검색 (PL/SQL 함수 사용)
-     * @param keyword 검색 키워드
-     * @param sortByRating 정렬 방식
-     * @param pageNum 페이지 번호 (1부터 시작)
-     * @param pageSize 페이지 크기
-     * @return 검색된 카페 목록
-     */
-    public List<CafeDto.SimpleCafeDto> searchCafesWithPaging(String keyword, boolean sortByRating,
-                                                             int pageNum, int pageSize) {
-        try {
-            System.out.println("\n=== PL/SQL 페이징 검색 시작 ===");
-            System.out.println("검색어: " + (keyword != null ? keyword : "전체"));
-            System.out.println("정렬: " + (sortByRating ? "평점순" : "최신순"));
-            System.out.println("페이지: " + pageNum + "/" + pageSize);
-
-            long startTime = System.currentTimeMillis();
-
-            List<CafeDto.SimpleCafeDto> results = cafeDao.searchCafesWithPLSQL(keyword, sortByRating, pageNum, pageSize);
-
-            long endTime = System.currentTimeMillis();
-
-            System.out.println("PL/SQL 페이징 검색 완료!");
-            System.out.println("   실행 시간: " + (endTime - startTime) + "ms");
-            System.out.println("   결과: " + results.size() + "개 (페이지 " + pageNum + ")");
-            System.out.println("=== PL/SQL 페이징 검색 완료 ===\n");
-
-            return results;
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-            throw new RuntimeException("페이징 검색 중 오류 발생: " + e.getMessage());
-        }
-    }
 
     /**
      * 카페 ID로 상세 정보 조회 (상세 페이지용)

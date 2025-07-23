@@ -351,7 +351,7 @@ public class CafeDao {
      * @throws SQLException SQL 예외
      */
     public List<CafeDto.SimpleCafeDto> findAllCafesWithPLSQL(boolean sortByRating) throws SQLException {
-        // 첫 번째 페이지의 큰 사이즈로 전체 조회 (실제로는 페이징 처리 권장)
+        // 첫 번째 페이지의 큰 사이즈로 전체 조회
         return searchCafesWithPLSQL(null, sortByRating, 1, 100);
     }
 
