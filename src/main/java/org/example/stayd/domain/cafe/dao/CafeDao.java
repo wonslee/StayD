@@ -32,7 +32,7 @@ public class CafeDao {
         Connection connection = databaseConnection.getConnection();
 
         try {
-            System.out.println(" PL/SQL 프로시저로 카페 생성 시작...");
+            System.out.println(" PL/SQL Start creating a cafe with a procedure");
 
             // PL/SQL 프로시저 호출 (파라미터 11개)
             String sql = "{ call create_study_cafe(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) }";
@@ -51,15 +51,15 @@ public class CafeDao {
                 //  운영일을 문자열로 변환 ("월,화,수,목,금")
                 String operatingDaysString = createOperatingDaysString(operatingHours);
                 cstmt.setString(8, operatingDaysString);
-                System.out.println("🗓 운영일 문자열: " + operatingDaysString);
+                System.out.println("🗓 operatingDaysString: " + operatingDaysString);
 
                 // 운영시간 설정 (첫 번째 운영시간 사용)
                 if (!operatingHours.isEmpty()) {
                     cstmt.setInt(9, operatingHours.get(0).getOperationStart());
                     cstmt.setInt(10, operatingHours.get(0).getOperationEnd());
-                    System.out.println("운영시간: " + operatingHours.get(0).getOperationStart() + ":00 - " + operatingHours.get(0).getOperationEnd() + ":00");
+                    System.out.println("operatingHours: " + operatingHours.get(0).getOperationStart() + ":00 - " + operatingHours.get(0).getOperationEnd() + ":00");
                 } else {
-                    throw new SQLException("운영시간이 설정되지 않았습니다.");
+                    throw new SQLException("Operating time is not set.");
                 }
 
                 // 출력 파라미터 설정
@@ -76,15 +76,11 @@ public class CafeDao {
                 if (result == 0) {
                     // 성공
                     Long cafeId = cstmt.getLong(11);
-                    System.out.println(" PL/SQL 프로시저 실행 성공!");
-                    System.out.println("   생성된 카페 ID: " + cafeId);
-                    System.out.println("   실행 시간: " + (endTime - startTime) + "ms");
-                    System.out.println("   네트워크 호출: 1번 (기존 20+번에서 대폭 감소!)");
                     return cafeId;
                 } else {
                     // 실패
-                    System.out.println(" PL/SQL 프로시저 실행 실패 (결과 코드: " + result + ")");
-                    throw new SQLException("카페 생성 프로시저 실행 실패");
+                    System.out.println(" PL/SQL fail: " + result + ")");
+                    throw new SQLException("create cafe failed.");
                 }
             }
 
@@ -166,8 +162,6 @@ public class CafeDao {
      */
     public CafeDto.DetailResponse findById(Long cafeId) throws SQLException {
         // 디버깅 로그 추가
-        System.out.println("=== DAO 디버깅 ===");
-        System.out.println("조회할 카페 ID: " + cafeId);
 
         String cafeSql = "SELECT * FROM cafe WHERE cafe_id = ?";
         String opSql = "SELECT * FROM operation_hours WHERE cafe_id = ?";
@@ -180,12 +174,12 @@ public class CafeDao {
             ResultSet cafeRs = cafeStmt.executeQuery();
 
             //  결과 확인
-            System.out.println("SQL 쿼리 실행: " + cafeSql);
-            System.out.println("파라미터: " + cafeId);
+            System.out.println("SQL query: " + cafeSql);
+            System.out.println("Parameter: " + cafeId);
 
             if (!cafeRs.next()) {
-                System.out.println("결과 없음");
-                throw new SQLException("해당 ID의 카페를 찾을 수 없습니다.");
+                System.out.println("No result");
+                throw new SQLException(" Not find cafe with id: " + cafeId);
             }
 
             System.out.println("✅ 카페 찾음!");
@@ -277,10 +271,6 @@ public class CafeDao {
         List<CafeDto.SimpleCafeDto> cafes = new ArrayList<>();
 
         try {
-            System.out.println("PL/SQL 함수로 카페 검색 시작...");
-            System.out.println("   키워드: " + (keyword != null ? keyword : "전체"));
-            System.out.println("   정렬: " + (sortByRating ? "평점순" : "최신순"));
-            System.out.println("   페이지: " + pageNum + " (크기: " + pageSize + ")");
 
             // PL/SQL 함수 호출
             String sql = "{ ? = call search_cafes_advanced(?, ?, ?, ?) }";
@@ -326,10 +316,7 @@ public class CafeDao {
                     }
                 }
 
-                System.out.println("PL/SQL 검색 완료!");
-                System.out.println("   실행 시간: " + (endTime - startTime) + "ms");
-                System.out.println("   검색 결과: " + cafes.size() + "개");
-                System.out.println("   네트워크 호출: 1번 (복잡한 JOIN + 정렬 + 페이징이 DB에서 처리)");
+                System.out.println("PL/SQL Search!");
 
             }
 
@@ -532,8 +519,8 @@ public class CafeDao {
         Connection connection = databaseConnection.getConnection();
 
         try {
-            System.out.println(" PL/SQL 프로시저로 카페 삭제 시작...");
-            System.out.println("   카페 ID: " + cafeId + ", 소유자 ID: " + ownerId);
+            System.out.println(" PL/SQL deleteCafe Start");
+            System.out.println("   CAFE ID: " + cafeId + ", OWNER ID: " + ownerId);
 
             // PL/SQL 프로시저 호출
             String sql = "{ call delete_study_cafe(?, ?, ?) }";
@@ -560,26 +547,24 @@ public class CafeDao {
                 switch (result) {
                     case 0:
                         // 성공
-                        System.out.println(" PL/SQL 카페 삭제 성공!");
-                        System.out.println("   네트워크 호출: 1번 (기존 4번에서 대폭 감소!)");
-                        System.out.println("   처리된 작업: 소유자 확인 + 좌석 삭제 + 운영시간 삭제 + 카페 삭제");
+                        System.out.println(" PL/SQL Cafe delete!");
                         break;
 
                     case 1:
                         // 권한 없음
-                        System.out.println(" 권한 없음: 소유자만 카페를 삭제할 수 있습니다.");
-                        throw new SQLException("본인이 소유한 카페만 삭제할 수 있습니다.");
+                        System.out.println(" No Owner");
+                        throw new SQLException("No Owner");
 
                     case 3:
                         // 카페 없음
-                        System.out.println(" 존재하지 않는 카페입니다.");
-                        throw new SQLException("해당 카페를 찾을 수 없습니다.");
+                        System.out.println(" Not Exist");
+                        throw new SQLException("Not Exist");
 
                     case 2:
                     default:
                         // 일반 실패
-                        System.out.println(" PL/SQL 프로시저 실행 실패 (결과 코드: " + result + ")");
-                        throw new SQLException("카페 삭제 프로시저 실행 실패");
+                        System.out.println(" PL/SQL fail: " + result + ")");
+                        throw new SQLException("cafe delete fail");
                 }
             }
 

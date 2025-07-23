@@ -285,7 +285,7 @@ public class CafeListController implements Initializable {
 
         // 캐시에서 확인
         if (imageCache.containsKey(imageUrl)) {
-            System.out.println("Image cache hit for card " + cardIndex);
+//            System.out.println("Image cache hit for card " + cardIndex);
             imageView.setImage(imageCache.get(imageUrl));
             return;
         }

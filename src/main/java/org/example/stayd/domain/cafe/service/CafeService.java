@@ -62,16 +62,16 @@ public class CafeService {
             // 카페 생성 (카페 + 운영시간 + 좌석 20개)
             Long cafeId = cafeDao.createCafe(cafe, operatingHours);
 
-            return new CafeDto.CreateResponse(cafeId, "스터디 카페가 성공적으로 생성되었습니다.", true);
+            return new CafeDto.CreateResponse(cafeId, "Study cafe created successfully.", true);
 
         } catch (IllegalArgumentException e) {
             return new CafeDto.CreateResponse(null, e.getMessage(), false);
         } catch (SQLException e) {
             e.printStackTrace();
-            return new CafeDto.CreateResponse(null, "데이터베이스 오류가 발생했습니다: " + e.getMessage(), false);
+            return new CafeDto.CreateResponse(null, "database error: " + e.getMessage(), false);
         } catch (Exception e) {
             e.printStackTrace();
-            return new CafeDto.CreateResponse(null, "예상치 못한 오류가 발생했습니다: " + e.getMessage(), false);
+            return new CafeDto.CreateResponse(null, "An unexpected error: " + e.getMessage(), false);
         }
     }
 
@@ -85,7 +85,7 @@ public class CafeService {
      */
     private void validateCreateRequest(CafeDto.CreateRequest request) {
         if (request == null) {
-            throw new IllegalArgumentException("카페 생성 정보가 없습니다.");
+            throw new IllegalArgumentException("no cafe creation information.");
         }
 
         // 공통 검증 로직 호출
@@ -109,11 +109,11 @@ public class CafeService {
      */
     private void validateUpdateRequest(CafeDto.UpdateRequest request) {
         if (request == null) {
-            throw new IllegalArgumentException("카페 수정 정보가 없습니다.");
+            throw new IllegalArgumentException("No cafe modification information");
         }
 
         if (request.getCafeId() == null) {
-            throw new IllegalArgumentException("카페 ID가 없습니다.");
+            throw new IllegalArgumentException("No cafe id information.");
         }
 
         // 공통 검증 로직 호출
@@ -150,58 +150,58 @@ public class CafeService {
 
     private void validateCafeName(String name) {
         if (name == null || name.trim().isEmpty()) {
-            throw new IllegalArgumentException("카페 이름을 입력해주세요.");
+            throw new IllegalArgumentException("cafe name cannot be empty.");
         }
         if (name.trim().length() > 50) {
-            throw new IllegalArgumentException("카페 이름은 50자 이하로 입력해주세요.");
+            throw new IllegalArgumentException("cafe name cannot exceed 50 characters.");
         }
     }
     private void validateCafeAddress(String address) {
         if (address == null || address.trim().isEmpty()) {
-            throw new IllegalArgumentException("카페 주소를 입력해주세요.");
+            throw new IllegalArgumentException("cafe address cannot be empty.");
         }
         if (address.trim().length() > 100) {
-            throw new IllegalArgumentException("주소는 100자 이하로 입력해주세요.");
+            throw new IllegalArgumentException("address cannot exceed 100 characters.");
         }
     }
     private void validatePricePerHour(Integer pricePerHour) {
         if (pricePerHour == null || pricePerHour < 1000) {
-            throw new IllegalArgumentException("시간당 가격은 1000원 이상이어야 합니다.");
+            throw new IllegalArgumentException("pricePerHour cannot be less than 1000.");
         }
     }
     private void validateDescription(String description, int maxLength) {
         if (description == null || description.trim().isEmpty()) {
-            throw new IllegalArgumentException("카페 설명을 입력해주세요.");
+            throw new IllegalArgumentException("description cannot be empty.");
         }
         if (description.trim().length() > maxLength) {
-            throw new IllegalArgumentException("설명은 " + maxLength + "자 이하로 입력해주세요.");
+            throw new IllegalArgumentException("description " + maxLength);
         }
     }
     private void validatePhoneNumber(String phoneNumber) {
         if (phoneNumber == null || phoneNumber.trim().isEmpty()) {
-            throw new IllegalArgumentException("전화번호를 입력해주세요.");
+            throw new IllegalArgumentException("Phone number cannot be empty.");
         }
         if (!isValidPhoneNumber(phoneNumber)) {
-            throw new IllegalArgumentException("올바른 전화번호 형식이 아닙니다. (예: 02-123-4567, 010-1234-5678)");
+            throw new IllegalArgumentException("Invalid phone number format. (ex: 02-123-4567, 010-1234-5678)");
         }
     }
     private void validateOperatingDays(List<String> operatingDays) {
         if (operatingDays == null || operatingDays.isEmpty()) {
-            throw new IllegalArgumentException("영업일을 선택해주세요.");
+            throw new IllegalArgumentException("Operating days cannot be empty.");
         }
     }
     private void validateOperatingHours(Integer startHour, Integer endHour) {
         if (startHour == null || endHour == null) {
-            throw new IllegalArgumentException("운영시간을 설정해주세요.");
+            throw new IllegalArgumentException("Operating hours cannot be empty.");
         }
         if (startHour < 0 || startHour > 23) {
-            throw new IllegalArgumentException("시작 시간은 0~23시 사이여야 합니다.");
+            throw new IllegalArgumentException("startHour must be between 0 and 23");
         }
         if (endHour < 0 || endHour > 23) {
-            throw new IllegalArgumentException("종료 시간은 0~23시 사이여야 합니다.");
+            throw new IllegalArgumentException("endHour must be between 0 and 23");
         }
         if (startHour >= endHour) {
-            throw new IllegalArgumentException("종료 시간은 시작 시간보다 늦어야 합니다.");
+            throw new IllegalArgumentException("endHour cannot be greater than startHour");
         }
     }
     private boolean isValidPhoneNumber(String phoneNumber) {
@@ -268,7 +268,7 @@ public class CafeService {
             return cafeDao.findById(cafeId);
         } catch (SQLException e) {
             e.printStackTrace();
-            throw new RuntimeException("카페 상세 정보 조회 중 오류 발생: " + e.getMessage());
+            throw new RuntimeException("Error checking cafe details: " + e.getMessage());
         }
     }
 
@@ -280,7 +280,6 @@ public class CafeService {
      */
     public List<CafeDto.SimpleCafeDto> getAllCafes(boolean sortByRating) {
         try {
-            System.out.println("\n=== PL/SQL 전체 카페 조회 시작 ===");
 
             long totalStartTime = System.currentTimeMillis();
 
@@ -289,30 +288,16 @@ public class CafeService {
 
             long totalEndTime = System.currentTimeMillis();
 
-            System.out.println("PL/SQL 전체 카페 조회 완료!");
-            System.out.println("성능 비교:");
-            System.out.println("   이전 (Java): 복잡한 JOIN 쿼리를 Java에서 처리");
-            System.out.println("      - SELECT + LEFT JOIN reservation");
-            System.out.println("      - GROUP BY + ORDER BY 처리");
-            System.out.println("      - 메모리에서 정렬 작업");
-            System.out.println("   현재 (PL/SQL): 모든 로직이 DB에서 최적화되어 처리");
-            System.out.println("      - 동적 쿼리 생성");
-            System.out.println("      - DB 엔진 레벨에서 정렬 최적화");
-            System.out.println("      - 인덱스 활용 극대화");
-            System.out.println("   총 소요 시간: " + (totalEndTime - totalStartTime) + "ms");
-            System.out.println("   결과: " + results.size() + "개");
-            System.out.println("=== PL/SQL 전체 카페 조회 완료 ===\n");
-
             return results;
 
         } catch (SQLException e) {
             e.printStackTrace();
-            System.out.println("PL/SQL 전체 카페 조회 실패: " + e.getMessage());
-            throw new RuntimeException("카페 목록 조회 중 오류 발생: " + e.getMessage());
+            System.out.println("PL/SQL Full Cafe Inquiry Failed: " + e.getMessage());
+            throw new RuntimeException("Error cafe list: " + e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            System.out.println("예상치 못한 오류: " + e.getMessage());
-            throw new RuntimeException("카페 목록 조회 중 예상치 못한 오류: " + e.getMessage());
+            System.out.println("An unexpected error: : " + e.getMessage());
+            throw new RuntimeException("Error cafe list: " + e.getMessage());
         }
     }
 
@@ -324,9 +309,9 @@ public class CafeService {
      */
     public List<CafeDto.SimpleCafeDto> searchCafesByName(String keyword, boolean sortByRating) {
         try {
-            System.out.println("\n=== PL/SQL 카페 검색 시작 ===");
-            System.out.println("검색어: " + (keyword != null && !keyword.trim().isEmpty() ? keyword : "전체"));
-            System.out.println("정렬: " + (sortByRating ? "평점순" : "최신순"));
+            System.out.println("Start PL/SQL Cafe Search");
+            System.out.println("search word: " + (keyword != null && !keyword.trim().isEmpty() ? keyword : "all"));
+            System.out.println("sort: " + (sortByRating ? "평점" : "최신순"));
 
             long totalStartTime = System.currentTimeMillis();
 
@@ -342,32 +327,16 @@ public class CafeService {
 
             long totalEndTime = System.currentTimeMillis();
 
-            System.out.println("PL/SQL 카페 검색 완료!");
-            System.out.println("성능 비교:");
-            System.out.println("   이전 (Java): 여러 단계로 처리");
-            System.out.println("      1. 기본 SELECT 쿼리 실행");
-            System.out.println("      2. LIKE 조건으로 필터링");
-            System.out.println("      3. Java에서 정렬 로직 처리");
-            System.out.println("      4. 결과 매핑 및 변환");
-            System.out.println("   현재 (PL/SQL): 원스톱 처리");
-            System.out.println("      - 동적 WHERE 조건 생성");
-            System.out.println("      - 동적 ORDER BY 조건 생성");
-            System.out.println("      - 페이징까지 DB에서 처리");
-            System.out.println("      - 최적화된 실행 계획 사용");
-            System.out.println("   총 소요 시간: " + (totalEndTime - totalStartTime) + "ms");
-            System.out.println("   검색 결과: " + results.size() + "개");
-            System.out.println("=== PL/SQL 카페 검색 완료 ===\n");
-
             return results;
 
         } catch (SQLException e) {
             e.printStackTrace();
-            System.out.println("PL/SQL 카페 검색 실패: " + e.getMessage());
-            throw new RuntimeException("카페 검색 중 오류 발생: " + e.getMessage());
+            System.out.println("PL/SQL cafe search fail: " + e.getMessage());
+            throw new RuntimeException("cafe search error: " + e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            System.out.println("예상치 못한 오류: " + e.getMessage());
-            throw new RuntimeException("카페 검색 중 예상치 못한 오류: " + e.getMessage());
+            System.out.println("unexpected error: " + e.getMessage());
+            throw new RuntimeException("cafe seartch upexpected error: " + e.getMessage());
         }
     }
 
@@ -411,7 +380,7 @@ public class CafeService {
 
             // 카페 존재 여부 및 소유자 확인
             if (!isOwnerOfCafe(request.getCafeId(), ownerId)) {
-                return new CafeDto.UpdateResponse(false, "본인이 소유한 카페만 수정할 수 있습니다.");
+                return new CafeDto.UpdateResponse(false, "You can only modify the cafes you own.");
             }
 
             // 운영시간 생성
@@ -424,13 +393,13 @@ public class CafeService {
             // 카페 정보 수정
             cafeDao.updateCafe(request, operatingHours);
 
-            return new CafeDto.UpdateResponse(true, "카페 정보가 성공적으로 수정되었습니다.");
+            return new CafeDto.UpdateResponse(true, "cafe information has been successfully modified.");
 
         } catch (IllegalArgumentException e) {
             return new CafeDto.UpdateResponse(false, e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            return new CafeDto.UpdateResponse(false, "카페 수정 중 오류가 발생했습니다: " + e.getMessage());
+            return new CafeDto.UpdateResponse(false, "error occurred while modifying the cafe: " + e.getMessage());
         }
     }
 
@@ -444,17 +413,17 @@ public class CafeService {
         try {
             // 카페 존재 여부 및 소유자 확인
             if (!isOwnerOfCafe(cafeId, ownerId)) {
-                return new CafeDto.DeleteResponse(false, "본인이 소유한 카페만 삭제할 수 있습니다.");
+                return new CafeDto.DeleteResponse(false, "You can only delete the cafes you own.");
             }
 
             // 카페 삭제 (관련 데이터도 함께 삭제)
             cafeDao.deleteCafe(cafeId, ownerId);
 
-            return new CafeDto.DeleteResponse(true, "카페가 성공적으로 삭제되었습니다.");
+            return new CafeDto.DeleteResponse(true, "The cafe has been deleted successfully.");
 
         } catch (Exception e) {
             e.printStackTrace();
-            return new CafeDto.DeleteResponse(false, "카페 삭제 중 오류가 발생했습니다: " + e.getMessage());
+            return new CafeDto.DeleteResponse(false, "Error deleting cafe: " + e.getMessage());
         }
     }
 

@@ -149,7 +149,7 @@ public class CafeDetailController implements Initializable {
 
         // 캐시에서 확인
         if (imageCache.containsKey(imageUrl)) {
-            System.out.println("Detail image cache hit");
+//            System.out.println("Detail image cache hit");
             imageView.setImage(imageCache.get(imageUrl));
             return;
         }
