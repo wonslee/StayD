@@ -13,7 +13,7 @@ import org.example.stayd.domain.reservation.dao.ReservationWDAO;
 import org.example.stayd.domain.reservation.dao.ReservationDao;
 import org.example.stayd.domain.reservation.dao.SeatDAO;
 import org.example.stayd.domain.reservation.dto.ReservationDTO;
-import org.example.stayd.domain.reservation.dto.ReservationDto;
+import org.example.stayd.domain.reservation.dto.ReservationDTO;
 import org.example.stayd.domain.reservation.model.Reservation;
 import org.example.stayd.domain.reservation.model.Seat;
 
@@ -30,7 +30,7 @@ public class ReservationService {
         this.reservationDAO = new ReservationWDAO();
     }
 
-    public List<ReservationDto> getReservationStatusByLoggedInUser() throws SQLException {
+    public List<ReservationDTO> getReservationStatusByLoggedInUser() throws SQLException {
         return reservationDao.getReservationStatusByLoggedInUser();  // 로그인한 유저의 cafe_id로 필터링된 데이터 반환
     }
 
