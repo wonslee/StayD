@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<HBox spacing="10" alignment="CENTER" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.stayd.common.NavbarController" prefHeight="30">
+    <Button text="카페 생성" onAction="#goToCafeCreate" prefWidth="200"/>
+    <Button text="카페 수정" onAction="#goToCafeModifyDelete" prefWidth="200"/>
+    <Button text="날짜별 현황" onAction="#goToReservationStatus" prefWidth="200"/>
+    <Button text="요일별 현황" onAction="#goToReservationStatusDay" prefWidth="200"/>
+    <Button text="할인 설정" onAction="#goToDiscountSettings" prefWidth="200"/>
+</HBox>
