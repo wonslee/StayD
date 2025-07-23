@@ -249,18 +249,20 @@ public class CafeDetailController implements Initializable {
 
             if (!reservationLoaded) {
                 try {
+                    // CHANGED: Use classic FXML loading with fx:controller
                     FXMLLoader loader = new FXMLLoader(
                             getClass().getResource("/org/example/stayd/reservation/reservation-view.fxml"));
-                    DetailResponse cafeDto = cafeService.getCafeDetail(17L);
-                    ReservationCreateController controller = new ReservationCreateController(cafeDto);
-                    loader.setController(controller); // Directly set the controller instance
+                    Node reservationView = loader.load();
 
-                    reservationTabContent.getChildren().setAll((Node) loader.load());
+                    // CHANGED: Get controller and inject cafe data after loading
+                    ReservationCreateController controller = loader.getController();
+                    DetailResponse cafeDto = cafeService.getCafeDetail(17L); // or actual selected cafe
+                    controller.setCafe(cafeDto);
+
+                    reservationTabContent.getChildren().setAll(reservationView);
                     reservationLoaded = true;
-
                 } catch (Exception ex) {
                     ex.printStackTrace();
-                    // 필요 시 사용자 알림
                 }
             }
         }
