@@ -5,6 +5,7 @@ import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.SQLException;
 import java.util.List;
 import org.example.stayd.domain.reservation.dto.ReservationDto;
@@ -32,8 +33,14 @@ public class ReservationService {
         this.reservationDAO = new ReservationWDAO();
     }
 
-    public List<ReservationDTO> getReservationStatusByLoggedInUser() throws SQLException {
-        return reservationDao.getReservationStatusByLoggedInUser();  // 로그인한 유저의 cafe_id로 필터링된 데이터 반환
+    // 날짜별 예약 현황을 가져오는 메서드
+    public List<ReservationDTO> getReservationStatusByLoggedInUser(Date selectedDate) throws SQLException {
+        return reservationDao.getReservationStatusByLoggedInUser(selectedDate);  // 로그인한 유저의 cafe_id로 필터링된 데이터 반환
+    }
+
+    // 요일별 예약 현황을 가져오는 메서드
+    public List<ReservationDTO> getReservationStatusByDay(String selectedDay) throws SQLException {
+        return reservationDao.getReservationStatusByDay(selectedDay);
     }
 
     /**

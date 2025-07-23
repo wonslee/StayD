@@ -1,5 +1,6 @@
 package org.example.stayd.domain.cafe.service;
 
+import org.example.stayd.common.DayOfWeekConverter;
 import org.example.stayd.domain.cafe.dao.CafeDao;
 import org.example.stayd.domain.cafe.dto.CafeDto;
 import org.example.stayd.domain.cafe.model.CafeModel;
@@ -7,6 +8,9 @@ import org.example.stayd.domain.cafe.model.CafeModel;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+
+
+import org.example.stayd.common.PerformanceMonitor;
 
 /**
  * 스터디 카페 생성 비즈니스 로직 서비스
@@ -72,6 +76,9 @@ public class CafeService {
         }
     }
 
+    // CafeService.java에서 기존 validateCreateRequest와 validateUpdateRequest를
+// 다음 코드로 교체하세요
+
     /**
      * 카페 생성 요청 검증
      * @param request 생성 요청
@@ -82,68 +89,122 @@ public class CafeService {
             throw new IllegalArgumentException("카페 생성 정보가 없습니다.");
         }
 
-        // 카페 이름 검증
-        if (request.getName() == null || request.getName().trim().isEmpty()) {
-            throw new IllegalArgumentException("카페 이름을 입력해주세요.");
-        }
-        if (request.getName().trim().length() > 50) {
-            throw new IllegalArgumentException("카페 이름은 50자 이하로 입력해주세요.");
-        }
-
-        // 주소 검증
-        if (request.getAddress() == null || request.getAddress().trim().isEmpty()) {
-            throw new IllegalArgumentException("카페 주소를 입력해주세요.");
-        }
-        if (request.getAddress().trim().length() > 100) {
-            throw new IllegalArgumentException("주소는 100자 이하로 입력해주세요.");
-        }
-
-        // 시간당 가격 검증
-        if (request.getPricePerHour() == null || request.getPricePerHour() < 1000) {
-            throw new IllegalArgumentException("시간당 가격은 1000원 이상이어야 합니다.");
-        }
-
-        // 설명 검증
-        if (request.getDescription() == null || request.getDescription().trim().isEmpty()) {
-            throw new IllegalArgumentException("카페 설명을 입력해주세요.");
-        }
-        if (request.getDescription().trim().length() > 100) {
-            throw new IllegalArgumentException("설명은 100자 이하로 입력해주세요.");
-        }
-
-        // 전화번호 검증
-        if (request.getPhoneNumber() == null || request.getPhoneNumber().trim().isEmpty()) {
-            throw new IllegalArgumentException("전화번호를 입력해주세요.");
-        }
-        if (!isValidPhoneNumber(request.getPhoneNumber())) {
-            throw new IllegalArgumentException("올바른 전화번호 형식이 아닙니다. (예: 02-123-4567, 010-1234-5678)");
-        }
-
-        // 영업일 검증
-        if (request.getOperatingDays() == null || request.getOperatingDays().isEmpty()) {
-            throw new IllegalArgumentException("영업일을 선택해주세요.");
-        }
-
-        // 운영시간 검증
-        if (request.getOperatingStartHour() == null || request.getOperatingEndHour() == null) {
-            throw new IllegalArgumentException("운영시간을 설정해주세요.");
-        }
-        if (request.getOperatingStartHour() < 0 || request.getOperatingStartHour() > 23) {
-            throw new IllegalArgumentException("시작 시간은 0~23시 사이여야 합니다.");
-        }
-        if (request.getOperatingEndHour() < 0 || request.getOperatingEndHour() > 23) {
-            throw new IllegalArgumentException("종료 시간은 0~23시 사이여야 합니다.");
-        }
-        if (request.getOperatingStartHour() >= request.getOperatingEndHour()) {
-            throw new IllegalArgumentException("종료 시간은 시작 시간보다 늦어야 합니다.");
-        }
+        // 공통 검증 로직 호출
+        validateCafeBasicInfo(
+                request.getName(),
+                request.getAddress(),
+                request.getPricePerHour(),
+                request.getDescription(),
+                request.getPhoneNumber(),
+                request.getOperatingDays(),
+                request.getOperatingStartHour(),
+                request.getOperatingEndHour(),
+                100 // 생성 시 설명 최대 길이
+        );
     }
 
     /**
-     * 전화번호 형식 검증
-     * @param phoneNumber 전화번호
-     * @return 유효성 여부
+     * 카페 수정 요청 검증
+     * @param request 수정 요청
+     * @throws IllegalArgumentException 검증 실패 시
      */
+    private void validateUpdateRequest(CafeDto.UpdateRequest request) {
+        if (request == null) {
+            throw new IllegalArgumentException("카페 수정 정보가 없습니다.");
+        }
+
+        if (request.getCafeId() == null) {
+            throw new IllegalArgumentException("카페 ID가 없습니다.");
+        }
+
+        // 공통 검증 로직 호출
+        validateCafeBasicInfo(
+                request.getName(),
+                request.getAddress(),
+                request.getPricePerHour(),
+                request.getDescription(),
+                request.getPhoneNumber(),
+                request.getOperatingDays(),
+                request.getOperatingStartHour(),
+                request.getOperatingEndHour(),
+                200 // 수정 시 설명 최대 길이
+        );
+    }
+
+    /**
+     * 카페 기본 정보 공통 검증
+     * @throws IllegalArgumentException 검증 실패 시
+     */
+    private void validateCafeBasicInfo(String name, String address, Integer pricePerHour,
+                                       String description, String phoneNumber,
+                                       List<String> operatingDays, Integer startHour,
+                                       Integer endHour, int descriptionMaxLength) {
+
+        validateCafeName(name);
+        validateCafeAddress(address);
+        validatePricePerHour(pricePerHour);
+        validateDescription(description, descriptionMaxLength);
+        validatePhoneNumber(phoneNumber);
+        validateOperatingDays(operatingDays);
+        validateOperatingHours(startHour, endHour);
+    }
+
+    private void validateCafeName(String name) {
+        if (name == null || name.trim().isEmpty()) {
+            throw new IllegalArgumentException("카페 이름을 입력해주세요.");
+        }
+        if (name.trim().length() > 50) {
+            throw new IllegalArgumentException("카페 이름은 50자 이하로 입력해주세요.");
+        }
+    }
+    private void validateCafeAddress(String address) {
+        if (address == null || address.trim().isEmpty()) {
+            throw new IllegalArgumentException("카페 주소를 입력해주세요.");
+        }
+        if (address.trim().length() > 100) {
+            throw new IllegalArgumentException("주소는 100자 이하로 입력해주세요.");
+        }
+    }
+    private void validatePricePerHour(Integer pricePerHour) {
+        if (pricePerHour == null || pricePerHour < 1000) {
+            throw new IllegalArgumentException("시간당 가격은 1000원 이상이어야 합니다.");
+        }
+    }
+    private void validateDescription(String description, int maxLength) {
+        if (description == null || description.trim().isEmpty()) {
+            throw new IllegalArgumentException("카페 설명을 입력해주세요.");
+        }
+        if (description.trim().length() > maxLength) {
+            throw new IllegalArgumentException("설명은 " + maxLength + "자 이하로 입력해주세요.");
+        }
+    }
+    private void validatePhoneNumber(String phoneNumber) {
+        if (phoneNumber == null || phoneNumber.trim().isEmpty()) {
+            throw new IllegalArgumentException("전화번호를 입력해주세요.");
+        }
+        if (!isValidPhoneNumber(phoneNumber)) {
+            throw new IllegalArgumentException("올바른 전화번호 형식이 아닙니다.");
+        }
+    }
+    private void validateOperatingDays(List<String> operatingDays) {
+        if (operatingDays == null || operatingDays.isEmpty()) {
+            throw new IllegalArgumentException("영업일을 선택해주세요.");
+        }
+    }
+    private void validateOperatingHours(Integer startHour, Integer endHour) {
+        if (startHour == null || endHour == null) {
+            throw new IllegalArgumentException("운영시간을 설정해주세요.");
+        }
+        if (startHour < 0 || startHour > 23) {
+            throw new IllegalArgumentException("시작 시간은 0시부터 23시 사이여야 합니다.");
+        }
+        if (endHour < 0 || endHour > 23) {
+            throw new IllegalArgumentException("종료 시간은 0시부터 23시 사이여야 합니다.");
+        }
+        if (startHour >= endHour) {
+            throw new IllegalArgumentException("종료 시간은 시작 시간보다 늦어야 합니다.");
+        }
+    }
     private boolean isValidPhoneNumber(String phoneNumber) {
         if (phoneNumber == null) return false;
 
@@ -155,22 +216,33 @@ public class CafeService {
     }
 
     /**
-     * 운영시간 목록 생성
-     * @param operatingDays 영업일 목록 (한글)
+     * 운영시간 목록 생성 (한글 → 영어 변환)
+     * @param operatingDays 영업일 목록 (한글: 월, 화, 수, 목, 금, 토, 일)
      * @param startHour 시작 시간
      * @param endHour 종료 시간
-     * @return 운영시간 DTO 목록
+     * @return 운영시간 DTO 목록 (영어 요일로 변환됨)
      */
     private List<CafeDto.OperatingHours> createOperatingHours(List<String> operatingDays,
                                                               Integer startHour, Integer endHour) {
         List<CafeDto.OperatingHours> operatingHours = new ArrayList<>();
 
-        for (String day : operatingDays) {
-            String dbDay = CafeDao.convertDayToDbFormat(day.trim());
-            if (!dbDay.isEmpty()) {
-                operatingHours.add(new CafeDto.OperatingHours(dbDay, startHour, endHour));
+        System.out.println("=== 운영시간 생성 시작 ===");
+        System.out.println("입력받은 한글 요일: " + operatingDays);
+
+        for (String koreanDay : operatingDays) {
+            String trimmedKoreanDay = koreanDay.trim();
+            String englishDay = DayOfWeekConverter.toEnglish(trimmedKoreanDay);
+
+            if (englishDay != null && !englishDay.isEmpty()) {
+                operatingHours.add(new CafeDto.OperatingHours(englishDay, startHour, endHour));
+//                System.out.println("운영시간 추가: " + trimmedKoreanDay + " → " + englishDay + " (" + startHour + ":00-" + endHour + ":00)");
+            } else {
+                System.out.println("Warning: 변환 실패한 요일: " + trimmedKoreanDay);
             }
         }
+
+//        System.out.println("최종 운영시간 개수: " + operatingHours.size());
+        System.out.println("=== 운영시간 생성 완료 ===");
 
         return operatingHours;
     }
@@ -182,7 +254,7 @@ public class CafeService {
      */
     public Long getDummyOwnerId() {
         // TODO: 실제 사용자 모듈 완성 후 제거
-        return 1L; // 더미 카페 오너 ID
+        return 5L; // 더미 카페 오너 ID
     }
 
     /**
@@ -208,8 +280,177 @@ public class CafeService {
             return cafeDao.findById(cafeId);
         } catch (SQLException e) {
             e.printStackTrace();
-            throw new RuntimeException("카페 상세 정보 조회 중 오류 발생: " + e.getMessage());
+            throw new RuntimeException("카페 상세 정보 조회 중 오류가 발생했습니다: " + e.getMessage());
         }
     }
 
+
+    /**
+     * 모든 카페 목록 조회 (PL/SQL 함수 사용)
+     * @param sortByRating true: 평점순, false: 최신순
+     * @return 카페 DTO 목록
+     */
+    public List<CafeDto.SimpleCafeDto> getAllCafes(boolean sortByRating) {
+        try {
+
+            long totalStartTime = System.currentTimeMillis();
+
+            // PL/SQL 함수로 전체 카페 조회
+            List<CafeDto.SimpleCafeDto> results = cafeDao.findAllCafesWithPLSQL(sortByRating);
+
+            long totalEndTime = System.currentTimeMillis();
+
+            return results;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println("PL/SQL 전체 카페 조회 실패: " + e.getMessage());
+            throw new RuntimeException("카페 목록 조회 중 오류가 발생했습니다: " + e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("예상치 못한 오류: " + e.getMessage());
+            throw new RuntimeException("카페 목록 조회 중 오류가 발생했습니다: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 카페 이름으로 검색 (PL/SQL 함수 사용)
+     * @param keyword 검색 키워드
+     * @param sortByRating true: 평점순, false: 최신순
+     * @return 검색된 카페 DTO 목록
+     */
+    public List<CafeDto.SimpleCafeDto> searchCafesByName(String keyword, boolean sortByRating) {
+        try {
+            System.out.println("PL/SQL 카페 검색 시작");
+            System.out.println("검색어: " + (keyword != null && !keyword.trim().isEmpty() ? keyword : "전체"));
+            System.out.println("정렬: " + (sortByRating ? "평점순" : "최신순"));
+
+            long totalStartTime = System.currentTimeMillis();
+
+            List<CafeDto.SimpleCafeDto> results;
+
+            if (keyword == null || keyword.trim().isEmpty()) {
+                // 전체 조회 (PL/SQL 함수)
+                results = cafeDao.findAllCafesWithPLSQL(sortByRating);
+            } else {
+                // 키워드 검색 (PL/SQL 함수)
+                results = cafeDao.searchCafesByNameWithPLSQL(keyword.trim(), sortByRating);
+            }
+
+            long totalEndTime = System.currentTimeMillis();
+
+            return results;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println("PL/SQL 카페 검색 실패: " + e.getMessage());
+            throw new RuntimeException("카페 검색 중 오류가 발생했습니다: " + e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("예상치 못한 오류: " + e.getMessage());
+            throw new RuntimeException("카페 검색 중 예상치 못한 오류가 발생했습니다: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 카페 ID로 상세 정보 조회 (상세 페이지용)
+     * @param cafeId 카페 ID
+     * @return 카페 DTO (없으면 null)
+     */
+    public CafeDto.SimpleCafeDto getCafeById(int cafeId) {
+//        return PerformanceMonitor.measureTimeWithResult("DB - Get Cafe By ID: " + cafeId, () -> {
+        try {
+            return cafeDao.findCafeById(cafeId);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException("카페 상세 정보 로딩 중 오류가 발생했습니다: " + e.getMessage());
+        }
+//        });
+    }
+
+    /**
+     * 찜하기 상태 업데이트 (나중에 구현)
+     * @param cafeId 카페 ID
+     * @param isFavorite 찜하기 상태
+     */
+    public void updateFavoriteStatus(int cafeId, boolean isFavorite) {
+        // TODO: 찜하기 기능 구현 시 추가
+        System.out.println("찜하기 기능은 추후 구현 예정 - 카페 ID: " + cafeId + ", 상태: " + isFavorite);
+    }
+
+
+    /**
+     * 카페 정보 수정
+     * @param request 수정 요청 정보
+     * @param ownerId 카페 소유자 ID
+     * @return 수정 결과
+     */
+    public CafeDto.UpdateResponse updateCafe(CafeDto.UpdateRequest request, Long ownerId) {
+        try {
+            // 입력 검증
+            validateUpdateRequest(request);
+
+            // 카페 존재 여부 및 소유자 확인
+            if (!isOwnerOfCafe(request.getCafeId(), ownerId)) {
+                return new CafeDto.UpdateResponse(false, "본인이 소유한 카페만 수정할 수 있습니다.");
+            }
+
+            // 운영시간 생성
+            List<CafeDto.OperatingHours> operatingHours = createOperatingHours(
+                    request.getOperatingDays(),
+                    request.getOperatingStartHour(),
+                    request.getOperatingEndHour()
+            );
+
+            // 카페 정보 수정
+            cafeDao.updateCafe(request, operatingHours);
+
+            return new CafeDto.UpdateResponse(true, "카페 정보가 성공적으로 수정되었습니다.");
+
+        } catch (IllegalArgumentException e) {
+            return new CafeDto.UpdateResponse(false, e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new CafeDto.UpdateResponse(false, "카페 수정 중 오류가 발생했습니다: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 카페 삭제
+     * @param cafeId 삭제할 카페 ID
+     * @param ownerId 카페 소유자 ID
+     * @return 삭제 결과
+     */
+    public CafeDto.DeleteResponse deleteCafe(Long cafeId, Long ownerId) {
+        try {
+            // 카페 존재 여부 및 소유자 확인
+            if (!isOwnerOfCafe(cafeId, ownerId)) {
+                return new CafeDto.DeleteResponse(false, "본인이 소유한 카페만 삭제할 수 있습니다.");
+            }
+
+            // 카페 삭제 (관련 데이터도 함께 삭제)
+            cafeDao.deleteCafe(cafeId, ownerId);
+
+            return new CafeDto.DeleteResponse(true, "카페가 성공적으로 삭제되었습니다.");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new CafeDto.DeleteResponse(false, "카페 삭제 중 오류가 발생했습니다: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 카페 소유자 확인
+     * @param cafeId 카페 ID
+     * @param ownerId 소유자 ID
+     * @return 소유자 여부
+     */
+    private boolean isOwnerOfCafe(Long cafeId, Long ownerId) {
+        try {
+            return cafeDao.isOwnerOfCafe(cafeId, ownerId);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 }

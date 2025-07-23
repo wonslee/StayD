@@ -7,6 +7,8 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
+import org.example.stayd.domain.cafe.dto.CafeDto;
+import org.example.stayd.domain.cafe.service.CafeService;
 
 import java.net.URL;
 import java.time.LocalTime;
@@ -56,20 +58,29 @@ public class CafeModifyDeleteController implements Initializable {
     // 내부 변수들
     private final Set<String> selectedDays = new HashSet<>();
     private final Map<ToggleButton, String> dayButtonMap = new HashMap<>();
+    private CafeService cafeService;
+    private Long currentCafeId; // 현재 카페 ID
+    private final Long DUMMY_OWNER_ID = 5L; // 더미 사용자 ID
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        cafeService = new CafeService();
         initializeDayButtons();
         initializeCharacterCount();
 
-        // 테스트용 샘플 데이터 로드 (실제 구현 시 삭제)
-        loadCafeData(1L);
+        // 테스트용 카페 데이터 로드 (실제로는 외부에서 setCafeId 호출)
+        loadCafeData(28L); // DB에 있는 카페 ID로 테스트
 
         // 기본값 설정
-        startTimeField.setText("09:00");
-        endTimeField.setText("18:00");
-        priceField.setText("1000");
         charCountLabel.setText("0/200");
+    }
+
+    /**
+     * 외부에서 카페 ID를 설정하는 메서드
+     */
+    public void setCafeId(Long cafeId) {
+        this.currentCafeId = cafeId;
+        loadCafeData(cafeId);
     }
 
     /**
@@ -77,53 +88,57 @@ public class CafeModifyDeleteController implements Initializable {
      * @param cafeId 카페 ID
      */
     public void loadCafeData(Long cafeId) {
-        // TODO: 실제 구현 시 Service를 통해 카페 데이터를 가져와야 함
-        // 현재는 예시 데이터로 설정
+        try {
+            currentCafeId = cafeId;
+            cafeIdField.setText(String.valueOf(cafeId));
 
-        cafeIdField.setText(String.valueOf(cafeId));
+            // DB에서 카페 데이터 가져오기
+            CafeDto.DetailResponse cafe = cafeService.getCafeDetail(cafeId);
 
-        // 예시 데이터 (실제로는 Service에서 가져올 데이터)
-        cafeNameField.setText("스터디 카페 예시");
-        locationField.setText("서울시 강남구");
-        phoneField.setText("010-1234-5678");
-        imageUrlField.setText("https://example.com/image.jpg");
-        descriptionArea.setText("편안하고 조용한 스터디 카페입니다.");
-        startTimeField.setText("08:00");
-        endTimeField.setText("22:00");
-        priceField.setText("2000");
-
-        // 영업일 설정 (예: 월,화,수,목,금)
-        Set<String> businessDays = Set.of("월", "화", "수", "목", "금");
-        for (Map.Entry<ToggleButton, String> entry : dayButtonMap.entrySet()) {
-            if (businessDays.contains(entry.getValue())) {
-                entry.getKey().setSelected(true);
-                entry.getKey().setOpacity(1.0);
-                selectedDays.add(entry.getValue());
+            if (cafe == null) {
+                showAlert(Alert.AlertType.ERROR, "오류", "해당 카페를 찾을 수 없습니다.");
+                return;
             }
-        }
-        updateSelectedDaysField();
-        updateCharacterCount();
 
-        /*
-        // 실제 구현 시 사용할 코드 예시:
-        CafeService cafeService = new CafeService();
-        Cafe cafe = cafeService.findById(cafeId);
-
-        if (cafe != null) {
+            // 필드에 데이터 설정
             cafeNameField.setText(cafe.getName());
-            locationField.setText(cafe.getLocation());
-            phoneField.setText(cafe.getPhone());
+            locationField.setText(cafe.getAddress());
+            phoneField.setText(cafe.getPhoneNumber());
             imageUrlField.setText(cafe.getImageUrl());
             descriptionArea.setText(cafe.getDescription());
-            startTimeField.setText(cafe.getStartTime());
-            endTimeField.setText(cafe.getEndTime());
-            priceField.setText(String.valueOf(cafe.getPrice()));
+            priceField.setText(String.valueOf(cafe.getPricePerHour()));
+
+            // 운영시간 설정
+            startTimeField.setText(String.format("%02d:00", cafe.getOperatingStartHour()));
+            endTimeField.setText(String.format("%02d:00", cafe.getOperatingEndHour()));
 
             // 영업일 설정
-            Set<String> businessDays = cafe.getBusinessDays();
-            // ... 영업일 토글 버튼 설정 로직
+            selectedDays.clear();
+            Set<String> businessDays = new HashSet<>(cafe.getOperatingDays());
+
+            for (Map.Entry<ToggleButton, String> entry : dayButtonMap.entrySet()) {
+                ToggleButton button = entry.getKey();
+                String day = entry.getValue();
+
+                if (businessDays.contains(day)) {
+                    button.setSelected(true);
+                    button.setOpacity(1.0);
+                    selectedDays.add(day);
+                } else {
+                    button.setSelected(false);
+                    button.setOpacity(0.5);
+                }
+            }
+
+            updateSelectedDaysField();
+            updateCharacterCount();
+
+            System.out.println("카페 데이터 로드 완료: " + cafe.getName());
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            showAlert(Alert.AlertType.ERROR, "오류", "카페 데이터 로드 중 오류가 발생했습니다: " + e.getMessage());
         }
-        */
     }
 
     private void initializeDayButtons() {
@@ -209,7 +224,7 @@ public class CafeModifyDeleteController implements Initializable {
     private void adjustPrice(int amount) {
         try {
             int currentPrice = Integer.parseInt(priceField.getText());
-            int newPrice = Math.max(0, currentPrice + amount);
+            int newPrice = Math.max(1000, currentPrice + amount); // 최소 1000원
             priceField.setText(String.valueOf(newPrice));
         } catch (NumberFormatException e) {
             System.err.println("가격 조정 중 오류 발생: " + e.getMessage());
@@ -258,7 +273,7 @@ public class CafeModifyDeleteController implements Initializable {
         }
     }
 
-    // 수정 버튼 이벤트
+    // 수정 버튼 이벤트 (DB 연동)
     @FXML
     private void modifyCafe() {
         if (!validateInput()) {
@@ -266,37 +281,42 @@ public class CafeModifyDeleteController implements Initializable {
         }
 
         try {
-            // TODO: 실제 구현 시 Service를 통해 카페 정보 수정
-            Long cafeId = Long.parseLong(cafeIdField.getText());
+            // 수정 요청 데이터 생성
+            CafeDto.UpdateRequest request = new CafeDto.UpdateRequest();
+            request.setCafeId(currentCafeId);
+            request.setName(cafeNameField.getText().trim());
+            request.setAddress(locationField.getText().trim());
+            request.setPricePerHour(Integer.parseInt(priceField.getText()));
+            request.setDescription(descriptionArea.getText().trim());
+            request.setPhoneNumber(phoneField.getText().trim());
+            request.setImageUrl(imageUrlField.getText().trim());
 
-            /*
-            // 실제 구현 예시:
-            CafeModifyRequest request = CafeModifyRequest.builder()
-                .id(cafeId)
-                .name(cafeNameField.getText())
-                .location(locationField.getText())
-                .phone(phoneField.getText())
-                .imageUrl(imageUrlField.getText())
-                .description(descriptionArea.getText())
-                .startTime(startTimeField.getText())
-                .endTime(endTimeField.getText())
-                .price(Integer.parseInt(priceField.getText()))
-                .businessDays(selectedDays)
-                .build();
+            // 운영일 리스트로 변환
+            request.setOperatingDays(new ArrayList<>(selectedDays));
 
-            CafeService cafeService = new CafeService();
-            cafeService.modifyCafe(request);
-            */
+            // 운영시간 파싱
+            LocalTime startTime = LocalTime.parse(startTimeField.getText(), DateTimeFormatter.ofPattern("HH:mm"));
+            LocalTime endTime = LocalTime.parse(endTimeField.getText(), DateTimeFormatter.ofPattern("HH:mm"));
+            request.setOperatingStartHour(startTime.getHour());
+            request.setOperatingEndHour(endTime.getHour());
 
-            showAlert(Alert.AlertType.INFORMATION, "수정 완료", "스터디 카페 정보가 성공적으로 수정되었습니다.");
-            closeWindow();
+            // Service를 통해 카페 정보 수정
+            CafeDto.UpdateResponse response = cafeService.updateCafe(request, DUMMY_OWNER_ID);
+
+            if (response.isSuccess()) {
+                showAlert(Alert.AlertType.INFORMATION, "수정 완료", response.getMessage());
+                closeWindow(); // 창닫기
+            } else {
+                showAlert(Alert.AlertType.ERROR, "수정 실패", response.getMessage());
+            }
 
         } catch (Exception e) {
+            e.printStackTrace();
             showAlert(Alert.AlertType.ERROR, "수정 실패", "카페 정보 수정 중 오류가 발생했습니다: " + e.getMessage());
         }
     }
 
-    // 삭제 버튼 이벤트
+    // 삭제 버튼 이벤트 (DB 연동)
     @FXML
     private void deleteCafe() {
         Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);
@@ -307,19 +327,18 @@ public class CafeModifyDeleteController implements Initializable {
         Optional<ButtonType> result = confirmAlert.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {
             try {
-                // TODO: 실제 구현 시 Service를 통해 카페 삭제
-                Long cafeId = Long.parseLong(cafeIdField.getText());
+                // Service를 통해 카페 삭제
+                CafeDto.DeleteResponse response = cafeService.deleteCafe(currentCafeId, DUMMY_OWNER_ID);
 
-                /*
-                // 실제 구현 예시:
-                CafeService cafeService = new CafeService();
-                cafeService.deleteCafe(cafeId);
-                */
-
-                showAlert(Alert.AlertType.INFORMATION, "삭제 완료", "스터디 카페가 성공적으로 삭제되었습니다.");
-                closeWindow();
+                if (response.isSuccess()) {
+                    showAlert(Alert.AlertType.INFORMATION, "삭제 완료", response.getMessage());
+                    closeWindow(); // 창닫기
+                } else {
+                    showAlert(Alert.AlertType.ERROR, "삭제 실패", response.getMessage());
+                }
 
             } catch (Exception e) {
+                e.printStackTrace();
                 showAlert(Alert.AlertType.ERROR, "삭제 실패", "카페 삭제 중 오류가 발생했습니다: " + e.getMessage());
             }
         }
@@ -347,11 +366,23 @@ public class CafeModifyDeleteController implements Initializable {
 
         try {
             int price = Integer.parseInt(priceField.getText());
-            if (price <= 0) {
-                errors.add("가격은 0보다 큰 값이어야 합니다.");
+            if (price < 1000) {
+                errors.add("가격은 1000원 이상이어야 합니다.");
             }
         } catch (NumberFormatException e) {
             errors.add("올바른 가격을 입력해주세요.");
+        }
+
+        // 시간 검증
+        try {
+            LocalTime startTime = LocalTime.parse(startTimeField.getText(), DateTimeFormatter.ofPattern("HH:mm"));
+            LocalTime endTime = LocalTime.parse(endTimeField.getText(), DateTimeFormatter.ofPattern("HH:mm"));
+
+            if (!startTime.isBefore(endTime)) {
+                errors.add("종료 시간은 시작 시간보다 늦어야 합니다.");
+            }
+        } catch (Exception e) {
+            errors.add("올바른 시간 형식을 입력해주세요. (예: 09:00)");
         }
 
         if (!errors.isEmpty()) {
@@ -400,6 +431,4 @@ public class CafeModifyDeleteController implements Initializable {
         Stage stage = (Stage) modifyButton.getScene().getWindow();
         stage.close();
     }
-
-
 }
