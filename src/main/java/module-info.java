@@ -22,5 +22,5 @@ module org.example.stayd {
 
     exports org.example.stayd;
     opens org.example.stayd.domain.cafe.model to org.hibernate.validator;
-
+    opens org.example.stayd.domain.discount.controller to javafx.fxml;
 }

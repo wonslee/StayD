@@ -61,10 +61,6 @@ public class CafeListController implements Initializable {
 
     // 상태 변수들
     private boolean isSortByLatest = true; // true: 최신순, false: 평점순
-    /**
-     * -- GETTER --
-     *  현재 페이지 반환
-     */
 
     @Getter
     private int currentPage = 1;
