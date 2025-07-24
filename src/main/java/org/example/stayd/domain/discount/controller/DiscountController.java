@@ -1,10 +1,7 @@
 package org.example.stayd.domain.discount.controller;
 
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.DatePicker;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import org.example.stayd.common.FXUtils;
 import org.example.stayd.domain.discount.dto.DiscountDTO;
@@ -25,6 +22,8 @@ public class DiscountController {
     private ComboBox<Integer> discountEndTime;    // 할인 종료 시간
     @FXML
     private TextField discountRate;  // 할인율
+    @FXML
+    private Button saveButton; // 저장 버튼
 
     private DiscountService discountService;  // DiscountService 객체
 
@@ -90,7 +89,9 @@ public class DiscountController {
      */
     @FXML
     private void handleMouseEnter(MouseEvent event) {
-        FXUtils.handleMouseEnter(event); // FXUtils에서 처리
+        saveButton.setStyle(
+                "-fx-background-color: #4caf4f; -fx-font-weight: bold; -fx-background-radius: 10;");
+        saveButton.setTextFill(javafx.scene.paint.Color.WHITE);
     }
 
     /**
@@ -99,6 +100,8 @@ public class DiscountController {
      */
     @FXML
     private void handleMouseExit(MouseEvent event) {
-        FXUtils.handleMouseExit(event); // FXUtils에서 처리
+        saveButton.setStyle(
+                "-fx-background-color: white; -fx-font-weight: bold; -fx-background-radius: 10;");
+        saveButton.setTextFill(javafx.scene.paint.Color.web("#4caf4f"));
     }
 }

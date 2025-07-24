@@ -1,48 +1,77 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-
-<?import javafx.scene.text.Text?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<?import javafx.scene.paint.Color?>
+<?import javafx.scene.effect.DropShadow?>
 <AnchorPane prefHeight="768" prefWidth="1024" style="-fx-background-color: white;" xmlns:fx="http://javafx.com/fxml/1"
+            xmlns="http://javafx.com/javafx/24.0.1"
             fx:controller="org.example.stayd.domain.discount.controller.DiscountController">
     <fx:include source="../common/header.fxml"/>
     <!-- 고정된 네브바 -->
     <fx:include source="../common/navbar.fxml" AnchorPane.topAnchor="130.0"/>
 
     <!-- Discount Date -->
-    <VBox spacing="10" alignment="CENTER_LEFT" layoutX="464" layoutY="220">
-        <Text text="할인 날짜"/>
-        <DatePicker fx:id="discountDate" prefWidth="150.0"/>
+    <VBox alignment="CENTER_LEFT" layoutX="200" layoutY="220" spacing="10">
+        <Text text="할인 날짜">
+            <font>
+                <Font name="System Bold" size="24.0"/>
+            </font>
+        </Text>
+        <DatePicker fx:id="discountDate" prefWidth="200.0"/>
     </VBox>
 
     <!-- Discount Start Time -->
-    <VBox spacing="10" alignment="CENTER_LEFT" layoutX="464" layoutY="290">
-        <Text text="시작 시간"/>
-        <ComboBox fx:id="discountStartTime" promptText="시작 시간" prefWidth="150.0"/>
+    <VBox alignment="CENTER_LEFT" layoutX="200" layoutY="360" spacing="10">
+        <Text text="시작 시간">
+            <font>
+                <Font name="System Bold" size="24.0"/>
+            </font>
+        </Text>
+        <ComboBox fx:id="discountStartTime" prefWidth="200.0" promptText="시작 시간"/>
     </VBox>
 
     <!-- Discount End Time -->
-    <VBox spacing="10" alignment="CENTER_LEFT" layoutX="464" layoutY="360">
-        <Text text="종료 시간"/>
-        <ComboBox fx:id="discountEndTime" promptText="종료 시간" prefWidth="150.0"/>
+    <VBox alignment="CENTER_LEFT" layoutX="614" layoutY="360" spacing="10">
+        <Text text="종료 시간">
+            <font>
+                <Font name="System Bold" size="24.0"/>
+            </font>
+        </Text>
+        <ComboBox fx:id="discountEndTime" prefWidth="200.0" promptText="종료 시간"/>
     </VBox>
 
     <!-- Discount Rate -->
-    <VBox spacing="10" alignment="CENTER_LEFT" layoutX="464" layoutY="430">
-        <Text text="할인율 (%)"/>
-        <TextField fx:id="discountRate" promptText="0 ~ 100" maxWidth="150"/>
+    <VBox alignment="CENTER_LEFT" layoutX="614" layoutY="220" spacing="10">
+        <Text text="할인율 (%)">
+            <font>
+                <Font name="System Bold" size="24.0"/>
+            </font>
+        </Text>
+        <TextField fx:id="discountRate" maxWidth="200" minWidth="200" promptText="0 ~ 100"/>
     </VBox>
 
     <!-- Save Buttons -->
-    <VBox spacing="10" alignment="CENTER_LEFT" layoutX="464" layoutY="500">
-        <Button text="적용" onAction="#saveDiscountSettings" prefWidth="150.0" onMouseEntered="#handleMouseEnter" onMouseExited="#handleMouseExit" style="-fx-background-color: #A8D6AA;" textFill="white">
+    <VBox alignment="CENTER_LEFT" layoutX="437" layoutY="500" spacing="10">
+        <Button fx:id="saveButton" onAction="#saveDiscountSettings" onMouseEntered="#handleMouseEnter" onMouseExited="#handleMouseExit"
+                prefWidth="150.0" style="-fx-background-color: white; -fx-font-weight: bold; -fx-background-radius: 10;" text="적용" textFill="#4caf4f">
+            <effect>
+                <DropShadow>
+                    <color>
+                        <Color opacity="0.2779456377029419" />
+                    </color>
+                </DropShadow>
+            </effect>
             <font>
-                <Font name="System Bold" size="13.0" />
-            </font></Button>
+                <Font name="System Bold" size="13.0"/>
+            </font>
+        </Button>
     </VBox>
 </AnchorPane>

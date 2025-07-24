@@ -38,7 +38,7 @@
 
             <!-- 제목 -->
             <HBox alignment="CENTER_LEFT" maxWidth="800.0" prefHeight="23.0" prefWidth="800.0">
-                <Label style="-fx-font-size: 18px;" text="스터디 카페 등록" textFill="#4caf4f">
+                <Label style="-fx-font-size: 18px;" textFill="#4caf4f">
                     <font>
                         <Font name="System Bold Italic" size="24.0" />
                     </font>
@@ -112,12 +112,12 @@
                         </HBox>
                         <HBox alignment="CENTER_LEFT" spacing="10">
                             <TextField fx:id="startTimeField" editable="false" prefHeight="22.0" prefWidth="66.0" text="09:00" />
-                            <Button fx:id="startTimeUpButton" mnemonicParsing="false" onAction="#increaseStartTime" style="-fx-background-color: #90EE90;" text="▲" />
-                            <Button fx:id="startTimeDownButton" mnemonicParsing="false" onAction="#decreaseStartTime" style="-fx-background-color: #90EE90;" text="▼" />
+                            <Button fx:id="startTimeUpButton" onMouseEntered="#handleMouseEnter" onMouseExited="#handleMouseExit" mnemonicParsing="false" onAction="#increaseStartTime" style="-fx-background-color: #A8D6AA; -fx-background-radius: 10;" text="▲" textFill="white"/>
+                            <Button fx:id="startTimeDownButton" onMouseEntered="#handleMouseEnter" onMouseExited="#handleMouseExit" mnemonicParsing="false" onAction="#decreaseStartTime" style="-fx-background-color: #A8D6AA; -fx-background-radius: 10;" text="▼" textFill="white"/>
                             <Label text="~" />
                             <TextField fx:id="endTimeField" editable="false" prefHeight="22.0" prefWidth="66.0" text="18:00" />
-                            <Button fx:id="endTimeUpButton" mnemonicParsing="false" onAction="#increaseEndTime" style="-fx-background-color: #90EE90;" text="▲" />
-                            <Button fx:id="endTimeDownButton" mnemonicParsing="false" onAction="#decreaseEndTime" style="-fx-background-color: #90EE90;" text="▼" />
+                            <Button fx:id="endTimeUpButton" onMouseEntered="#handleMouseEnter" onMouseExited="#handleMouseExit" mnemonicParsing="false" onAction="#increaseEndTime" style="-fx-background-color: #A8D6AA; -fx-background-radius: 10;" text="▲" textFill="white"/>
+                            <Button fx:id="endTimeDownButton" onMouseEntered="#handleMouseEnter" onMouseExited="#handleMouseExit" mnemonicParsing="false" onAction="#decreaseEndTime" style="-fx-background-color: #A8D6AA; -fx-background-radius: 10;" text="▼" textFill="white"/>
                         </HBox>
                     </VBox>
                 </VBox>
@@ -139,8 +139,8 @@
                         </HBox>
                         <HBox alignment="CENTER_LEFT" spacing="8">
                             <TextField fx:id="priceField" editable="false" prefHeight="22.0" prefWidth="60.0" text="1000" />
-                            <Button fx:id="priceUpButton" mnemonicParsing="false" onAction="#increasePrice" style="-fx-background-color: #90EE90;" text="▲" />
-                            <Button fx:id="priceDownButton" mnemonicParsing="false" onAction="#decreasePrice" style="-fx-background-color: #90EE90;" text="▼" />
+                            <Button fx:id="priceUpButton" onMouseEntered="#handleMouseEnter" onMouseExited="#handleMouseExit" mnemonicParsing="false" onAction="#increasePrice" style="-fx-background-color: #A8D6AA; -fx-background-radius: 10;" text="▲" textFill="white"/>
+                            <Button fx:id="priceDownButton" onMouseEntered="#handleMouseEnter" onMouseExited="#handleMouseExit" mnemonicParsing="false" onAction="#decreasePrice" style="-fx-background-color: #A8D6AA; -fx-background-radius: 10;" text="▼" textFill="white"/>
                         </HBox>
                     </VBox>
 
