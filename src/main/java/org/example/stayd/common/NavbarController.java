@@ -4,6 +4,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
+import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 import org.example.stayd.config.SceneConfig;
 
@@ -60,5 +61,23 @@ public class NavbarController {
     @FXML
     private void goToDiscountSettings(ActionEvent event) {
         navigateToPage(SceneConfig.DISCOUNT_SETTINGS_FXML, event); // 할인 설정 화면으로 이동
+    }
+
+    /**
+     * 마우스가 버튼 위에 올라갔을 때 색상 변경
+     * @param event MouseEvent
+     */
+    @FXML
+    private void handleMouseEnter(MouseEvent event) {
+        FXUtils.handleMouseEnter(event); // FXUtils에서 처리
+    }
+
+    /**
+     * 마우스가 버튼을 벗어났을 때 원래 색상으로 복원
+     * @param event MouseEvent
+     */
+    @FXML
+    private void handleMouseExit(MouseEvent event) {
+        FXUtils.handleMouseExit(event); // FXUtils에서 처리
     }
 }

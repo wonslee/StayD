@@ -12,7 +12,8 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane prefHeight="768" prefWidth="1024" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/24.0.1" fx:controller="org.example.stayd.domain.reservation.controller.ReservationStatusController">
+<?import javafx.scene.text.Font?>
+<AnchorPane prefHeight="768" prefWidth="1024" style="-fx-background-color: white;" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/24.0.1" fx:controller="org.example.stayd.domain.reservation.controller.ReservationStatusController">
     <!-- 고정된 헤더 -->
     <fx:include source="../common/header.fxml" />
 
@@ -21,15 +22,13 @@
 
     <!-- 날짜 선택 -->
     <HBox spacing="10" alignment="CENTER" AnchorPane.topAnchor="170.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0">
-        <Text text="날짜 선택: " />
-        <DatePicker fx:id="datePicker" />
-        <Button onAction="#loadReservationStatus" text="조회" />
+        <DatePicker fx:id="datePicker" onAction="#loadReservationStatus"/>
     </HBox>
 
-    <ScrollPane AnchorPane.topAnchor="210.0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.bottomAnchor="0">
-        <VBox spacing="20">
+    <AnchorPane AnchorPane.topAnchor="210.0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.bottomAnchor="0" style="-fx-background-color: white;">
+        <VBox spacing="20" style="-fx-background-color: white;">
             <!-- BarChart를 사용하여 예약 현황을 표시 -->
-            <BarChart fx:id="reservationBarChart" prefWidth="1000" prefHeight="550">
+            <BarChart fx:id="reservationBarChart" prefWidth="1024" prefHeight="550" style="-fx-background-color: white;">
                 <xAxis>
                     <CategoryAxis fx:id="xAxis" />
                 </xAxis>
@@ -38,5 +37,5 @@
                 </yAxis>
             </BarChart>
         </VBox>
-    </ScrollPane>
+    </AnchorPane>
 </AnchorPane>

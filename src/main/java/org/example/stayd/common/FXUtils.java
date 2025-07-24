@@ -1,6 +1,7 @@
 package org.example.stayd.common;
 
 import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -103,5 +104,25 @@ public class FXUtils {
             e.printStackTrace();
             showAlert(((Node) event.getSource()).getScene().getWindow(), Alert.AlertType.ERROR, "화면 전환 오류", "오류가 발생했습니다.");
         }
+    }
+
+    /**
+     * 마우스가 버튼 위에 올라갔을 때 색상 변경
+     * @param event MouseEvent
+     */
+    @FXML
+    public static void handleMouseEnter(MouseEvent event) {
+        Node node = (Node) event.getSource();
+        node.setStyle("-fx-background-color: #4CAF4F; -fx-background-radius: 10;");
+    }
+
+    /**
+     * 마우스가 버튼을 벗어났을 때 원래 색상으로 복원
+     * @param event MouseEvent
+     */
+    @FXML
+    public static void handleMouseExit(MouseEvent event) {
+        Node node = (Node) event.getSource();
+        node.setStyle("-fx-background-color: #A8D6AA; -fx-background-radius: 10;");
     }
 }

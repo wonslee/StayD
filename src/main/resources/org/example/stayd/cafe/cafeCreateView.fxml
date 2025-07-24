@@ -18,11 +18,17 @@
 <?import javafx.scene.shape.Line?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane maxHeight="768.0" maxWidth="1028.0" prefHeight="768.0" prefWidth="1028.0" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.stayd.domain.cafe.controller.CafeCreateController">
+<BorderPane maxHeight="768.0" maxWidth="1028.0" prefHeight="768.0" prefWidth="1028.0" style="-fx-background-color:white" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.stayd.domain.cafe.controller.CafeCreateController">
 
-    <!-- 헤더: 빈 공간 -->
+    <!-- 헤더, 네비게이션 바: 빈 공간 -->
     <top>
-        <fx:include source="../common/header.fxml" />
+        <VBox>
+            <!-- 헤더 포함 -->
+            <fx:include source="../common/header.fxml" />
+
+            <!-- 네비게이션 바 포함 -->
+            <fx:include source="../common/navbar.fxml" />
+        </VBox>
     </top>
     <bottom>
         <VBox alignment="CENTER" spacing="30.0" BorderPane.alignment="CENTER">

@@ -18,35 +18,35 @@
     </ImageView>
 
     <!-- ID 필드 -->
-    <TextField fx:id="loginIdTextField" layoutX="330" layoutY="180" prefHeight="50.0" prefWidth="350.0" promptText="ID"
+    <TextField fx:id="loginIdTextField" layoutX="330" layoutY="205" prefHeight="50.0" prefWidth="350.0" promptText="ID"
                style="-fx-background-radius: 10;"/>
 
     <!-- ID 확인 라벨 -->
-    <Label fx:id="idValidationLabel" layoutX="330" layoutY="235" textFill="red"/>
+    <Label fx:id="idValidationLabel" layoutX="330" layoutY="260" textFill="red"/>
 
     <!-- 이메일 필드 -->
-    <TextField fx:id="emailTextField" layoutX="330" layoutY="260" prefHeight="50.0" prefWidth="350.0" promptText="EMAIL"
+    <TextField fx:id="emailTextField" layoutX="330" layoutY="285" prefHeight="50.0" prefWidth="350.0" promptText="EMAIL"
                style="-fx-background-radius: 10;"/>
 
     <!-- 이메일 확인 라벨 -->
-    <Label fx:id="emailValidationLabel" layoutX="330" layoutY="305" textFill="red"/>
+    <Label fx:id="emailValidationLabel" layoutX="330" layoutY="330" textFill="red"/>
 
     <!-- PW 필드 -->
-    <PasswordField fx:id="passwordTextField" layoutX="330" layoutY="340" prefHeight="50.0" prefWidth="350.0"
+    <PasswordField fx:id="passwordTextField" layoutX="330" layoutY="365" prefHeight="50.0" prefWidth="350.0"
                    promptText="PASSWORD" style="-fx-background-radius: 10;"/>
 
     <!-- PW 라벨 -->
-    <Label fx:id="passwordValidationLabel" layoutX="330" layoutY="395" textFill="red"/>
+    <Label fx:id="passwordValidationLabel" layoutX="330" layoutY="420" textFill="red"/>
 
     <!-- PW 확인 필드 -->
-    <PasswordField fx:id="passwordMatchTextField" layoutX="330" layoutY="420" prefHeight="50.0" prefWidth="350.0"
+    <PasswordField fx:id="passwordMatchTextField" layoutX="330" layoutY="445" prefHeight="50.0" prefWidth="350.0"
                    promptText="PASSWORD CHECK" style="-fx-background-radius: 10;"/>
 
     <!-- PW 확인 라벨 -->
-    <Label fx:id="passwordMatchValidationLabel" layoutX="330" layoutY="475" textFill="red"/>
+    <Label fx:id="passwordMatchValidationLabel" layoutX="330" layoutY="500" textFill="red"/>
 
     <!-- 회원가입 버튼 -->
-    <Button fx:id="signUpButton" disable="true" layoutX="330" layoutY="550" prefHeight="50.0" prefWidth="350.0"
+    <Button fx:id="signUpButton" disable="true" layoutX="330" layoutY="525" prefHeight="50.0" prefWidth="350.0"
             style="-fx-background-color: #4CAF4F; -fx-background-radius: 10;" text="회원가입" textFill="WHITE"
             onAction="#onSignUp"/>
 </AnchorPane>
