@@ -77,7 +77,7 @@
                             <Image url="https://pimg.daara.co.kr/kidd/photo/2018/01/09/1515480765_11.jpg" />
                         </ImageView>
                         <!-- 찜하기 버튼 -->
-                        <Button fx:id="favoriteBtn0" onAction="#toggleFavorite" style="-fx-background-color: white; -fx-background-radius: 15; -fx-border-radius: 15;" StackPane.alignment="TOP_RIGHT">
+                        <Button visible="false" fx:id="favoriteBtn0" onAction="#toggleFavorite" style="-fx-background-color: white; -fx-background-radius: 15; -fx-border-radius: 15;" StackPane.alignment="TOP_RIGHT">
                             <StackPane.margin>
                                 <Insets right="10.0" top="10.0" />
                             </StackPane.margin>
@@ -108,7 +108,7 @@
                         <ImageView fx:id="cafeImage1" fitHeight="180.0" fitWidth="220.0" preserveRatio="true" style="-fx-background-radius: 10 10 0 0;">
                             <Image url="https://pimg.daara.co.kr/kidd/photo/2018/01/09/1515480765_11.jpg" />
                         </ImageView>
-                        <Button fx:id="favoriteBtn1" onAction="#toggleFavorite" style="-fx-background-color: white; -fx-background-radius: 15; -fx-border-radius: 15;" StackPane.alignment="TOP_RIGHT">
+                        <Button visible="false" fx:id="favoriteBtn1" onAction="#toggleFavorite" style="-fx-background-color: white; -fx-background-radius: 15; -fx-border-radius: 15;" StackPane.alignment="TOP_RIGHT">
                             <StackPane.margin>
                                 <Insets right="10.0" top="10.0" />
                             </StackPane.margin>
@@ -139,7 +139,7 @@
                         <ImageView fx:id="cafeImage2" fitHeight="180.0" fitWidth="220.0" preserveRatio="true" style="-fx-background-radius: 10 10 0 0;">
                             <Image url="https://pimg.daara.co.kr/kidd/photo/2018/01/09/1515480765_11.jpg" />
                         </ImageView>
-                        <Button fx:id="favoriteBtn2" onAction="#toggleFavorite" style="-fx-background-color: white; -fx-background-radius: 15; -fx-border-radius: 15;" StackPane.alignment="TOP_RIGHT">
+                        <Button visible="false" fx:id="favoriteBtn2" onAction="#toggleFavorite" style="-fx-background-color: white; -fx-background-radius: 15; -fx-border-radius: 15;" StackPane.alignment="TOP_RIGHT">
                             <StackPane.margin>
                                 <Insets right="10.0" top="10.0" />
                             </StackPane.margin>
@@ -170,7 +170,7 @@
                         <ImageView fx:id="cafeImage3" fitHeight="180.0" fitWidth="220.0" preserveRatio="true" style="-fx-background-radius: 10 10 0 0;">
                             <Image url="https://pimg.daara.co.kr/kidd/photo/2018/01/09/1515480765_11.jpg" />
                         </ImageView>
-                        <Button fx:id="favoriteBtn3" onAction="#toggleFavorite" style="-fx-background-color: white; -fx-background-radius: 15; -fx-border-radius: 15;" StackPane.alignment="TOP_RIGHT">
+                        <Button visible="false" fx:id="favoriteBtn3" onAction="#toggleFavorite" style="-fx-background-color: white; -fx-background-radius: 15; -fx-border-radius: 15;" StackPane.alignment="TOP_RIGHT">
                             <StackPane.margin>
                                 <Insets right="10.0" top="10.0" />
                             </StackPane.margin>
@@ -202,7 +202,7 @@
                         <ImageView fx:id="cafeImage4" fitHeight="180.0" fitWidth="220.0" preserveRatio="true" style="-fx-background-radius: 10 10 0 0;">
                             <Image url="https://pimg.daara.co.kr/kidd/photo/2018/01/09/1515480765_11.jpg" />
                         </ImageView>
-                        <Button fx:id="favoriteBtn4" onAction="#toggleFavorite" style="-fx-background-color: white; -fx-background-radius: 15; -fx-border-radius: 15;" StackPane.alignment="TOP_RIGHT">
+                        <Button visible="false" fx:id="favoriteBtn4" onAction="#toggleFavorite" style="-fx-background-color: white; -fx-background-radius: 15; -fx-border-radius: 15;" StackPane.alignment="TOP_RIGHT">
                             <StackPane.margin>
                                 <Insets right="10.0" top="10.0" />
                             </StackPane.margin>
@@ -233,7 +233,7 @@
                         <ImageView fx:id="cafeImage5" fitHeight="180.0" fitWidth="220.0" preserveRatio="true" style="-fx-background-radius: 10 10 0 0;">
                             <Image url="https://pimg.daara.co.kr/kidd/photo/2018/01/09/1515480765_11.jpg" />
                         </ImageView>
-                        <Button fx:id="favoriteBtn5" onAction="#toggleFavorite" style="-fx-background-color: white; -fx-background-radius: 15; -fx-border-radius: 15;" StackPane.alignment="TOP_RIGHT">
+                        <Button visible="false" fx:id="favoriteBtn5" onAction="#toggleFavorite" style="-fx-background-color: white; -fx-background-radius: 15; -fx-border-radius: 15;" StackPane.alignment="TOP_RIGHT">
                             <StackPane.margin>
                                 <Insets right="10.0" top="10.0" />
                             </StackPane.margin>
@@ -264,7 +264,7 @@
                         <ImageView fx:id="cafeImage6" fitHeight="180.0" fitWidth="220.0" preserveRatio="true" style="-fx-background-radius: 10 10 0 0;">
                             <Image url="https://pimg.daara.co.kr/kidd/photo/2018/01/09/1515480765_11.jpg" />
                         </ImageView>
-                        <Button fx:id="favoriteBtn6" onAction="#toggleFavorite" style="-fx-background-color: white; -fx-background-radius: 15; -fx-border-radius: 15;" StackPane.alignment="TOP_RIGHT">
+                        <Button visible="false" fx:id="favoriteBtn6" onAction="#toggleFavorite" style="-fx-background-color: white; -fx-background-radius: 15; -fx-border-radius: 15;" StackPane.alignment="TOP_RIGHT">
                             <StackPane.margin>
                                 <Insets right="10.0" top="10.0" />
                             </StackPane.margin>
@@ -295,7 +295,7 @@
                         <ImageView fx:id="cafeImage7" fitHeight="180.0" fitWidth="220.0" preserveRatio="true" style="-fx-background-radius: 10 10 0 0;">
                             <Image url="https://pimg.daara.co.kr/kidd/photo/2018/01/09/1515480765_11.jpg" />
                         </ImageView>
-                        <Button fx:id="favoriteBtn7" onAction="#toggleFavorite" style="-fx-background-color: white; -fx-background-radius: 15; -fx-border-radius: 15;" StackPane.alignment="TOP_RIGHT">
+                        <Button visible="false" fx:id="favoriteBtn7" onAction="#toggleFavorite" style="-fx-background-color: white; -fx-background-radius: 15; -fx-border-radius: 15;" StackPane.alignment="TOP_RIGHT">
                             <StackPane.margin>
                                 <Insets right="10.0" top="10.0" />
                             </StackPane.margin>

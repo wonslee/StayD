@@ -56,7 +56,7 @@
                             </HBox>
                         </VBox>
                         <Pane HBox.hgrow="ALWAYS" />
-                        <Button fx:id="favoriteButton" onAction="#toggleFavorite" style="-fx-background-color: white; -fx-border-color: #4CAF4F; -fx-border-radius: 5; -fx-background-radius: 5;">
+                        <Button  visible="false" fx:id="favoriteButton" onAction="#toggleFavorite" style="-fx-background-color: white; -fx-border-color: #4CAF4F; -fx-border-radius: 5; -fx-background-radius: 5;">
                             <graphic>
                                 <ImageView fx:id="favoriteIcon" fitHeight="20" fitWidth="20" preserveRatio="true">
                                     <Image url="https://m.yconcepts.co.kr/web/upload/icon_202302260647299800.png" />

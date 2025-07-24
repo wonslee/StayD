@@ -1,15 +1,25 @@
 package org.example.stayd.domain.cafe.controller;
 
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
+import org.example.stayd.common.FXUtils;
+import org.example.stayd.common.SessionManager;
+import org.example.stayd.config.SceneConfig;
 import org.example.stayd.domain.cafe.dto.CafeDto;
 import org.example.stayd.domain.cafe.service.CafeService;
 
+import javax.mail.Session;
+import java.io.IOException;
 import java.net.URL;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -18,49 +28,80 @@ import java.util.*;
 public class CafeModifyDeleteController implements Initializable {
 
     // FXML 필드들
-    @FXML private TextField cafeNameField;
-    @FXML private TextField locationField;
-    @FXML private TextField selectedDaysField;
-    @FXML private TextField startTimeField;
-    @FXML private TextField endTimeField;
-    @FXML private TextField priceField;
-    @FXML private TextField phoneField;
-    @FXML private TextField imageUrlField;
-    @FXML private TextArea descriptionArea;
-    @FXML private Label charCountLabel;
-    @FXML private TextField cafeIdField; // 카페 ID 저장용 숨겨진 필드
+    @FXML
+    private TextField cafeNameField;
+    @FXML
+    private TextField locationField;
+    @FXML
+    private TextField selectedDaysField;
+    @FXML
+    private TextField startTimeField;
+    @FXML
+    private TextField endTimeField;
+    @FXML
+    private TextField priceField;
+    @FXML
+    private TextField phoneField;
+    @FXML
+    private TextField imageUrlField;
+    @FXML
+    private TextArea descriptionArea;
+    @FXML
+    private Label charCountLabel;
+    @FXML
+    private TextField cafeIdField; // 카페 ID 저장용 숨겨진 필드
 
     // 요일 토글 버튼들
-    @FXML private ToggleButton mondayButton;
-    @FXML private ToggleButton tuesdayButton;
-    @FXML private ToggleButton wednesdayButton;
-    @FXML private ToggleButton thursdayButton;
-    @FXML private ToggleButton fridayButton;
-    @FXML private ToggleButton saturdayButton;
-    @FXML private ToggleButton sundayButton;
+    @FXML
+    private ToggleButton mondayButton;
+    @FXML
+    private ToggleButton tuesdayButton;
+    @FXML
+    private ToggleButton wednesdayButton;
+    @FXML
+    private ToggleButton thursdayButton;
+    @FXML
+    private ToggleButton fridayButton;
+    @FXML
+    private ToggleButton saturdayButton;
+    @FXML
+    private ToggleButton sundayButton;
 
     // 시간 조정 버튼들
-    @FXML private Button startTimeUpButton;
-    @FXML private Button startTimeDownButton;
-    @FXML private Button endTimeUpButton;
-    @FXML private Button endTimeDownButton;
+    @FXML
+    private Button startTimeUpButton;
+    @FXML
+    private Button startTimeDownButton;
+    @FXML
+    private Button endTimeUpButton;
+    @FXML
+    private Button endTimeDownButton;
 
     // 가격 조정 버튼들
-    @FXML private Button priceUpButton;
-    @FXML private Button priceDownButton;
+    @FXML
+    private Button priceUpButton;
+    @FXML
+    private Button priceDownButton;
 
     // 수정/삭제 버튼들
-    @FXML private Button modifyButton;
-    @FXML private Button deleteButton;
-    @FXML private Font modifyButtonFont;
-    @FXML private Font deleteButtonFont;
+    @FXML
+    private Button modifyButton;
+    @FXML
+    private Button deleteButton;
+    @FXML
+    private Font modifyButtonFont;
+    @FXML
+    private Font deleteButtonFont;
 
     // 내부 변수들
     private final Set<String> selectedDays = new HashSet<>();
     private final Map<ToggleButton, String> dayButtonMap = new HashMap<>();
     private CafeService cafeService;
     private Long currentCafeId; // 현재 카페 ID
-    private final Long DUMMY_OWNER_ID = 5L; // 더미 사용자 ID
+    //    private final Long DUMMY_OWNER_ID = 5L; // 더미 사용자 ID
+    private final Long OWNER_ID = (long) SessionManager.getInstance().getLoggedInUser()
+        .getUser_id();
+
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -68,15 +109,15 @@ public class CafeModifyDeleteController implements Initializable {
         initializeDayButtons();
         initializeCharacterCount();
 
-        // 테스트용 카페 데이터 로드 (실제로는 외부에서 setCafeId 호출)
-        loadCafeData(28L); // DB에 있는 카페 ID로 테스트
+//        // 테스트용 카페 데이터 로드 (실제로는 외부에서 setCafeId 호출)
+//        loadCafeData(28L); // DB에 있는 카페 ID로 테스트
 
         // 기본값 설정
         charCountLabel.setText("0/200");
     }
 
     /**
-     * 외부에서 카페 ID를 설정하는 메서드
+     * 외부에서 카페 ID를 설정하는 메서드 현재는 NavBar에서 이동시 사용중
      */
     public void setCafeId(Long cafeId) {
         this.currentCafeId = cafeId;
@@ -85,16 +126,20 @@ public class CafeModifyDeleteController implements Initializable {
 
     /**
      * 카페 데이터를 로드하여 필드에 설정
+     *
      * @param cafeId 카페 ID
      */
     public void loadCafeData(Long cafeId) {
+        System.out.println("=== loadCafeData 시작 ===");
+        System.out.println("전달받은 cafeId: " + cafeId);
         try {
             currentCafeId = cafeId;
             cafeIdField.setText(String.valueOf(cafeId));
-
+            System.out.println("cafeService.getCafeDetail 호출 전");
             // DB에서 카페 데이터 가져오기
             CafeDto.DetailResponse cafe = cafeService.getCafeDetail(cafeId);
-
+            System.out.println(
+                "cafeService.getCafeDetail 호출 후, 결과: " + (cafe != null ? "성공" : "null"));
             if (cafe == null) {
                 showAlert(Alert.AlertType.ERROR, "오류", "해당 카페를 찾을 수 없습니다.");
                 return;
@@ -152,6 +197,7 @@ public class CafeModifyDeleteController implements Initializable {
     }
 
     private void initializeCharacterCount() {
+        // TextArea의 입력값이 변경될 때마다 글자 수를 업데이트하기 위한 리스너 설정
         descriptionArea.textProperty().addListener((observable, oldValue, newValue) -> {
             updateCharacterCount();
         });
@@ -202,7 +248,8 @@ public class CafeModifyDeleteController implements Initializable {
 
     private void adjustTime(TextField timeField, int hours) {
         try {
-            LocalTime currentTime = LocalTime.parse(timeField.getText(), DateTimeFormatter.ofPattern("HH:mm"));
+            LocalTime currentTime = LocalTime.parse(timeField.getText(),
+                DateTimeFormatter.ofPattern("HH:mm"));
             LocalTime newTime = currentTime.plusHours(hours);
             timeField.setText(newTime.format(DateTimeFormatter.ofPattern("HH:mm")));
         } catch (Exception e) {
@@ -275,8 +322,8 @@ public class CafeModifyDeleteController implements Initializable {
 
     // 수정 버튼 이벤트 (DB 연동)
     @FXML
-    private void modifyCafe() {
-        if (!validateInput()) {
+    private void modifyCafe(ActionEvent event) {
+        if (!validateInput()) { // 빈 입력값 없도록.
             return;
         }
 
@@ -295,17 +342,22 @@ public class CafeModifyDeleteController implements Initializable {
             request.setOperatingDays(new ArrayList<>(selectedDays));
 
             // 운영시간 파싱
-            LocalTime startTime = LocalTime.parse(startTimeField.getText(), DateTimeFormatter.ofPattern("HH:mm"));
-            LocalTime endTime = LocalTime.parse(endTimeField.getText(), DateTimeFormatter.ofPattern("HH:mm"));
+            LocalTime startTime = LocalTime.parse(startTimeField.getText(),
+                DateTimeFormatter.ofPattern("HH:mm"));
+            LocalTime endTime = LocalTime.parse(endTimeField.getText(),
+                DateTimeFormatter.ofPattern("HH:mm"));
             request.setOperatingStartHour(startTime.getHour());
             request.setOperatingEndHour(endTime.getHour());
 
             // Service를 통해 카페 정보 수정
-            CafeDto.UpdateResponse response = cafeService.updateCafe(request, DUMMY_OWNER_ID);
+            CafeDto.UpdateResponse response = cafeService.updateCafe(request, OWNER_ID);
 
             if (response.isSuccess()) {
                 showAlert(Alert.AlertType.INFORMATION, "수정 완료", response.getMessage());
-                closeWindow(); // 창닫기
+                // FXUtils로 페이지 이동
+                Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+                FXUtils.navigateToPage(stage, SceneConfig.RESERVATION_STATUS_FXML, "페이지 이동");
+
             } else {
                 showAlert(Alert.AlertType.ERROR, "수정 실패", response.getMessage());
             }
@@ -318,7 +370,7 @@ public class CafeModifyDeleteController implements Initializable {
 
     // 삭제 버튼 이벤트 (DB 연동)
     @FXML
-    private void deleteCafe() {
+    private void deleteCafe(ActionEvent event) {
         Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);
         confirmAlert.setTitle("카페 삭제 확인");
         confirmAlert.setHeaderText("정말로 이 스터디 카페를 삭제하시겠습니까?");
@@ -328,11 +380,13 @@ public class CafeModifyDeleteController implements Initializable {
         if (result.isPresent() && result.get() == ButtonType.OK) {
             try {
                 // Service를 통해 카페 삭제
-                CafeDto.DeleteResponse response = cafeService.deleteCafe(currentCafeId, DUMMY_OWNER_ID);
+                CafeDto.DeleteResponse response = cafeService.deleteCafe(currentCafeId, OWNER_ID);
 
                 if (response.isSuccess()) {
                     showAlert(Alert.AlertType.INFORMATION, "삭제 완료", response.getMessage());
-                    closeWindow(); // 창닫기
+                    // FXUtils로 페이지 이동
+                    Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+                    FXUtils.navigateToPage(stage, SceneConfig.RESERVATION_STATUS_FXML, "페이지 이동");
                 } else {
                     showAlert(Alert.AlertType.ERROR, "삭제 실패", response.getMessage());
                 }
@@ -375,8 +429,10 @@ public class CafeModifyDeleteController implements Initializable {
 
         // 시간 검증
         try {
-            LocalTime startTime = LocalTime.parse(startTimeField.getText(), DateTimeFormatter.ofPattern("HH:mm"));
-            LocalTime endTime = LocalTime.parse(endTimeField.getText(), DateTimeFormatter.ofPattern("HH:mm"));
+            LocalTime startTime = LocalTime.parse(startTimeField.getText(),
+                DateTimeFormatter.ofPattern("HH:mm"));
+            LocalTime endTime = LocalTime.parse(endTimeField.getText(),
+                DateTimeFormatter.ofPattern("HH:mm"));
 
             if (!startTime.isBefore(endTime)) {
                 errors.add("종료 시간은 시작 시간보다 늦어야 합니다.");
@@ -396,25 +452,29 @@ public class CafeModifyDeleteController implements Initializable {
     // 버튼 호버 효과들
     @FXML
     private void onModifyButtonEnter(MouseEvent event) {
-        modifyButton.setStyle("-fx-background-color: #4caf4f; -fx-font-weight: bold; -fx-background-radius: 10;");
+        modifyButton.setStyle(
+            "-fx-background-color: #4caf4f; -fx-font-weight: bold; -fx-background-radius: 10;");
         modifyButton.setTextFill(javafx.scene.paint.Color.WHITE);
     }
 
     @FXML
     private void onModifyButtonExit(MouseEvent event) {
-        modifyButton.setStyle("-fx-background-color: white; -fx-font-weight: bold; -fx-background-radius: 10;");
+        modifyButton.setStyle(
+            "-fx-background-color: white; -fx-font-weight: bold; -fx-background-radius: 10;");
         modifyButton.setTextFill(javafx.scene.paint.Color.web("#4caf4f"));
     }
 
     @FXML
     private void onDeleteButtonEnter(MouseEvent event) {
-        deleteButton.setStyle("-fx-background-color: #ff6b6b; -fx-font-weight: bold; -fx-background-radius: 10; ");
+        deleteButton.setStyle(
+            "-fx-background-color: #ff6b6b; -fx-font-weight: bold; -fx-background-radius: 10; ");
         deleteButton.setTextFill(javafx.scene.paint.Color.WHITE);
     }
 
     @FXML
     private void onDeleteButtonExit(MouseEvent event) {
-        deleteButton.setStyle("-fx-background-color: white; -fx-font-weight: bold; -fx-background-radius: 10;");
+        deleteButton.setStyle(
+            "-fx-background-color: white; -fx-font-weight: bold; -fx-background-radius: 10;");
         deleteButton.setTextFill(javafx.scene.paint.Color.web("#ff6b6b"));
     }
 
@@ -431,4 +491,6 @@ public class CafeModifyDeleteController implements Initializable {
         Stage stage = (Stage) modifyButton.getScene().getWindow();
         stage.close();
     }
+
+
 }

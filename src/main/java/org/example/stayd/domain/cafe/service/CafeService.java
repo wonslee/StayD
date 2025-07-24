@@ -1,6 +1,7 @@
 package org.example.stayd.domain.cafe.service;
 
 import org.example.stayd.common.DayOfWeekConverter;
+import org.example.stayd.common.SessionManager;
 import org.example.stayd.domain.cafe.dao.CafeDao;
 import org.example.stayd.domain.cafe.dto.CafeDto;
 import org.example.stayd.domain.cafe.model.CafeModel;
@@ -10,6 +11,10 @@ import org.example.stayd.domain.cafe.model.DiscountHours;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+
+
+import org.example.stayd.common.PerformanceMonitor;
+import org.example.stayd.domain.user.dto.UserDTO;
 
 /**
  * 스터디 카페 생성 비즈니스 로직 서비스
@@ -251,22 +256,28 @@ public class CafeService {
      * CAFE_OWNER 권한을 가진 더미 사용자
      * @return 더미 사용자 ID
      */
-    public Long getDummyOwnerId() {
-        // TODO: 실제 사용자 모듈 완성 후 제거
-        return 5L; // 더미 카페 오너 ID
-    }
+//    public Long getDummyOwnerId() {
+//        // TODO: 실제 사용자 모듈 완성 후 제거
+//        return 5L; // 더미 카페 오너 ID
+//    }
 
     /**
-     * 카페 오너 권한 검증 (추후 구현)
+     * 카페 오너 권한, 로그인 검증
      * @param userId 사용자 ID
      * @throws IllegalArgumentException 권한이 없는 경우
      */
     private void validateCafeOwnerPermission(Long userId) {
-        // TODO: 사용자 서비스와 연동하여 CAFE_OWNER 권한 확인
-        // UserService를 통해 사용자 역할 확인
-        // if (!userService.hasRole(userId, "CAFE_OWNER")) {
-        //     throw new IllegalArgumentException("카페 생성 권한이 없습니다. CAFE_OWNER 권한이 필요합니다.");
-        // }
+        UserDTO loggedInUser = SessionManager.getInstance().getLoggedInUser();
+
+        if (loggedInUser == null) {
+            throw new IllegalArgumentException("로그인이 필요합니다.");
+        }
+
+        String userRole = loggedInUser.getRole();
+
+        if (!"CAFE_OWNER".equals(userRole) && !"ADMIN".equals(userRole)) {
+            throw new IllegalArgumentException("카페 생성 권한이 없습니다. CAFE_OWNER 권한이 필요합니다.");
+        }
     }
 
     /**
@@ -511,6 +522,20 @@ public class CafeService {
         } catch (Exception e) {
             e.printStackTrace();
             return java.util.Collections.emptyList();
+        }
+    }
+
+    /**
+     * 특정 오너의 가장 최신 카페 ID 조회
+     * @param ownerId 카페 오너 ID
+     * @return 가장 최근에 생성된 카페 ID (없으면 null)
+     */
+    public Long getLatestCafeIdByOwnerId(Long ownerId) {
+        try {
+            return cafeDao.findLatestCafeIdByOwnerId(ownerId);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
         }
     }
 }
