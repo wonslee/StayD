@@ -39,29 +39,26 @@ public class NavbarController {
      */
     @FXML
     private void goToCafeModifyDelete(ActionEvent event) {
-        navigateToPage(SceneConfig.CAFE_Modify_Delete_FXML, event); // 카페 수정/삭제 화면으로 이동
         try {
-            // 현재 로그인한 사용자의 ID 가져오기
+            // 1. 먼저 권한 및 카페 존재 여부 확인
             Long ownerId = (long) SessionManager.getInstance().getLoggedInUser().getUser_id();
-
-            // 가장 최신에 생성된 카페 ID 조회
             Long cafeId = cafeService.getLatestCafeIdByOwnerId(ownerId);
 
             if (cafeId == null) {
                 showAlert(((Node) event.getSource()).getScene().getWindow(),
-                        Alert.AlertType.WARNING, "카페 없음", "등록된 카페가 없습니다. 먼저 카페를 생성해주세요.");
+                    Alert.AlertType.WARNING, "카페 없음", "등록된 카페가 없습니다. 먼저 카페를 생성해주세요.");
                 return;
             }
 
-            // FXML 로더 생성
+            // 2. FXML 로더 생성 및 컨트롤러 설정
             FXMLLoader loader = new FXMLLoader(getClass().getResource(SceneConfig.CAFE_Modify_Delete_FXML));
             Parent root = loader.load();
 
-            // 컨트롤러 가져와서 카페 ID 설정
+            // 3. 컨트롤러 가져와서 카페 ID 설정 (화면 이동 전에!)
             CafeModifyDeleteController controller = loader.getController();
             controller.setCafeId(cafeId);
 
-            // 화면 전환
+            // 4. 마지막에 화면 전환
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             Scene scene = new Scene(root);
             stage.setScene(scene);
@@ -69,7 +66,8 @@ public class NavbarController {
 
         } catch (IOException e) {
             e.printStackTrace();
-            showAlert(((Node) event.getSource()).getScene().getWindow(), Alert.AlertType.ERROR, "화면 전환 오류", "오류가 발생했습니다.");
+            showAlert(((Node) event.getSource()).getScene().getWindow(),
+                Alert.AlertType.ERROR, "화면 전환 오류", "오류가 발생했습니다.");
         } catch (Exception e) {
             e.printStackTrace();
 
@@ -80,10 +78,10 @@ public class NavbarController {
                 System.out.println("실제 예외 메시지: " + cause.getMessage());
                 cause.printStackTrace();
                 showAlert(((Node) event.getSource()).getScene().getWindow(), Alert.AlertType.ERROR, "오류",
-                        "카페 정보를 불러오는 중 오류가 발생했습니다: " + cause.getMessage());
+                    "카페 정보를 불러오는 중 오류가 발생했습니다: " + cause.getMessage());
             } else {
                 showAlert(((Node) event.getSource()).getScene().getWindow(), Alert.AlertType.ERROR, "오류",
-                        "카페 정보를 불러오는 중 오류가 발생했습니다: " + e.getMessage());
+                    "카페 정보를 불러오는 중 오류가 발생했습니다: " + e.getMessage());
             }
         }
     }
