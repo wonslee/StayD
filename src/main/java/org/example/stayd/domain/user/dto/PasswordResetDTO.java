@@ -23,6 +23,8 @@ public class PasswordResetDTO {
      * 로그인 아이디
      * 아이디는 비어 있으면 안되며, 유효한 아이디가 입력되어야 합니다.
      */
+    private int userId;
+
     @NotBlank(message = "아이디를 입력해주세요.")
     private String loginId;
 

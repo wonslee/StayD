@@ -1,0 +1,98 @@
+
+/* ─────── 별점 버튼 스타일 ─────── */
+.star-btn {
+    -fx-font-size: 20px;
+    -fx-background-color: transparent;
+    -fx-text-fill: #bdbdbd;
+    -fx-cursor: hand;
+    -fx-padding: 4 6;
+    -fx-background-radius: 5;
+    -fx-border-radius: 5;
+    -fx-border-color: transparent;
+    -fx-border-width: 1;
+    -fx-transition: all 0.2s ease-in-out;
+}
+
+.star-btn:selected {
+    -fx-text-fill: #f1c40f; /* 노란 별 */
+}
+
+.star-btn:hover {
+    -fx-font-size: 22px;
+}
+
+/* ─────── 텍스트 영역 ─────── */
+.text-area {
+    -fx-font-size: 13px;
+    -fx-padding: 10;
+    -fx-focus-color: #2ecc71;
+    -fx-faint-focus-color: transparent;
+}
+
+/* 스크롤 없애기 (깔끔하게) */
+.text-area .scroll-pane .scroll-bar:vertical,
+.text-area .scroll-pane .scroll-bar:horizontal {
+    -fx-opacity: 0;
+}
+
+/* ─────── 버튼 공통 ─────── */
+.button {
+    -fx-font-size: 11px;
+    -fx-cursor: hand;
+    -fx-font-weight: bold;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 2, 0.1, 0, 1);
+}
+
+/* 제출 버튼 hover */
+#submitButton:hover {
+    -fx-background-color: #2ecc71;
+}
+
+/* 취소 버튼 hover */
+#cancelButton:hover {
+    -fx-background-color: #b0b0b0;
+}
+
+/* ─────── 평균 평점 강조 ─────── */
+#avgScore {
+    -fx-text-fill: #f1c40f;
+    -fx-font-weight: bold;
+}
+
+/* ─────── 빈 리뷰 셀 숨기기 ─────── */
+.review-list .list-cell:empty {
+    -fx-background-color: white;
+    -fx-border-width: 0;
+}
+
+/* ─────── 페이지네이션 여백 ─────── */
+.pagination {
+    -fx-padding: 0 0 20 0;
+}
+
+/* ─────── 리뷰 리스트 셀 ─────── */
+.review-list {
+    -fx-background-color: white;
+    -fx-border-color: transparent;
+}
+
+.review-list .list-cell {
+    -fx-padding: 15px;
+    -fx-border-color: #e0e0e0;
+    -fx-border-width: 0 0 1px 0;
+    -fx-background-color: white;
+}
+
+.review-list .list-cell:hover {
+    -fx-background-color: #f9f9f9;
+}
+
+.review-list .list-cell:empty {
+    -fx-background-color: white;
+    -fx-border-width: 0;
+}
+
+/* ─────── 페이지네이션 여백 ─────── */
+.pagination {
+    -fx-padding: 0 0 20 0;
+}

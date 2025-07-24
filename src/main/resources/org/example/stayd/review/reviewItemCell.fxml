@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<HBox xmlns:fx="http://javafx.com/fxml"
+      fx:controller="org.example.stayd.domain.review.controller.ReviewItemCellController"
+      spacing="20"
+      style="-fx-padding: 10;">
+
+    <!-- ─── 헤더 자리 (공통 컴포넌트 들어올 위치) ─── -->
+    <AnchorPane fx:id="headerPlaceholder" prefHeight="130.0"
+                AnchorPane.leftAnchor="0.0"
+                AnchorPane.rightAnchor="0.0"
+                AnchorPane.topAnchor="0.0" />
+
+    <!-- 리뷰 정보 -->
+    <VBox spacing="5">
+        <Label fx:id="cafeNameLabel" text="카페 이름" style="-fx-font-weight: bold;" />
+        <Label fx:id="ratingLabel" text="⭐ 5점" />
+        <Label fx:id="contentLabel" text="리뷰 내용 내용" wrapText="true" />
+        <Label fx:id="dateLabel" text="작성일: 2025-07-20" />
+    </VBox>
+
+    <Pane HBox.hgrow="ALWAYS"/>
+
+    <!-- 수정/삭제 버튼 -->
+    <VBox spacing="5" alignment="CENTER_RIGHT">
+        <Button fx:id="editReviewButton" text="수정" onAction="#onEditClicked"/>
+        <Button fx:id="deleteReviewButton" text="삭제" onAction="#onDeleteClicked"/>
+    </VBox>
+
+</HBox>

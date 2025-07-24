@@ -1,13 +1,103 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
+<?import java.net.URL?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.*?>
 
-<AnchorPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            prefHeight="400.0" prefWidth="600.0">
+<AnchorPane prefHeight="768" prefWidth="1024" style="-fx-background-color:white;"
+            xmlns="http://javafx.com/javafx/21.0.1"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="org.example.stayd.domain.review.controller.ReviewController">
 
+    <!-- ─── 헤더 자리 ─── -->
+    <AnchorPane fx:id="headerPlaceholder" prefHeight="130.0"
+                AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+
+    <!-- ─── 네비게이션 바 ─── -->
+    <HBox fx:id="navBar" alignment="CENTER" prefHeight="40.0" spacing="80"
+          AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="130.0">
+        <Label fx:id="detailTab" style="-fx-font-size:15; -fx-text-fill:#7d7d7d;" text="상세" />
+        <Label fx:id="reserveTab" style="-fx-font-size:15; -fx-text-fill:#7d7d7d;" text="예약" />
+        <VBox alignment="CENTER">
+            <Label fx:id="reviewTab" style="-fx-font-size:15; -fx-font-weight:bold; -fx-text-fill:#111111;" text="리뷰" />
+            <Rectangle fill="#2ecc71" height="3" width="40" />
+        </VBox>
+    </HBox>
+
+    <!-- 탭 아래 구분선 -->
+    <Line endX="1024" startX="0" stroke="#e0e0e0" strokeWidth="1" AnchorPane.topAnchor="170.0" />
+
+    <!-- ─── 스터디카페 정보 블록 ─── -->
+    <AnchorPane fx:id="infoPane" prefHeight="160" prefWidth="900"
+                AnchorPane.leftAnchor="62.0" AnchorPane.topAnchor="190.0">
+
+        <!-- 썸네일 -->
+        <StackPane layoutX="283.0" layoutY="-10.0" prefHeight="80" prefWidth="80"
+                   style="-fx-background-color:#f2f2f2; -fx-background-radius:10;">
+            <Label style="-fx-font-size:26; -fx-text-fill:#bdbdbd;" text="📷" />
+        </StackPane>
+
+        <!-- 지점명 -->
+        <Label fx:id="branchName" layoutX="383.0" layoutY="44.0"
+               style="-fx-text-fill:#7d7d7d;" text="혜화점" />
+
+        <!-- 예약 정보 -->
+        <VBox layoutX="320.0" layoutY="79.0" prefWidth="310" spacing="12"
+              style="-fx-border-color:#e0e0e0; -fx-border-radius:10; -fx-background-radius:10; -fx-padding:18 20;">
+            <HBox alignment="CENTER_LEFT" spacing="10">
+                <Label style="-fx-font-size:14;" text="🗓" />
+                <Label text="날짜" />
+                <Label fx:id="useDate" style="-fx-font-weight:bold;" text="2025년 07월 30일" />
+            </HBox>
+            <HBox alignment="CENTER_LEFT" spacing="10">
+                <Label style="-fx-font-size:14;" text="⏰" />
+                <Label text="시간" />
+                <Label fx:id="useTime" style="-fx-font-weight:bold;" text="15:00 - 19:00" />
+            </HBox>
+        </VBox>
+
+        <Label fx:id="avgScore" layoutX="580.0" layoutY="15.0"
+               style="-fx-font-size:18;" text="4.7" />
+        <Label layoutX="556.0" layoutY="15.0"
+               style="-fx-font-size:18; -fx-text-fill:#f1c40f;" text="★" />
+        <Label fx:id="cafeName" layoutX="378.0" layoutY="12.0"
+               style="-fx-font-size:24; -fx-font-weight:bold;" text="작심 스터디카페" />
+    </AnchorPane>
+
+    <!-- ─── 리뷰 입력 영역 ─── -->
+    <Label layoutX="150.0" layoutY="400.0" style="-fx-font-size:16; -fx-font-weight:bold;" text="리뷰" />
+
+    <!-- ⭐ 별점 버튼 HBox -->
+    <HBox fx:id="ratingBox" layoutX="200.0" layoutY="395.0" spacing="8">
+        <ToggleButton fx:id="star1" text="★" styleClass="star-btn"/>
+        <ToggleButton fx:id="star2" text="★" styleClass="star-btn"/>
+        <ToggleButton fx:id="star3" text="★" styleClass="star-btn"/>
+        <ToggleButton fx:id="star4" text="★" styleClass="star-btn"/>
+        <ToggleButton fx:id="star5" text="★" styleClass="star-btn"/>
+    </HBox>
+
+    <!-- 리뷰 내용 입력 -->
+    <TextArea fx:id="reviewTextArea" layoutX="150.0" layoutY="430.0"
+              prefHeight="145" prefWidth="725"
+              promptText="리뷰를 작성해주세요. 악의적인 리뷰는 블랙리스트 대상이 될 수 있습니다."
+              wrapText="true"
+              style="-fx-border-color:#e0e0e0; -fx-border-radius:10; -fx-background-radius:10;" />
+
+    <!-- 작성 / 취소 버튼 -->
+    <HBox layoutX="430.0" layoutY="595.0" spacing="20">
+        <Button fx:id="cancelButton" text="취소"
+                prefHeight="35" prefWidth="100"
+                style="-fx-background-color:#d6d6d6; -fx-text-fill:#333; -fx-background-radius:8;"
+                onAction="#handleCancel" />
+        <Button fx:id="submitButton" text="리뷰 작성"
+                prefHeight="35" prefWidth="120"
+                style="-fx-background-color:#27ae60; -fx-text-fill:white; -fx-background-radius:8;"
+                onAction="#handleSubmit" />
+    </HBox>
+
+    <!-- ⭐ 별점 스타일 -->
+    <stylesheets>
+        <URL value="@review.css" />
+    </stylesheets>
 </AnchorPane>

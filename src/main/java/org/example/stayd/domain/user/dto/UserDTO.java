@@ -81,4 +81,8 @@ public class UserDTO {
         this.passwordCheck = passwordCheck;
         this.role = role;
     }
+    // 명시적으로 user_id getter 추가
+    public int getUserId() {
+        return user_id;
+    }
 }
