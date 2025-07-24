@@ -1,10 +1,15 @@
 package org.example.stayd.domain.cafe.model;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import java.time.LocalDateTime;
 
 /**
  * 스터디 카페 엔티티 클래스
  */
+@Getter
+@Setter
 public class CafeModel {
     private Long cafeId;
     private Long ownerId;
@@ -43,79 +48,6 @@ public class CafeModel {
         this.description = description;
         this.phoneNumber = phoneNumber;
         this.imageUrl = imageUrl;
-        this.createdAt = createdAt;
-    }
-
-    // Getters and Setters
-    public Long getCafeId() {
-        return cafeId;
-    }
-
-    public void setCafeId(Long cafeId) {
-        this.cafeId = cafeId;
-    }
-
-    public Long getOwnerId() {
-        return ownerId;
-    }
-
-    public void setOwnerId(Long ownerId) {
-        this.ownerId = ownerId;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
-    public Integer getPricePerHour() {
-        return pricePerHour;
-    }
-
-    public void setPricePerHour(Integer pricePerHour) {
-        this.pricePerHour = pricePerHour;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getPhoneNumber() {
-        return phoneNumber;
-    }
-
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
-    }
-
-    public String getImageUrl() {
-        return imageUrl;
-    }
-
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
 
