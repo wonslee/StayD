@@ -64,10 +64,18 @@ public class FXUtils {
         alert.showAndWait();
     }
 
+
+    public static void navigateToPage(Stage stage, String loginFxml, String message) {
+        try {
+            switchScene(stage, loginFxml);  // 로그인 페이지로 이동
+        } catch (IOException e) {
+            e.printStackTrace();
+            showAlert(stage, Alert.AlertType.ERROR, "화면 전환 오류", message);
+        }
+    }
+
     /**
-     * ActionEvent를 처리할 수 있도록 화면 전환을 수행하는 메서드.
-     * 이벤트 발생 시 해당 페이지로 이동합니다.
-     *
+     * ActionEvent를 처리할 수 있도록 오버로드된 navigateToPage 메서드
      * @param fxmlPath 이동할 FXML 파일 경로
      * @param event    ActionEvent (버튼 클릭 등)
      */
