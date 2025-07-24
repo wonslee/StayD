@@ -129,15 +129,15 @@ public class FindPwController {
         new Thread(() -> {
             try {
                 // 이메일 발송 내용 설정
-                String subject = "[MyStay] 아이디 안내";
+                String subject = "[MyStay] 인증번호 안내";
                 String body = """
                         안녕하세요.
-                        요청하신 회원님의 아이디는 다음과 같습니다:
+                        요청하신 회원님의 인증번호는 다음과 같습니다:
                         
-                        %s
+                        인증 코드: %s
                         
                         감사합니다.
-                        """.formatted(loginId);
+                        """.formatted(pendingToken);
 
                 // 이메일 발송
                 emailService.sendEmail(email, subject, body);

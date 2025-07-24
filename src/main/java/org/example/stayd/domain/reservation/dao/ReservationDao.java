@@ -35,21 +35,24 @@ public class ReservationDao {
         // 유저의 cafe_id 가져오기
         int cafeId = getCafeIdByUserId(userId);
 
-        // 유효한 cafe_id가 있는 경우, 해당 cafe_id와 선택된 요일로 예약 현황 조회
         if (cafeId != -1) {
-            String query = "SELECT usage_started_at, usage_ended_at, day_of_week FROM reservation WHERE cafe_id = ? AND day_of_week = ? AND is_canceled IS NULL";
+            // PL/SQL 프로시저 호출
+            String query = "{call get_reservation_status_by_day(?, ?, ?)}";  // 프로시저 호출
 
-            try (PreparedStatement stmt = connection.prepareStatement(query)) {
-                stmt.setInt(1, cafeId);  // cafe_id로 필터링
-                stmt.setString(2, dayOfWeek);  // 요일 값으로 필터링
+            try (CallableStatement stmt = connection.prepareCall(query)) {
+                stmt.setInt(1, cafeId);  // cafe_id
+                stmt.setString(2, dayOfWeek);  // day_of_week
+                stmt.registerOutParameter(3, Types.REF_CURSOR);  // 출력 커서
 
-                try (ResultSet rs = stmt.executeQuery()) {
+                stmt.execute();
+
+                // 출력 커서를 통해 결과 처리
+                try (ResultSet rs = (ResultSet) stmt.getObject(3)) {
                     while (rs.next()) {
                         ReservationDTO reservation = ReservationDTO.builder()
                                 .usageStartedAt(rs.getInt("usage_started_at"))
                                 .usageEndedAt(rs.getInt("usage_ended_at"))
                                 .build();
-
                         reservationList.add(reservation);
                     }
                 }
@@ -74,21 +77,24 @@ public class ReservationDao {
         // 유저의 cafe_id 가져오기
         int cafeId = getCafeIdByUserId(userId);
 
-        // 유효한 cafe_id가 있는 경우, 해당 cafe_id와 선택된 날짜로 예약 현황 조회
         if (cafeId != -1) {
-            String query = "SELECT usage_started_at, usage_ended_at, RESERVATION_DATE FROM reservation WHERE cafe_id = ? AND RESERVATION_DATE = ? AND is_canceled IS NULL";
+            // PL/SQL 프로시저 호출
+            String query = "{call get_reservation_status_by_date(?, ?, ?)}";  // 프로시저 호출
 
-            try (PreparedStatement stmt = connection.prepareStatement(query)) {
-                stmt.setInt(1, cafeId);  // cafe_id로 필터링
-                stmt.setDate(2, selectedDate);  // 선택된 날짜로 필터링
+            try (CallableStatement stmt = connection.prepareCall(query)) {
+                stmt.setInt(1, cafeId);  // cafe_id
+                stmt.setDate(2, selectedDate);  // selected_date
+                stmt.registerOutParameter(3, Types.REF_CURSOR);  // 출력 커서
 
-                try (ResultSet rs = stmt.executeQuery()) {
+                stmt.execute();
+
+                // 출력 커서를 통해 결과 처리
+                try (ResultSet rs = (ResultSet) stmt.getObject(3)) {
                     while (rs.next()) {
                         ReservationDTO reservation = ReservationDTO.builder()
                                 .usageStartedAt(rs.getInt("usage_started_at"))
                                 .usageEndedAt(rs.getInt("usage_ended_at"))
                                 .build();
-
                         reservationList.add(reservation);
                     }
                 }
@@ -105,17 +111,16 @@ public class ReservationDao {
      * @throws SQLException 데이터베이스 접근 중 발생할 수 있는 예외
      */
     private int getCafeIdByUserId(int userId) throws SQLException {
-        String query = "SELECT cafe_id FROM cafe WHERE owner_id = ?";
+        String query = "{call get_cafe_id_by_user_id(?, ?)}";  // PL/SQL 프로시저 호출
 
-        try (PreparedStatement stmt = connection.prepareStatement(query)) {
-            stmt.setInt(1, userId);
+        try (CallableStatement stmt = connection.prepareCall(query)) {
+            stmt.setInt(1, userId);  // user_id
+            stmt.registerOutParameter(2, Types.INTEGER);  // 출력 값은 cafe_id
 
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getInt("cafe_id");  // cafe_id 반환
-                }
-            }
+            stmt.execute();
+
+            // cafe_id 반환
+            return stmt.getInt(2);
         }
-        return -1; // 카페 ID를 찾을 수 없으면 -1 반환
     }
 }
