@@ -7,6 +7,7 @@ import org.example.stayd.common.DatabaseConnection;
 import org.example.stayd.domain.mypage.MypageController;
 import org.example.stayd.domain.reservation.dao.ReservationWDAO;
 import org.example.stayd.domain.reservation.dto.ReservationWithCafeDTO;
+import org.example.stayd.domain.review.dao.ReviewDAO;
 
 import java.sql.Connection;
 import java.time.format.DateTimeFormatter;
@@ -27,6 +28,8 @@ public class ReservationItemCellController {
 
     public void setData(ReservationWithCafeDTO reservation) {
         this.reservation = reservation;
+        System.out.println("리뷰 체크 - rating: " + reservation.getRating() + ", content: " + reservation.getContent());
+
 
         cafeNameLabel.setText( reservation.getCafeName());
         reservationDateLabel.setText("예약일: " + reservation.getReservationDate().format(DateTimeFormatter.ofPattern("yyyy년 M월 d일")));
@@ -53,7 +56,8 @@ public class ReservationItemCellController {
         confirm.showAndWait().ifPresent(result -> {
             if (result == ButtonType.OK) {
                 try (Connection conn = new DatabaseConnection().getConnection()) {
-                    boolean deleted = new ReservationWDAO().deleteReview(conn, reservation.getReservationId());
+                    ReviewDAO reviewDAO = new ReviewDAO();
+                    boolean deleted = reviewDAO.deleteReview(conn, reservation.getReservationId());
                     if (deleted) {
                         showAlert("리뷰가 삭제되었습니다.");
                         this.cafeNameLabel.getScene().getWindow().hide(); // 셀 숨기기 또는 새로고침 처리

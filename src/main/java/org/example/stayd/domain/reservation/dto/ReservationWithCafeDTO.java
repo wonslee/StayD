@@ -25,4 +25,5 @@ public class ReservationWithCafeDTO {
     private int rating;
     private String content;
     private LocalDateTime reviewCreatedAt;
+    private String branchName;
 }

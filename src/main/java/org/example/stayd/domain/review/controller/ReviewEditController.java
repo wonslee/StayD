@@ -3,6 +3,7 @@ package org.example.stayd.domain.review.controller;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
+import org.example.stayd.domain.review.dao.ReviewDAO;
 import org.example.stayd.domain.review.dto.ReviewDTO;
 import org.example.stayd.domain.reservation.dao.ReservationWDAO;
 import org.example.stayd.common.DatabaseConnection;
@@ -23,6 +24,7 @@ public class ReviewEditController {
     @FXML private Button saveButton;
     @FXML private Button cancelButton;
 
+    private final ReviewDAO reviewDAO = new ReviewDAO();
     private List<ToggleButton> stars;
     private ReviewDTO review;
     private Runnable onReviewUpdatedCallback;
@@ -76,7 +78,7 @@ public class ReviewEditController {
         }
 
         try (Connection conn = new DatabaseConnection().getConnection()) {
-            boolean success = reservationWDAO.updateReview(conn, review.getReservationId(), rating, content);
+            boolean success = reviewDAO.updateReview(conn, review.getReservationId(), rating, content);
             if (success) {
                 showAlert("리뷰가 수정되었습니다.");
                 if (onReviewUpdatedCallback != null) {

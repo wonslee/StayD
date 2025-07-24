@@ -8,6 +8,7 @@ import org.example.stayd.common.DatabaseConnection;
 import org.example.stayd.common.SessionManager;
 import org.example.stayd.domain.reservation.dao.ReservationWDAO;
 import org.example.stayd.domain.reservation.dto.ReservationWithCafeDTO;
+import org.example.stayd.domain.review.dao.ReviewDAO;
 import org.example.stayd.domain.user.dto.UserDTO;
 
 import java.sql.Connection;
@@ -18,6 +19,7 @@ import java.util.function.Consumer;
 
 public class ReviewController {
 
+    private final ReviewDAO reviewDAO = new ReviewDAO();
     @FXML private TextArea reviewTextArea;
     @FXML private Button submitButton, cancelButton;
 
@@ -116,17 +118,19 @@ public class ReviewController {
         }
 
         try (Connection conn = new DatabaseConnection().getConnection()) {
-            if (reservationWDAO.existsReviewByReservationId(conn, reservationId)) {
+            if (reviewDAO.existsReviewByReservationId(conn, reservationId)) {
                 showAlert("이미 작성한 리뷰입니다.");
                 return;
             }
 
-            if (!reservationWDAO.isReservationFinished(conn, reservationId)) {
+            if (!reviewDAO.isReservationFinished(conn, reservationId)) {
                 showAlert("아직 이용이 완료되지 않았습니다.");
                 return;
             }
 
-            boolean result = reservationWDAO.saveReview(conn, reservationId, selectedRating, content);
+            System.out.println("💾 리뷰 저장 시도...");
+            boolean result = reviewDAO.saveReview(conn, reservationId, selectedRating, content);
+            System.out.println("🧨 DAO 저장 결과: " + result);
 
             if (result) {
                 System.out.println("✅ 리뷰 등록 성공!");

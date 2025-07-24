@@ -11,6 +11,8 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.stage.Modality;
 
+import org.example.stayd.common.SessionManager;
+import org.example.stayd.domain.review.dao.ReviewDAO;
 import org.example.stayd.domain.review.dto.ReviewDTO;
 import org.example.stayd.domain.review.controller.ReviewEditController;
 import org.example.stayd.domain.reservation.dao.ReservationWDAO;
@@ -27,18 +29,24 @@ public class ReviewItemCellController {
 
     @FXML private Button editReviewButton;
     @FXML private Button deleteReviewButton;
-
+    private final ReviewDAO reviewDAO = new ReviewDAO();
     private ReviewDTO review;
     private MypageController mypageController;
     @FXML private Label cafeNameLabel;
+
     public void setData(ReviewDTO dto) {
         this.review = dto;
 
         cafeNameLabel.setText(dto.getCafeName());
-
         ratingLabel.setText("⭐ " + dto.getRating() + "점");
         contentLabel.setText(dto.getContent());
         dateLabel.setText("작성일: " + dto.getReviewCreatedAt().toLocalDate());
+
+        long loginUserId = SessionManager.getInstance().getLoggedInUser().getUserId();
+
+        boolean isMyReview = (dto.getUserId() == loginUserId);
+        editReviewButton.setVisible(isMyReview);
+        deleteReviewButton.setVisible(isMyReview);
     }
 
     public void setMypageController(MypageController controller) {
@@ -79,7 +87,7 @@ public class ReviewItemCellController {
         confirm.showAndWait().ifPresent(result -> {
             if (result == ButtonType.OK) {
                 try (Connection conn = new DatabaseConnection().getConnection()) {
-                    boolean success = new ReservationWDAO().deleteReview(conn, review.getReservationId());
+                    boolean success = new ReviewDAO().deleteReview(conn, review.getReservationId());
                     if (success) {
                         Alert successAlert = new Alert(Alert.AlertType.INFORMATION);
                         successAlert.setContentText("리뷰가 삭제되었습니다.");
