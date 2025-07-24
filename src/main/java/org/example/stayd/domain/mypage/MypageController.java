@@ -1,10 +1,12 @@
 package org.example.stayd.domain.mypage;
 
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.AnchorPane;
@@ -20,6 +22,9 @@ import org.example.stayd.domain.review.controller.ReviewController;
 import org.example.stayd.domain.review.controller.ReviewItemCellController;
 import org.example.stayd.domain.review.dao.ReviewListDao;
 import org.example.stayd.domain.review.dto.ReviewDTO;
+import org.example.stayd.domain.user.controller.ResetPwController;
+import org.example.stayd.domain.user.dto.PasswordResetDTO;
+import org.example.stayd.domain.user.dto.UserDTO;
 
 import java.io.IOException;
 import java.net.URL;
@@ -34,6 +39,8 @@ public class MypageController implements Initializable {
 
     @FXML private ListView<ReservationWithCafeDTO> reservationListView;
     @FXML private ListView<ReviewDTO> reviewListView;
+    @FXML private Label nicknameLabel;
+    @FXML private Label emailLabel;
 
     private final ReservationWDAO reservationWDAO = new ReservationWDAO();
     private final ReviewListDao reviewListDao = new ReviewListDao();
@@ -45,7 +52,14 @@ public class MypageController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         loadHeader();            // 헤더 삽입
         loadReservationList();   // 예약 불러오기
-        refreshReviewList();     // 리뷰 불러오기
+        refreshReviewList();
+
+        UserDTO user = SessionManager.getInstance().getLoggedInUser();
+        if (user != null) {
+            nicknameLabel.setText("아이디: " + user.getLogin_id());
+            emailLabel.setText("이메일: " + user.getEmail());
+        }
+// 리뷰 불러오기
 
         System.out.println("로그인 유저: " + SessionManager.getInstance().getLoggedInUser());
     }
@@ -170,4 +184,33 @@ public class MypageController implements Initializable {
             e.printStackTrace();
         }
     }
+    @FXML
+    private void handleChangePw(ActionEvent event) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/stayd/user/resetPw.fxml"));
+            Parent root = loader.load();
+
+            ResetPwController controller = loader.getController();
+
+            // 로그인 유저 정보를 PasswordResetDTO로 생성
+            UserDTO user = SessionManager.getInstance().getLoggedInUser();
+            PasswordResetDTO dto = new PasswordResetDTO();
+            dto.setUserId(user.getUserId());
+            dto.setLoginId(user.getLogin_id());
+
+            // ✅ initData() 메서드로 전달
+            controller.initData(dto);
+
+            // 👉 현재 마이페이지 Stage 가져오기
+            Stage currentStage = (Stage) ((javafx.scene.Node) event.getSource()).getScene().getWindow();
+
+            // 👉 현재 Stage에 새로운 Scene 설정 (즉, 페이지 이동)
+            currentStage.setScene(new Scene(root));
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
 }

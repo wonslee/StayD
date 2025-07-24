@@ -9,8 +9,10 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
-import org.example.stayd.domain.review.controller.ReviewEditController;
+import javafx.stage.Modality;
+
 import org.example.stayd.domain.review.dto.ReviewDTO;
+import org.example.stayd.domain.review.controller.ReviewEditController;
 import org.example.stayd.domain.reservation.dao.ReservationWDAO;
 import org.example.stayd.domain.mypage.MypageController;
 import org.example.stayd.common.DatabaseConnection;
@@ -22,16 +24,19 @@ public class ReviewItemCellController {
     @FXML private Label ratingLabel;
     @FXML private Label contentLabel;
     @FXML private Label dateLabel;
+
     @FXML private Button editReviewButton;
     @FXML private Button deleteReviewButton;
 
     private ReviewDTO review;
     private MypageController mypageController;
-
+    @FXML private Label cafeNameLabel;
     public void setData(ReviewDTO dto) {
         this.review = dto;
 
-        ratingLabel.setText("\u2B50 " + dto.getRating() + "점");
+        cafeNameLabel.setText(dto.getCafeName());
+
+        ratingLabel.setText("⭐ " + dto.getRating() + "점");
         contentLabel.setText(dto.getContent());
         dateLabel.setText("작성일: " + dto.getReviewCreatedAt().toLocalDate());
     }
@@ -43,14 +48,20 @@ public class ReviewItemCellController {
     @FXML
     private void onEditClicked() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/stayd/view/reviewEdit.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/stayd/review/reviewEdit.fxml"));
             Parent root = loader.load();
 
             ReviewEditController controller = loader.getController();
             controller.setReview(review);
+            controller.setOnReviewUpdatedCallback(() -> {
+                if (mypageController != null) {
+                    mypageController.refreshReviewList();
+                }
+            });
 
             Stage stage = new Stage();
             stage.setTitle("리뷰 수정");
+            stage.initModality(Modality.APPLICATION_MODAL);
             stage.setScene(new Scene(root));
             stage.show();
         } catch (Exception e) {

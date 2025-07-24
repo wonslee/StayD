@@ -25,6 +25,7 @@ public class ReviewEditController {
 
     private List<ToggleButton> stars;
     private ReviewDTO review;
+    private Runnable onReviewUpdatedCallback;
 
     private final ReservationWDAO reservationWDAO = new ReservationWDAO();
 
@@ -42,6 +43,11 @@ public class ReviewEditController {
         reviewTextArea.setText(review.getContent());
         selectStars(review.getRating());
     }
+
+    public void setOnReviewUpdatedCallback(Runnable callback) {
+        this.onReviewUpdatedCallback = callback;
+    }
+
 
     private void selectStars(int count) {
         for (int i = 0; i < stars.size(); i++) {
@@ -73,6 +79,9 @@ public class ReviewEditController {
             boolean success = reservationWDAO.updateReview(conn, review.getReservationId(), rating, content);
             if (success) {
                 showAlert("리뷰가 수정되었습니다.");
+                if (onReviewUpdatedCallback != null) {
+                    onReviewUpdatedCallback.run();
+                }
                 close();
             } else {
                 showAlert("리뷰 수정에 실패했습니다.");

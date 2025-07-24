@@ -16,6 +16,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class PasswordResetDTO {
 
+    private int userId;
+
     @NotBlank(message = "아이디를 입력해주세요.")
     private String loginId;
 

@@ -12,20 +12,28 @@ import org.example.stayd.domain.user.dto.UserDTO;
 
 import java.sql.Connection;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
+import java.util.List;
 import java.util.function.Consumer;
 
 public class ReviewController {
 
-    @FXML private TextArea reviewContentArea;
+    @FXML private TextArea reviewTextArea;
     @FXML private Button submitButton, cancelButton;
 
-    @FXML private ToggleGroup starGroup; // 연결 필요
-    @FXML private HBox ratingBox; // 별점 버튼들이 들어있는 HBox
+    @FXML private ToggleButton star1;
+    @FXML private ToggleButton star2;
+    @FXML private ToggleButton star3;
+    @FXML private ToggleButton star4;
+    @FXML private ToggleButton star5;
+    @FXML private HBox ratingBox;
 
     @FXML private Label cafeName;
     @FXML private Label useDate;
     @FXML private Label useTime;
     @FXML private Label branchName;
+
+    private List<ToggleButton> stars;
 
     private ReservationWithCafeDTO selectedReservation;
     private final ReservationWDAO reservationWDAO = new ReservationWDAO();
@@ -50,9 +58,27 @@ public class ReviewController {
 
     @FXML
     private void initialize() {
-        // 버튼 핸들러 등록 제거 (FXML에서 이미 onAction 지정됨)
-        // submitButton.setOnAction(this::handleSubmit);
-        // cancelButton.setOnAction(event -> submitButton.getScene().getWindow().hide());
+        stars = Arrays.asList(star1, star2, star3, star4, star5);
+        for (int i = 0; i < stars.size(); i++) {
+            final int index = i;
+            stars.get(i).setOnAction(e -> selectStars(index + 1));
+        }
+    }
+
+    private void selectStars(int count) {
+        for (int i = 0; i < stars.size(); i++) {
+            stars.get(i).setSelected(i < count);
+        }
+    }
+
+    private int getSelectedRating() {
+        int rating = 0;
+        for (int i = 0; i < stars.size(); i++) {
+            if (stars.get(i).isSelected()) {
+                rating = i + 1;
+            }
+        }
+        return rating;
     }
 
     @FXML
@@ -75,7 +101,7 @@ public class ReviewController {
         int selectedRating = getSelectedRating();
 
         System.out.println("⭐️ 선택된 별점: " + selectedRating);
-        System.out.println("📝 입력된 리뷰 내용: " + reviewContentArea.getText().trim());
+        System.out.println("📝 입력된 리뷰 내용: " + reviewTextArea.getText().trim());
         System.out.println("💾 대상 예약 ID: " + reservationId);
 
         if (selectedRating == 0) {
@@ -83,7 +109,7 @@ public class ReviewController {
             return;
         }
 
-        String content = reviewContentArea.getText().trim();
+        String content = reviewTextArea.getText().trim();
         if (content.isEmpty()) {
             showAlert("리뷰 내용을 입력해주세요.");
             return;
@@ -120,16 +146,9 @@ public class ReviewController {
         }
     }
 
-    private int getSelectedRating() {
-        Toggle selected = starGroup.getSelectedToggle();
-        if (selected != null) {
-            for (int i = 0; i < ratingBox.getChildren().size(); i++) {
-                if (ratingBox.getChildren().get(i) == selected) {
-                    return i + 1;
-                }
-            }
-        }
-        return 0;
+    @FXML
+    public void handleCancel(ActionEvent event) {
+        cancelButton.getScene().getWindow().hide();
     }
 
     private void showAlert(String msg) {
@@ -137,10 +156,5 @@ public class ReviewController {
         alert.setHeaderText(null);
         alert.setContentText(msg);
         alert.showAndWait();
-    }
-
-    @FXML
-    public void handleCancel(ActionEvent event) {
-        cancelButton.getScene().getWindow().hide();
     }
 }

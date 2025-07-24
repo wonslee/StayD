@@ -28,7 +28,7 @@ public class ReservationItemCellController {
     public void setData(ReservationWithCafeDTO reservation) {
         this.reservation = reservation;
 
-        cafeNameLabel.setText("카페 이름: " + reservation.getCafeName());
+        cafeNameLabel.setText( reservation.getCafeName());
         reservationDateLabel.setText("예약일: " + reservation.getReservationDate().format(DateTimeFormatter.ofPattern("yyyy년 M월 d일")));
         timeLabel.setText("이용 시간: " + reservation.getUsageStartedAt() + "시 ~ " + reservation.getUsageEndedAt() + "시");
 

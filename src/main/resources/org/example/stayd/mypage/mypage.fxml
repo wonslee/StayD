@@ -28,10 +28,10 @@
             <!-- 왼쪽: 프로필 -->
             <VBox spacing="10" alignment="TOP_CENTER">
                 <Label text="👤" style="-fx-font-size: 48px;" />
-                <Label fx:id="nicknameLabel" text="haedeune" style="-fx-font-weight: bold; -fx-font-size: 16px;" />
-                <Label fx:id="emailLabel" text="email: haedeune@gmail.com" />
+                <Label fx:id="nicknameLabel" style="-fx-font-weight: bold; -fx-font-size: 16px;" />
+                <Label fx:id="emailLabel"  />
                 <Label fx:id="passwordLabel" text="pw: ***************" />
-                <Button fx:id="changePasswordButton" text="비밀번호 변경"
+                <Button fx:id="changePwButton" text="비밀번호 변경" onAction="#handleChangePw"
                         style="-fx-background-color: #4CAF50; -fx-text-fill: white;" />
             </VBox>
             <!-- 가운데: 이용 내역 -->
