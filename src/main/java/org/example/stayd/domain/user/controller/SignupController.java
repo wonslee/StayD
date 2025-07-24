@@ -30,35 +30,39 @@ import static org.example.stayd.common.FXUtils.showAlert;
 public class SignupController {
 
     @FXML
-    private TextField loginIdTextField;
+    private TextField loginIdTextField;  // 사용자 아이디 입력 필드
     @FXML
-    private Label idValidationLabel;
+    private Label idValidationLabel;    // 아이디 유효성 검사 라벨
     @FXML
-    private TextField emailTextField;
+    private TextField emailTextField;   // 이메일 입력 필드
     @FXML
-    private Label emailValidationLabel;
+    private Label emailValidationLabel; // 이메일 유효성 검사 라벨
     @FXML
-    private PasswordField passwordTextField;
+    private PasswordField passwordTextField;  // 비밀번호 입력 필드
     @FXML
-    private Label passwordValidationLabel;
+    private Label passwordValidationLabel;    // 비밀번호 유효성 검사 라벨
     @FXML
-    private PasswordField passwordMatchTextField;
+    private PasswordField passwordMatchTextField; // 비밀번호 확인 필드
     @FXML
-    private Label passwordMatchValidationLabel;
+    private Label passwordMatchValidationLabel;   // 비밀번호 확인 일치 검사 라벨
     @FXML
-    private Button signUpButton;
+    private Button signUpButton;  // 회원가입 버튼
 
-    private static final Pattern MIXED_PATTERN =
+    private static final Pattern MIXED_PATTERN =  // 비밀번호 유효성 검사 정규식
             Pattern.compile("^(?=.*[A-Za-z])(?=.*\\d)(?=.*\\W).+$");
 
-    private final UserService userService = new UserService();
+    private final UserService userService = new UserService();  // 사용자 서비스 객체
 
-    private final String propertiesFile = "src/main/resources/application.properties";
+    private final String propertiesFile = "src/main/resources/application.properties";  // 이메일 설정 파일 경로
 
-    private String pendingToken;
-    private Instant tokenExpiresAt;
-    private UserDTO pendingDto;
+    private String pendingToken;  // 인증 토큰
+    private Instant tokenExpiresAt;  // 인증 토큰 만료 시간
+    private UserDTO pendingDto;  // 임시 사용자 DTO
 
+    /**
+     * 초기화 메서드
+     * - 아이디, 이메일, 비밀번호, 비밀번호 확인의 유효성 검사 및 버튼 활성화 제어
+     */
     @FXML
     public void initialize() {
         // ID 중복 검사
@@ -129,7 +133,10 @@ public class SignupController {
         });
     }
 
-    // 비밀번호 확인 일치 로직
+    /**
+     * 비밀번호 확인 일치 로직
+     * - 비밀번호와 비밀번호 확인이 일치하는지 확인
+     */
     private void validatePasswordMatch() {
         String pw = passwordTextField.getText();
         String chk = passwordMatchTextField.getText();
@@ -142,7 +149,10 @@ public class SignupController {
         }
     }
 
-    // 버튼 활성/비활성 제어
+    /**
+     * 버튼 활성화/비활성화 제어
+     * - 아이디, 이메일, 비밀번호 및 비밀번호 확인이 모두 유효한 경우에만 가입 버튼을 활성화
+     */
     private void updateSignUpEnabled() {
         boolean idOk = "사용 가능한 아이디입니다.".equals(idValidationLabel.getText());
         boolean emOk = "사용 가능한 이메일입니다.".equals(emailValidationLabel.getText());
@@ -152,6 +162,10 @@ public class SignupController {
         signUpButton.setDisable(!(idOk && emOk && pwOk && match));
     }
 
+    /**
+     * 회원가입 버튼 클릭 시 호출되는 메서드
+     * - 아이디, 이메일, 비밀번호를 검증하고, 인증 코드를 발송하며, 비밀번호를 재설정하기 위한 화면으로 전환
+     */
     @FXML
     private void onSignUp() {
 
@@ -162,6 +176,7 @@ public class SignupController {
                 passwordMatchTextField.getText(),
                 "USER"
         );
+
         try {
             userService.validateForPending(pendingDto);
         } catch (UserService.ValidationException ex) {
@@ -169,11 +184,12 @@ public class SignupController {
             return;
         }
 
-        // 인증 토큰 생성
+        // 인증 토큰 생성·만료 설정
         pendingToken = UUID.randomUUID().toString().substring(0, 8).toUpperCase();
         tokenExpiresAt = Instant.now().plus(Duration.ofMinutes(10));
         signUpButton.setDisable(true);
 
+        // 이메일 설정 파일 읽기
         Properties props = new Properties();
         try (FileInputStream fis = new FileInputStream(propertiesFile)) {
             props.load(fis);
@@ -182,6 +198,8 @@ public class SignupController {
             signUpButton.setDisable(false);
             return;
         }
+
+        // 이메일 발송
         String mailUser = props.getProperty("mail.username");
         String mailPass = props.getProperty("mail.password");
         EmailService emailService = new EmailService(mailUser, mailPass);
@@ -214,7 +232,8 @@ public class SignupController {
     }
 
     /**
-     * 인증 코드 입력/검증 후 최종 등록
+     * 인증 코드 입력 및 검증 후 회원가입 완료
+     * - 사용자에게 입력을 받아 인증하고, 회원가입을 완료
      */
     private void promptForVerification() {
         TextInputDialog dlg = new TextInputDialog();
@@ -253,6 +272,7 @@ public class SignupController {
 
     /**
      * 라벨 색 변환
+     * - 라벨 텍스트와 색상 설정
      */
     private void setLabel(Label label, String text, boolean positive) {
         label.setText(text);
@@ -261,6 +281,7 @@ public class SignupController {
 
     /**
      * 로그인 페이지 이동
+     * - 회원가입 후 로그인 페이지로 이동
      */
     @FXML
     private void goToLogin() {

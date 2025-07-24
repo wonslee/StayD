@@ -13,40 +13,54 @@ import org.example.stayd.domain.user.service.UserService;
 
 import java.io.IOException;
 
+import static org.example.stayd.common.FXUtils.showAlert;
+
 public class LoginController {
 
     @FXML
-    private TextField loginIdField;
+    private TextField loginIdField;  // 아이디 입력 필드
     @FXML
-    private PasswordField passwordField;
+    private PasswordField passwordField;  // 비밀번호 입력 필드
     @FXML
-    private Button loginButton;
+    private Button loginButton;  // 로그인 버튼
     @FXML
-    private Label messageLabel;
+    private Label messageLabel;  // 로그인 메시지 라벨
     @FXML
-    private Label findIdLabel;
+    private Label findIdLabel;  // 아이디 찾기 라벨
     @FXML
-    private Label findPwLabel;
+    private Label findPwLabel;  // 비밀번호 찾기 라벨
     @FXML
-    private Label signUpLabel;
-    private final UserService userService = new UserService();
+    private Label signUpLabel;  // 회원가입 라벨
 
+    private final UserService userService = new UserService();  // 사용자 서비스 객체
+
+    /**
+     * 링크에 마우스 오버 시 스타일 변경
+     */
     @FXML
     private void onLinkHover(MouseEvent event) {
         Label lbl = (Label) event.getSource();
         lbl.setStyle("-fx-font-weight: bold; -fx-text-fill: black; -fx-underline: true;");
     }
 
+    /**
+     * 링크에 마우스 아웃 시 스타일 변경
+     */
     @FXML
     private void onLinkExit(MouseEvent event) {
         Label lbl = (Label) event.getSource();
         lbl.setStyle("-fx-font-weight: normal; -fx-text-fill: black; -fx-underline: true;");
     }
 
+    /**
+     * 로그인 버튼 클릭 시 호출되는 메서드
+     * 1. 아이디와 비밀번호를 입력받고 유효성 검사
+     * 2. 사용자 인증을 비동기로 진행하여 UI를 차단하지 않음
+     */
     @FXML
     private void onLogin() {
-        String loginId = loginIdField.getText().trim();
-        String rawPw = passwordField.getText();
+        String loginId = loginIdField.getText().trim();  // 아이디
+        String rawPw = passwordField.getText();  // 비밀번호
 
         // 입력 빈값 검증
         if (loginId.isEmpty() || rawPw.isEmpty()) {
@@ -58,85 +72,93 @@ public class LoginController {
         loginButton.setDisable(true);
         messageLabel.setText("로그인 중…");
 
+        // 로그인 작업을 비동기적으로 처리
         Task<UserDTO> loginTask = new Task<>() {
             @Override
             protected UserDTO call() throws Exception {
-                return userService.authenticate(loginId, rawPw);
+                return userService.authenticate(loginId, rawPw);  // 사용자 인증
             }
         };
 
+        // 로그인 성공 시 사용자 정보를 세션에 저장하고 홈 화면으로 이동
         loginTask.setOnSucceeded(evt -> {
-            // 로그인 성공 시, 사용자 정보를 SessionManager에 저장
-            UserDTO user = loginTask.getValue();
-            SessionManager.getInstance().setLoggedInUser(user);  // 로그인 정보 저장
+            UserDTO user = loginTask.getValue();  // 로그인 성공한 사용자 객체
+            SessionManager.getInstance().setLoggedInUser(user);  // 로그인 정보 세션에 저장
             goToHome(user);  // 홈 화면으로 이동
         });
 
+        // 로그인 실패 시 실패 메시지 표시
         loginTask.setOnFailed(evt -> {
             Throwable ex = loginTask.getException();
-            messageLabel.setText(ex.getMessage());
-            loginButton.setDisable(false);
+            messageLabel.setText(ex.getMessage());  // 오류 메시지 표시
+            loginButton.setDisable(false);  // 로그인 버튼 재활성화
         });
 
+        // 새로운 스레드에서 로그인 작업을 시작
         new Thread(loginTask).start();
     }
 
+    /**
+     * 사용자 역할에 맞는 홈 화면으로 이동
+     * @param user 로그인한 사용자 객체
+     */
     private void goToHome(UserDTO user) {
-        Stage stage = (Stage) loginButton.getScene().getWindow(); // 로그인 버튼이 속한 Stage를 가져옴
+        Stage stage = (Stage) loginButton.getScene().getWindow();  // 로그인 버튼이 속한 Stage를 가져옴
 
-        // 사용자의 역할에 맞게 화면을 전환
+        // 사용자의 역할에 따라 화면을 전환
         if ("CAFE_OWNER".equals(user.getRole())) {
             try {
                 // CAFE_OWNER일 경우 스터디 카페 관리 화면으로 이동
                 FXUtils.switchScene(stage, SceneConfig.RESERVATION_STATUS_FXML);
             } catch (IOException e) {
-                showAlert(Alert.AlertType.ERROR, "화면 전환 오류", "스터디 카페 관리 화면을 불러오는 중 오류가 발생했습니다.");
+                showAlert(null, Alert.AlertType.ERROR, "화면 전환 오류", "스터디 카페 관리 화면을 불러오는 중 오류가 발생했습니다.");
             }
         } else {
             try {
                 // 기본 사용자일 경우 메인 화면으로 이동
                 FXUtils.switchScene(stage, SceneConfig.HOME_FXML);
             } catch (IOException e) {
-                showAlert(Alert.AlertType.ERROR, "화면 전환 오류", "메인 화면을 불러오는 중 오류가 발생했습니다.");
+                showAlert(null, Alert.AlertType.ERROR, "화면 전환 오류", "메인 화면을 불러오는 중 오류가 발생했습니다.");
             }
         }
     }
 
+    /**
+     * 회원가입 페이지로 이동
+     */
     @FXML
     private void goToSignup() {
         try {
             Stage stage = (Stage) loginButton.getScene().getWindow();
             FXUtils.switchScene(stage, SceneConfig.SIGNUP_FXML);
         } catch (IOException e) {
-            showAlert(Alert.AlertType.ERROR, "화면 전환 오류", "홈 화면으로 이동하는 중 오류가 발생했습니다.");
+            showAlert(null, Alert.AlertType.ERROR, "화면 전환 오류", "홈 화면으로 이동하는 중 오류가 발생했습니다.");
         }
     }
 
+    /**
+     * 아이디 찾기 페이지로 이동
+     */
     @FXML
     private void onFindId(MouseEvent event) {
         try {
             Stage stage = (Stage) loginButton.getScene().getWindow();
             FXUtils.switchScene(stage, SceneConfig.FIND_ID_FXML);
         } catch (IOException e) {
-            showAlert(Alert.AlertType.ERROR, "화면 전환 오류", "아이디 찾기 화면을 불러오는 중 오류가 발생했습니다.");
+            showAlert(null, Alert.AlertType.ERROR, "화면 전환 오류", "아이디 찾기 화면을 불러오는 중 오류가 발생했습니다.");
         }
     }
 
+    /**
+     * 비밀번호 찾기 페이지로 이동
+     */
     @FXML
     private void onFindPw(MouseEvent event) {
         try {
             Stage stage = (Stage) loginButton.getScene().getWindow();
             FXUtils.switchScene(stage, SceneConfig.FIND_PW_FXML);
         } catch (IOException e) {
-            showAlert(Alert.AlertType.ERROR, "화면 전환 오류", "비밀번호 찾기 화면을 불러오는 중 오류가 발생했습니다.");
+            showAlert(null, Alert.AlertType.ERROR, "화면 전환 오류", "비밀번호 찾기 화면을 불러오는 중 오류가 발생했습니다.");
         }
-    }
-
-    private void showAlert(Alert.AlertType type, String title, String msg) {
-        Alert a = new Alert(type);
-        a.setTitle(title);
-        a.setHeaderText(null);
-        a.setContentText(msg);
-        a.showAndWait();
     }
 }

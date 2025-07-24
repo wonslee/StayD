@@ -31,15 +31,30 @@ public class ReservationService {
         this.reservationDAO = new ReservationWDAO();
     }
 
-    // 날짜별 예약 현황을 가져오는 메서드
+    /**
+     * 선택한 날짜에 대한 예약 현황을 가져오는 메서드
+     *
+     * @param selectedDate 선택한 날짜 (java.sql.Date)
+     * @return 예약 현황 목록 (List<ReservationDTO>)
+     * @throws SQLException SQL 쿼리 실행 중 발생할 수 있는 예외
+     */
     public List<ReservationDTO> getReservationStatusByLoggedInUser(Date selectedDate) throws SQLException {
-        return reservationDao.getReservationStatusByLoggedInUser(selectedDate);  // 로그인한 유저의 cafe_id로 필터링된 데이터 반환
+        // 로그인한 유저의 cafe_id로 필터링된 예약 현황 데이터를 반환
+        return reservationDao.getReservationStatusByLoggedInUser(selectedDate);
     }
 
-    // 요일별 예약 현황을 가져오는 메서드
+    /**
+     * 선택한 요일에 대한 예약 현황을 가져오는 메서드
+     *
+     * @param selectedDay 선택한 요일 (예: "MON", "TUE" 등)
+     * @return 예약 현황 목록 (List<ReservationDTO>)
+     * @throws SQLException SQL 쿼리 실행 중 발생할 수 있는 예외
+     */
     public List<ReservationDTO> getReservationStatusByDay(String selectedDay) throws SQLException {
+        // 선택한 요일에 대한 예약 현황 데이터를 반환
         return reservationDao.getReservationStatusByDay(selectedDay);
     }
+
 
     /**
      * 예약 생성

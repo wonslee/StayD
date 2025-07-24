@@ -19,15 +19,15 @@ public class ReservationDao {
         this.connection = new DatabaseConnection().getConnection();
     }
 
-    // 요일별 예약 데이터를 가져오는 메서드
+    /**
+     * 요일별 예약 현황을 가져오는 메서드
+     *
+     * @param dayOfWeek 요일 (MON, TUE, ... 등)
+     * @return 예약 현황 목록
+     * @throws SQLException 데이터베이스 접근 중 발생할 수 있는 예외
+     */
     public List<ReservationDTO> getReservationStatusByDay(String dayOfWeek) throws SQLException {
         List<ReservationDTO> reservationList = new ArrayList<>();
-        UserDTO loggedInUser = SessionManager.getInstance().getLoggedInUser();
-        if (loggedInUser != null) {
-            System.out.println("Logged-in User ID: " + loggedInUser);
-        } else {
-            System.out.println("No user is logged in.");
-        }
 
         // 로그인한 유저의 user_id 가져오기
         int userId = SessionManager.getInstance().getLoggedInUser().getUser_id();
@@ -58,24 +58,21 @@ public class ReservationDao {
         return reservationList;
     }
 
-    // 날짜에 해당하는 예약 현황 조회
+    /**
+     * 날짜에 해당하는 예약 현황을 가져오는 메서드
+     *
+     * @param selectedDate 선택된 날짜
+     * @return 예약 현황 목록
+     * @throws SQLException 데이터베이스 접근 중 발생할 수 있는 예외
+     */
     public List<ReservationDTO> getReservationStatusByLoggedInUser(Date selectedDate) throws SQLException {
         List<ReservationDTO> reservationList = new ArrayList<>();
 
-        UserDTO loggedInUser = SessionManager.getInstance().getLoggedInUser();
-        if (loggedInUser != null) {
-            System.out.println("Logged-in User ID: " + loggedInUser);
-        } else {
-            System.out.println("No user is logged in.");
-        }
-
         // 로그인한 유저의 user_id 가져오기
         int userId = SessionManager.getInstance().getLoggedInUser().getUser_id();
-        System.out.println("Logged-in User ID: " + userId);
 
         // 유저의 cafe_id 가져오기
         int cafeId = getCafeIdByUserId(userId);
-        System.out.println("Cafe ID for User " + userId + ": " + cafeId);
 
         // 유효한 cafe_id가 있는 경우, 해당 cafe_id와 선택된 날짜로 예약 현황 조회
         if (cafeId != -1) {
@@ -100,32 +97,25 @@ public class ReservationDao {
         return reservationList;
     }
 
-    // 숫자를 시간으로 변환하여 Timestamp 객체로 변환하는 메서드
-    private Timestamp convertToTimestamp(int time) {
-        // 예를 들어 time=9이면 09:00:00, time=16이면 16:00:00으로 변환
-        String timeString = String.format("%02d:00:00", time); // "09:00:00" 형식으로 변환
-        try {
-            SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss");
-            java.util.Date parsedDate = format.parse(timeString);
-            return new Timestamp(parsedDate.getTime()); // Timestamp 객체로 변환
-        } catch (ParseException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    // 유저의 cafe_id를 가져오는 메서드
+    /**
+     * 로그인된 유저의 cafe_id를 가져오는 메서드
+     *
+     * @param userId 로그인된 유저의 ID
+     * @return 해당 유저의 cafe_id
+     * @throws SQLException 데이터베이스 접근 중 발생할 수 있는 예외
+     */
     private int getCafeIdByUserId(int userId) throws SQLException {
         String query = "SELECT cafe_id FROM cafe WHERE owner_id = ?";
 
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setInt(1, userId);
+
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
-                    return rs.getInt("cafe_id");
+                    return rs.getInt("cafe_id");  // cafe_id 반환
                 }
             }
         }
-        return -1; // cafe_id가 없으면 -1 반환
+        return -1; // 카페 ID를 찾을 수 없으면 -1 반환
     }
 }
