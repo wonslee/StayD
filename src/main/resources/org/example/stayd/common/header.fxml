@@ -10,24 +10,17 @@
     <children>
         <ImageView fitHeight="130.0" fitWidth="150.0" pickOnBounds="true" preserveRatio="true" style="-fx-translate-x: 50;" onMouseClicked="#goToHome">
         <image>
-            <Image url="@images/logo.png" />
+            <Image url="@/images/header/logo.png" />
         </image>
     </ImageView>
 
     <!-- 빈 공간 -->
     <Region HBox.hgrow="ALWAYS" />
 
-    <!-- 알람 아이콘: 오른쪽에 배치 -->
-    <ImageView fitHeight="130.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true" style="-fx-translate-x: -50;">
-        <image>
-            <Image url="@images/icon_notification.png" />
-        </image>
-    </ImageView>
-
     <!-- 유저 프로필 아이콘: 오른쪽에 배치 -->
     <ImageView fitHeight="130.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true" style="-fx-translate-x: -50;" onMouseClicked="#goToUserPage">
         <image>
-            <Image url="@images/icon_user_profile.png" />
+            <Image url="@/images/header/icon_user_profile.png" />
         </image>
     </ImageView>
 </children>
