@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import org.example.stayd.common.YesNullableConverter;
-import org.example.stayd.domain.reservation.model.DayOfWeek;
+import org.example.stayd.domain.cafe.model.DayOfWeek;
 import org.example.stayd.domain.reservation.model.Reservation;
 
 public class ReservationWDAO {

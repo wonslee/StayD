@@ -4,8 +4,8 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
-import java.time.Instant;
 import java.time.LocalDateTime;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -13,7 +13,6 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @Builder
-@AllArgsConstructor
 @NoArgsConstructor
 public class Cafe {
     @NotNull
@@ -45,30 +44,28 @@ public class Cafe {
 
     private LocalDateTime createdAt;
 
-    /**
-     * 복잡 제약(예: 이미지 URL 형식 등)은 필요 시 여기서 체크
-     */
-    public void validateCustom() {
-        // 예) pricePerHour 상한선 등을 코드로 제어
-    }
+    private List<OperationHours> operationHourList;
+    private List<DiscountHours> discountHourList;
 
-    public Cafe(String name,
-                String address,
-                Integer pricePerHour,
-                String description,
-                String phoneNumber,
-                String imageUrl
-    ) {
+    // constructor - call validation method
+    public Cafe(Long cafeId, Long ownerId, String name, String address, Integer pricePerHour, String description,
+                String phoneNumber, String imageUrl, LocalDateTime createdAt, List<OperationHours> operationHourList,
+                List<DiscountHours> discountHourList) {
+        this.cafeId = cafeId;
+        this.ownerId = ownerId;
         this.name = name;
         this.address = address;
         this.pricePerHour = pricePerHour;
         this.description = description;
         this.phoneNumber = phoneNumber;
         this.imageUrl = imageUrl;
+        this.createdAt = createdAt;
+        this.operationHourList = operationHourList;
+        this.discountHourList = discountHourList;
         validate();
     }
 
-    public void validate() {
+    private void validate() {
 
         if (name == null || name.length() > 50) {
             throw new IllegalArgumentException("name은 1~50자");
