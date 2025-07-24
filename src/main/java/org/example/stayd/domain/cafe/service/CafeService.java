@@ -1,6 +1,7 @@
 package org.example.stayd.domain.cafe.service;
 
 import org.example.stayd.common.DayOfWeekConverter;
+import org.example.stayd.common.SessionManager;
 import org.example.stayd.domain.cafe.dao.CafeDao;
 import org.example.stayd.domain.cafe.dto.CafeDto;
 import org.example.stayd.domain.cafe.model.CafeModel;
@@ -11,6 +12,7 @@ import java.util.List;
 
 
 import org.example.stayd.common.PerformanceMonitor;
+import org.example.stayd.domain.user.dto.UserDTO;
 
 /**
  * 스터디 카페 생성 비즈니스 로직 서비스
@@ -40,7 +42,7 @@ public class CafeService {
             validateCreateRequest(request);
 
             // TODO: 사용자 권한 확인 (CAFE_OWNER 권한인지 확인)
-            // validateCafeOwnerPermission(ownerId);
+             validateCafeOwnerPermission(ownerId);
 
             // 카페 모델 생성
             CafeModel cafe = new CafeModel(
@@ -258,16 +260,22 @@ public class CafeService {
 //    }
 
     /**
-     * 카페 오너 권한 검증 (추후 구현)
+     * 카페 오너 권한, 로그인 검증
      * @param userId 사용자 ID
      * @throws IllegalArgumentException 권한이 없는 경우
      */
     private void validateCafeOwnerPermission(Long userId) {
-        // TODO: 사용자 서비스와 연동하여 CAFE_OWNER 권한 확인
-        // UserService를 통해 사용자 역할 확인
-        // if (!userService.hasRole(userId, "CAFE_OWNER")) {
-        //     throw new IllegalArgumentException("카페 생성 권한이 없습니다. CAFE_OWNER 권한이 필요합니다.");
-        // }
+        UserDTO loggedInUser = SessionManager.getInstance().getLoggedInUser();
+
+        if (loggedInUser == null) {
+            throw new IllegalArgumentException("로그인이 필요합니다.");
+        }
+
+        String userRole = loggedInUser.getRole();
+
+        if (!"CAFE_OWNER".equals(userRole) && !"ADMIN".equals(userRole)) {
+            throw new IllegalArgumentException("카페 생성 권한이 없습니다. CAFE_OWNER 권한이 필요합니다.");
+        }
     }
 
     /**

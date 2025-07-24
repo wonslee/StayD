@@ -22,7 +22,9 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
+import org.example.stayd.common.FXUtils;
 import org.example.stayd.common.SessionManager;
+import org.example.stayd.config.SceneConfig;
 import org.example.stayd.domain.cafe.dto.CafeDto;
 import org.example.stayd.domain.cafe.service.CafeService;
 
@@ -79,11 +81,6 @@ public class CafeCreateController implements Initializable {
 
     public CafeCreateController() {
         this.cafeService = new CafeService();
-    }
-
-    // 테스트용 생성자
-    public CafeCreateController(CafeService cafeService) {
-        this.cafeService = cafeService;
     }
 
 
@@ -213,14 +210,14 @@ public class CafeCreateController implements Initializable {
     @FXML
     private void onRegisterButtonEnter(MouseEvent event) {
         registerButton.setStyle(
-                "-fx-background-color: white; -fx-font-weight: bold; -fx-background-radius: 10; -fx-font-size: 16px;");
+            "-fx-background-color: white; -fx-font-weight: bold; -fx-background-radius: 10; -fx-font-size: 16px;");
     }
 
     // 등록 버튼 마우스 나가기
     @FXML
     private void onRegisterButtonExit(MouseEvent event) {
         registerButton.setStyle(
-                "-fx-background-color: white; -fx-font-weight: bold; -fx-background-radius: 10; -fx-font-size: 14px;");
+            "-fx-background-color: white; -fx-font-weight: bold; -fx-background-radius: 10; -fx-font-size: 14px;");
     }
 
     // 카페 생성 버튼 클릭 (백엔드 연동)
@@ -240,15 +237,16 @@ public class CafeCreateController implements Initializable {
             if (response.isSuccess()) {
                 // 성공 시
                 showAlert(Alert.AlertType.INFORMATION, "생성 성공",
-                        "카페 ID: " + response.getCafeId() + "\n" + response.getMessage());
+                    "카페 ID: " + response.getCafeId() + "\n" + response.getMessage());
                 clearForm();
 
             } else {
                 // 실패 시
                 showAlert(Alert.AlertType.ERROR, "생성 실패", response.getMessage());
             }
-            // reservationStatus.fxml로 화면 이동
-            navigateToReservationStatus(event);
+            // FXUtils로 페이지 이동
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            FXUtils.navigateToPage(stage, SceneConfig.RESERVATION_STATUS_FXML, "페이지 이동");
         } catch (Exception e) {
             e.printStackTrace();
             showAlert(Alert.AlertType.ERROR, "오류 발생", "예상치 못한 오류가 발생했습니다: " + e.getMessage());
@@ -310,8 +308,8 @@ public class CafeCreateController implements Initializable {
      */
     private void resetDayButtons() {
         ToggleButton[] dayButtons = {
-                mondayButton, tuesdayButton, wednesdayButton, thursdayButton,
-                fridayButton, saturdayButton, sundayButton
+            mondayButton, tuesdayButton, wednesdayButton, thursdayButton,
+            fridayButton, saturdayButton, sundayButton
         };
 
         for (ToggleButton button : dayButtons) {
@@ -333,26 +331,5 @@ public class CafeCreateController implements Initializable {
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
-    }
-
-    // 화면 이동 메서드
-    private void navigateToReservationStatus(ActionEvent event) {
-        try {
-            // FXML 파일 로드 (경로는 실제 파일 위치에 맞게 수정)
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/stayd/reservation/reservationStatus.fxml"));
-            Parent root = loader.load();
-
-            // 현재 Stage 가져오기
-            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-
-            // 새로운 Scene 생성 및 설정
-            Scene scene = new Scene(root);
-            stage.setScene(scene);
-            stage.show();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-            showAlert(Alert.AlertType.ERROR, "화면 이동 오류", "화면을 불러올 수 없습니다: " + e.getMessage());
-        }
     }
 }
