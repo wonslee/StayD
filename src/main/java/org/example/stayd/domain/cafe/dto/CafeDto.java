@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.List;
+import org.example.stayd.domain.reservation.dto.ReservationWithCafeDTO;
 
 /**
  * 스터디 카페 생성을 위한 DTO 클래스
@@ -135,6 +136,21 @@ public class CafeDto {
             this.operatingEndHour = operatingEndHour;
         }
 
+        @Override
+        public String toString() {
+            return "DetailResponse{" +
+                    "cafeId=" + cafeId +
+                    ", name='" + name + '\'' +
+                    ", address='" + address + '\'' +
+                    ", pricePerHour=" + pricePerHour +
+                    ", description='" + description + '\'' +
+                    ", phoneNumber='" + phoneNumber + '\'' +
+                    ", imageUrl='" + imageUrl + '\'' +
+                    ", operatingDays=" + operatingDays +
+                    ", operatingStartHour=" + operatingStartHour +
+                    ", operatingEndHour=" + operatingEndHour +
+                    '}';
+        }
     }
 
 

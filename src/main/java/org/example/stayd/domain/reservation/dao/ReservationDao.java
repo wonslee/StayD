@@ -104,6 +104,17 @@ public class ReservationDao {
     }
 
     /**
+     * 예약 ID로 예약을 삭제하는 메서드
+     */
+    public void deleteById(long reservationId) throws SQLException {
+        String sql = "DELETE FROM reservation WHERE reservation_id = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setLong(1, reservationId);
+            stmt.executeUpdate();
+        }
+    }
+
+    /**
      * 로그인된 유저의 cafe_id를 가져오는 메서드
      *
      * @param userId 로그인된 유저의 ID
