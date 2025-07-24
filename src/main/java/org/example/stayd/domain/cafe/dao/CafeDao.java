@@ -1,16 +1,22 @@
 package org.example.stayd.domain.cafe.dao;
 
+import java.sql.CallableStatement;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.sql.Types;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import org.example.stayd.common.DatabaseConnection;
 import org.example.stayd.common.DayOfWeekConverter;
 import org.example.stayd.domain.cafe.dto.CafeDto;
 import org.example.stayd.domain.cafe.model.CafeModel;
-
-import java.sql.*;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.sql.CallableStatement;
-import java.sql.Types;
+import org.example.stayd.domain.cafe.model.DayOfWeek;
+import org.example.stayd.domain.cafe.model.DiscountHours;
+import org.example.stayd.domain.cafe.model.OperationHours;
 
 /**
  * 스터디 카페 데이터 접근 객체
@@ -22,9 +28,11 @@ public class CafeDao {
     public CafeDao() {
         this.databaseConnection = new DatabaseConnection();
     }
+
     /**
      * 스터디 카페 생성 (PL/SQL 프로시저 사용 - 수정 버전)
-     * @param cafe 생성할 카페 정보
+     *
+     * @param cafe           생성할 카페 정보
      * @param operatingHours 운영시간 목록
      * @return 생성된 카페 ID
      * @throws SQLException SQL 예외
@@ -58,7 +66,8 @@ public class CafeDao {
                 if (!operatingHours.isEmpty()) {
                     cstmt.setInt(9, operatingHours.get(0).getOperationStart());
                     cstmt.setInt(10, operatingHours.get(0).getOperationEnd());
-                    System.out.println("operatingHours: " + operatingHours.get(0).getOperationStart() + ":00 - " + operatingHours.get(0).getOperationEnd() + ":00");
+                    System.out.println("operatingHours: " + operatingHours.get(0).getOperationStart() + ":00 - "
+                            + operatingHours.get(0).getOperationEnd() + ":00");
                 } else {
                     throw new SQLException("Operating time is not set.");
                 }
@@ -96,6 +105,7 @@ public class CafeDao {
 
     /**
      * 운영시간 목록을 영어 요일 문자열로 변환 ("MON,TUE,WED,THU,FRI")
+     *
      * @param operatingHours 운영시간 목록 (한글 요일 포함)
      * @return 쉼표로 구분된 영어 요일 문자열
      */
@@ -126,16 +136,17 @@ public class CafeDao {
 
     /**
      * 운영시간 등록
-     * @param connection DB 연결
-     * @param cafeId 카페 ID
+     *
+     * @param connection     DB 연결
+     * @param cafeId         카페 ID
      * @param operatingHours 운영시간 목록
      * @throws SQLException SQL 예외
      */
-    private void insertOperatingHours(Connection connection, Long cafeId, List<CafeDto.OperatingHours> operatingHours) throws SQLException {
+    private void insertOperatingHours(Connection connection, Long cafeId, List<CafeDto.OperatingHours> operatingHours)
+            throws SQLException {
         String sql = "INSERT INTO OPERATION_HOURS (cafe_id, day_of_week, operation_start, operation_end, created_at) VALUES (?, ?, ?, ?, ?)";
         System.out.println(">>> 연결된 사용자: " + connection.getMetaData().getUserName());
         System.out.println(">>> INSERT SQL: " + sql);
-
 
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
 
@@ -154,6 +165,7 @@ public class CafeDao {
 
     /**
      * 요일 문자열을 DB 형식으로 변환 (한글 그대로 저장)
+     *
      * @param dayInKorean 한글 요일 (월, 화, 수, 목, 금, 토, 일)
      * @return 한글 요일 그대로 반환
      */
@@ -170,19 +182,19 @@ public class CafeDao {
 
         // 요일 순서를 보장하는 SQL (월요일부터 일요일 순서)
         String opSql = """
-        SELECT * FROM operation_hours 
-        WHERE cafe_id = ? 
-        ORDER BY 
-            CASE day_of_week 
-                WHEN 'MON' THEN 1
-                WHEN 'TUE' THEN 2  
-                WHEN 'WED' THEN 3
-                WHEN 'THU' THEN 4
-                WHEN 'FRI' THEN 5
-                WHEN 'SAT' THEN 6
-                WHEN 'SUN' THEN 7
-            END
-        """;
+                SELECT * FROM operation_hours 
+                WHERE cafe_id = ? 
+                ORDER BY 
+                    CASE day_of_week 
+                        WHEN 'MON' THEN 1
+                        WHEN 'TUE' THEN 2  
+                        WHEN 'WED' THEN 3
+                        WHEN 'THU' THEN 4
+                        WHEN 'FRI' THEN 5
+                        WHEN 'SAT' THEN 6
+                        WHEN 'SUN' THEN 7
+                    END
+                """;
 
         try (Connection conn = databaseConnection.getConnection();
              PreparedStatement cafeStmt = conn.prepareStatement(cafeSql);
@@ -198,8 +210,6 @@ public class CafeDao {
                 System.out.println("No result");
                 throw new SQLException("Not find cafe with id: " + cafeId);
             }
-
-            System.out.println("카페 찾음!");
 
             // 카페 기본 정보 추출
             String name = cafeRs.getString("name");
@@ -224,16 +234,18 @@ public class CafeDao {
 
                 System.out.println("DB에서 조회된 요일 변환 (순서대로): " + englishDay + " → " + koreanDay);
 
-                if (start == null) start = opRs.getInt("operation_start");
-                if (end == null) end = opRs.getInt("operation_end");
+                if (start == null) {
+                    start = opRs.getInt("operation_start");
+                }
+                if (end == null) {
+                    end = opRs.getInt("operation_end");
+                }
             }
 
-            System.out.println("최종 요일 순서: " + koreanDays);
-
-            return new CafeDto.DetailResponse(cafeId, name, address, pricePerHour, description, phone, imageUrl, koreanDays, start, end);
+            return new CafeDto.DetailResponse(cafeId, name, address, pricePerHour, description, phone, imageUrl,
+                    koreanDays, start, end);
         }
     }
-
 
 
     /**
@@ -241,13 +253,13 @@ public class CafeDao {
      */
     public CafeDto.SimpleCafeDto findCafeById(int cafeId) throws SQLException {
         String sql = """
-        SELECT c.cafe_id, c.name, c.address, c.price_per_hour, c.description, 
-               c.phone_number, c.image_url,
-               0.0 as avg_rating,
-               0 as review_count
-        FROM cafe c
-        WHERE c.cafe_id = ?
-        """;
+                SELECT c.cafe_id, c.name, c.address, c.price_per_hour, c.description, 
+                       c.phone_number, c.image_url,
+                       0.0 as avg_rating,
+                       0 as review_count
+                FROM cafe c
+                WHERE c.cafe_id = ?
+                """;
 
         try (Connection conn = databaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -280,12 +292,14 @@ public class CafeDao {
 
         return null;
     }
+
     /**
      * 카페 검색 (PL/SQL 함수 사용)
-     * @param keyword 검색 키워드 (null이면 전체 조회)
+     *
+     * @param keyword      검색 키워드 (null이면 전체 조회)
      * @param sortByRating true: 평점순, false: 최신순
-     * @param pageNum 페이지 번호 (1부터 시작)
-     * @param pageSize 페이지 크기 (기본 8개)
+     * @param pageNum      페이지 번호 (1부터 시작)
+     * @param pageSize     페이지 크기 (기본 8개)
      * @return 검색된 카페 목록
      * @throws SQLException SQL 예외
      */
@@ -339,9 +353,6 @@ public class CafeDao {
                         cafes.add(cafe);
                     }
                 }
-
-                System.out.println("PL/SQL Search!");
-
             }
 
         } finally {
@@ -357,6 +368,7 @@ public class CafeDao {
 
     /**
      * 전체 카페 조회 (PL/SQL 함수 사용)
+     *
      * @param sortByRating true: 평점순, false: 최신순
      * @return 카페 목록
      * @throws SQLException SQL 예외
@@ -368,12 +380,14 @@ public class CafeDao {
 
     /**
      * 카페 이름으로 검색 (PL/SQL 함수 사용)
-     * @param keyword 검색 키워드
+     *
+     * @param keyword      검색 키워드
      * @param sortByRating true: 평점순, false: 최신순
      * @return 검색된 카페 목록
      * @throws SQLException SQL 예외
      */
-    public List<CafeDto.SimpleCafeDto> searchCafesByNameWithPLSQL(String keyword, boolean sortByRating) throws SQLException {
+    public List<CafeDto.SimpleCafeDto> searchCafesByNameWithPLSQL(String keyword, boolean sortByRating)
+            throws SQLException {
         // 첫 번째 페이지의 큰 사이즈로 검색 (실제로는 페이징 처리 권장)
         return searchCafesWithPLSQL(keyword, sortByRating, 1, 100);
     }
@@ -383,20 +397,20 @@ public class CafeDao {
      */
     private String getOperatingHoursString(int cafeId) throws SQLException {
         String sql = """
-        SELECT day_of_week, operation_start, operation_end 
-        FROM operation_hours 
-        WHERE cafe_id = ? 
-        ORDER BY 
-            CASE day_of_week 
-                WHEN 'MON' THEN 1
-                WHEN 'TUE' THEN 2  
-                WHEN 'WED' THEN 3
-                WHEN 'THU' THEN 4
-                WHEN 'FRI' THEN 5
-                WHEN 'SAT' THEN 6
-                WHEN 'SUN' THEN 7
-            END
-        """;
+                SELECT day_of_week, operation_start, operation_end 
+                FROM operation_hours 
+                WHERE cafe_id = ? 
+                ORDER BY 
+                    CASE day_of_week 
+                        WHEN 'MON' THEN 1
+                        WHEN 'TUE' THEN 2  
+                        WHEN 'WED' THEN 3
+                        WHEN 'THU' THEN 4
+                        WHEN 'FRI' THEN 5
+                        WHEN 'SAT' THEN 6
+                        WHEN 'SUN' THEN 7
+                    END
+                """;
 
         StringBuilder sb = new StringBuilder();
 
@@ -407,7 +421,9 @@ public class CafeDao {
 
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
-                    if (sb.length() > 0) sb.append(",");
+                    if (sb.length() > 0) {
+                        sb.append(",");
+                    }
                     sb.append(rs.getString("day_of_week"))
                             .append(":")
                             .append(String.format("%02d:00-%02d:00",
@@ -421,11 +437,14 @@ public class CafeDao {
     }
 
     // extractOperatingDays 메서드도 수정
+
     /**
      * 운영일 추출 (영어 → 한글 변환)
      */
     private String extractOperatingDays(String operatingInfo) {
-        if (operatingInfo == null || operatingInfo.isEmpty()) return "";
+        if (operatingInfo == null || operatingInfo.isEmpty()) {
+            return "";
+        }
 
         StringBuilder koreanDays = new StringBuilder();
         String[] parts = operatingInfo.split(",");
@@ -433,7 +452,9 @@ public class CafeDao {
         for (String part : parts) {
             String[] dayHour = part.split(":");
             if (dayHour.length >= 1) {
-                if (koreanDays.length() > 0) koreanDays.append(",");
+                if (koreanDays.length() > 0) {
+                    koreanDays.append(",");
+                }
 
                 String englishDay = dayHour[0].trim();
                 String koreanDay = DayOfWeekConverter.toKorean(englishDay);
@@ -483,11 +504,13 @@ public class CafeDao {
 
     /**
      * 카페 정보 수정
-     * @param request 수정 요청 정보
+     *
+     * @param request        수정 요청 정보
      * @param operatingHours 운영시간 목록
      * @throws SQLException SQL 예외
      */
-    public void updateCafe(CafeDto.UpdateRequest request, List<CafeDto.OperatingHours> operatingHours) throws SQLException {
+    public void updateCafe(CafeDto.UpdateRequest request, List<CafeDto.OperatingHours> operatingHours)
+            throws SQLException {
         Connection connection = databaseConnection.getConnection();
 
         try {
@@ -526,17 +549,18 @@ public class CafeDao {
 
     /**
      * 카페 정보만 수정
+     *
      * @param connection DB 연결
-     * @param request 수정 요청
+     * @param request    수정 요청
      * @throws SQLException SQL 예외
      */
     private void updateCafeInfo(Connection connection, CafeDto.UpdateRequest request) throws SQLException {
         String sql = """
-        UPDATE cafe 
-        SET name = ?, address = ?, price_per_hour = ?, description = ?, 
-            phone_number = ?, image_url = ?
-        WHERE cafe_id = ?
-        """;
+                UPDATE cafe 
+                SET name = ?, address = ?, price_per_hour = ?, description = ?, 
+                    phone_number = ?, image_url = ?
+                WHERE cafe_id = ?
+                """;
 
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setString(1, request.getName().trim());
@@ -555,11 +579,11 @@ public class CafeDao {
     }
 
 
-
     /**
      * 기존 운영시간 삭제
+     *
      * @param connection DB 연결
-     * @param cafeId 카페 ID
+     * @param cafeId     카페 ID
      * @throws SQLException SQL 예외
      */
     private void deleteOperatingHours(Connection connection, Long cafeId) throws SQLException {
@@ -573,7 +597,8 @@ public class CafeDao {
 
     /**
      * 카페 삭제 (PL/SQL 프로시저 사용)
-     * @param cafeId 삭제할 카페 ID
+     *
+     * @param cafeId  삭제할 카페 ID
      * @param ownerId 소유자 ID
      * @throws SQLException SQL 예외
      */
@@ -641,6 +666,7 @@ public class CafeDao {
 
     /**
      * 카페 소유자 확인
+     *
      * @param cafeId 카페 ID
      * @param userId 사용자 ID
      * @return 소유자 여부
@@ -665,6 +691,42 @@ public class CafeDao {
         return false;
     }
 
+    public List<OperationHours> getOperationHours(long cafeId) throws SQLException {
+        String sql = "SELECT day_of_week, operation_start, operation_end FROM operation_hours WHERE cafe_id = ?";
+        try (Connection conn = databaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setLong(1, cafeId);
+            ResultSet rs = pstmt.executeQuery();
+            List<OperationHours> result = new ArrayList<>();
+            while (rs.next()) {
+                result.add(new OperationHours(
+                        DayOfWeek.from(rs.getString("day_of_week")),
+                        rs.getInt("operation_start"),
+                        rs.getInt("operation_end")
+                ));
+            }
+            return result;
+        }
+    }
+
+    public List<DiscountHours> getDiscountHours(long cafeId) throws SQLException {
+        String sql = "SELECT day_of_week, discount_start, discount_end, discount_rate FROM discount_hours WHERE cafe_id = ?";
+        try (Connection conn = databaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setLong(1, cafeId);
+            ResultSet rs = pstmt.executeQuery();
+            List<DiscountHours> result = new ArrayList<>();
+            while (rs.next()) {
+                result.add(new DiscountHours(
+                        DayOfWeek.from(rs.getString("day_of_week")),
+                        rs.getInt("discount_start"),
+                        rs.getInt("discount_end"),
+                        rs.getInt("discount_rate")
+                ));
+            }
+            return result;
+        }
+    }
     /**
      * 특정 오너의 가장 최신 카페 ID 조회
      * @param ownerId 카페 오너 ID
