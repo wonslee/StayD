@@ -6,6 +6,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Button;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
@@ -112,5 +113,34 @@ public class ReviewItemCellController {
         error.setHeaderText(null);
         error.setContentText(msg);
         error.showAndWait();
+    }
+
+    // 버튼 호버 효과들
+    @FXML
+    private void onModifyButtonEnter(MouseEvent event) {
+        editReviewButton.setStyle(
+                "-fx-background-color: #4caf4f; -fx-font-weight: bold; -fx-background-radius: 10;");
+        editReviewButton.setTextFill(javafx.scene.paint.Color.WHITE);
+    }
+
+    @FXML
+    private void onModifyButtonExit(MouseEvent event) {
+        editReviewButton.setStyle(
+                "-fx-background-color: white; -fx-font-weight: bold; -fx-background-radius: 10;");
+        editReviewButton.setTextFill(javafx.scene.paint.Color.web("#4caf4f"));
+    }
+
+    @FXML
+    private void onDeleteButtonEnter(MouseEvent event) {
+        deleteReviewButton.setStyle(
+                "-fx-background-color: #ff6b6b; -fx-font-weight: bold; -fx-background-radius: 10; ");
+        deleteReviewButton.setTextFill(javafx.scene.paint.Color.WHITE);
+    }
+
+    @FXML
+    private void onDeleteButtonExit(MouseEvent event) {
+        deleteReviewButton.setStyle(
+                "-fx-background-color: white; -fx-font-weight: bold; -fx-background-radius: 10;");
+        deleteReviewButton.setTextFill(javafx.scene.paint.Color.web("#ff6b6b"));
     }
 }

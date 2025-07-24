@@ -164,7 +164,7 @@ public class ReservationStatusDayController {
      * 예약 건수에 따라 색상을 다르게 표시 (예: 예약 건수가 많으면 빨간색, 적으면 대표 색)
      */
     private Color getColorBasedOnCount(int count) {
-        if (count > 3) {
+        if (count > 10) {
             return Color.web("#4CAF4F"); // 예약 건수 5건 이상 빨간색
         } else {
             return Color.web("#A8D6AA"); // 평소엔 stayD 대표색
