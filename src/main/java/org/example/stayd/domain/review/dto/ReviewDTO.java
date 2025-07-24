@@ -7,7 +7,7 @@ public class ReviewDTO {
     private long reservationId;
     private long cafeId;
     private long userId;
-
+    private String loginId;
     private String cafeName; // 화면에 표시용 (조인 또는 서비스단에서 세팅)
     private int rating;
     private String content;
@@ -81,4 +81,12 @@ public class ReviewDTO {
     public void setReviewCreatedAt(LocalDateTime reviewCreatedAt) {
         this.reviewCreatedAt = reviewCreatedAt;
     }
+    public String getLoginId() {
+        return loginId;
+    }
+
+    public void setLoginId(String loginId) {
+        this.loginId = loginId;
+    }
+
 }

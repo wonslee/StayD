@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox xmlns:fx="http://javafx.com/fxml"
+      fx:controller="org.example.stayd.domain.review.controller.ReviewListController"
+      spacing="15" alignment="TOP_LEFT"
+      prefWidth="600"
+      style="-fx-padding: 20; -fx-background-color: white;">
+
+    <!-- 평균 평점 표시 -->
+    <Label fx:id="averageRatingLabel"
+           style="-fx-font-size: 18; -fx-font-weight: bold;" />
+
+    <!-- 리뷰 리스트 -->
+    <ListView fx:id="reviewListView"
+              prefHeight="400"
+              style="-fx-background-color: transparent;"/>
+</VBox>

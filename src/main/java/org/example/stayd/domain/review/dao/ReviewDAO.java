@@ -1,10 +1,13 @@
 package org.example.stayd.domain.review.dao;
 
 import org.example.stayd.common.YesNullableConverter;
+import org.example.stayd.domain.review.dto.ReviewListDTO;
 
 import java.sql.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ReviewDAO {
 //리뷰 등록
@@ -62,4 +65,60 @@ public class ReviewDAO {
         }
         return false;
     }
+    public List<ReviewListDTO> findReviewsByCafeId(Connection conn, long cafeId) throws SQLException {
+        String sql = """
+        SELECT r.user_id, u.login_id, r.rating, r.content, r.review_created_at
+        FROM reservation r
+        JOIN users u ON r.user_id = u.user_id
+        WHERE r.cafe_id = ?
+          AND r.rating IS NOT NULL
+          AND r.content IS NOT NULL
+        ORDER BY r.review_created_at DESC
+    """;
+
+        List<ReviewListDTO> list = new ArrayList<>();
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setLong(1, cafeId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+//                    ReviewListDTO dto = ReviewListDTO.builder()
+//                            .userId(rs.getLong("user_id"))
+//                            .rating(rs.getInt("rating"))
+//                            .content(rs.getString("content"))
+//                            .reviewCreatedAt(rs.getTimestamp("review_created_at").toLocalDateTime())
+//                            .build();
+//                    dto.setLoginId(rs.getString("login_id"));  // ⚠️ builder 안에 없어서 setter 따로 호출
+//                    list.add(dto);
+                    ReviewListDTO dto = new ReviewListDTO();
+                    dto.setUserId(rs.getLong("user_id"));
+                    dto.setRating(rs.getInt("rating"));
+                    dto.setContent(rs.getString("content"));
+                    dto.setReviewCreatedAt(rs.getTimestamp("review_created_at").toLocalDateTime());
+                    dto.setLoginId(rs.getString("login_id"));
+                    list.add(dto);
+                }
+            }
+        }
+        return list;
+    }
+    public double findAverageRatingByCafeId(Connection conn, long cafeId) throws SQLException {
+        String sql = """
+        SELECT AVG(rating) AS avg_rating
+        FROM reservation
+        WHERE cafe_id = ?
+          AND rating IS NOT NULL
+    """;
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setLong(1, cafeId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getDouble("avg_rating");
+                }
+            }
+        }
+
+        return 0.0;
+    }
+
 }
