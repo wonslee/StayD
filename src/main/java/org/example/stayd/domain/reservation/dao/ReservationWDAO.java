@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Optional;
 import org.example.stayd.common.YesNullableConverter;
 import org.example.stayd.domain.cafe.model.DayOfWeek;
+import org.example.stayd.domain.reservation.dto.ReservationWithCafeDTO;
 import org.example.stayd.domain.reservation.model.Reservation;
 
 public class ReservationWDAO {
@@ -138,6 +139,7 @@ public class ReservationWDAO {
                 SELECT reservation_id,
                        user_id,
                        cafe_id,
+                       reservation_date,  
                        usage_started_at,
                        usage_ended_at,
                        day_of_week,
@@ -161,24 +163,78 @@ public class ReservationWDAO {
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     Reservation reservation = Reservation.builder()
-                            .reservationId(rs.getLong("RESERVATION_ID"))
-                            .userId(rs.getLong("USER_ID"))
-                            .cafeId(rs.getLong("CAFE_ID"))
-                            .reservationDate(rs.getDate("RESERVATION_DATE").toLocalDate())
-                            .usageStartedAt(rs.getInt("USAGE_STARTED_AT"))
-                            .usageEndedAt(rs.getInt("USAGE_ENDED_AT"))
-                            .dayOfWeek(DayOfWeek.from(rs.getString("DAY_OF_WEEK")))
-                            .originalPrice(rs.getInt("ORIGINAL_PRICE"))
-                            .discountPrice(rs.getInt("DISCOUNT_PRICE"))
+                            .reservationId(rs.getLong("reservation_id"))
+                            .userId(rs.getLong("user_id"))
+                            .cafeId(rs.getLong("cafe_id"))
+                            .reservationDate(rs.getDate("reservation_date").toLocalDate())
+                            .usageStartedAt(rs.getInt("usage_started_at"))
+                            .usageEndedAt(rs.getInt("usage_ended_at"))
+                            .dayOfWeek(DayOfWeek.from(rs.getString("day_of_week")))
+                            .originalPrice(rs.getInt("original_price"))
+                            .discountPrice(rs.getInt("discount_price"))
                             .createdAt(rs.getTimestamp("created_at").toLocalDateTime())
-                            .isCanceled(YesNullableConverter.toBoolean(rs.getString("IS_CANCELED")))
-                            .canceledAt(rs.getTimestamp("CANCELED_AT").toLocalDateTime())
-                            .rating(rs.getInt("RATING"))
-                            .content(rs.getString("CONTENT"))
-                            .reviewCreatedAt(rs.getTimestamp("REVIEW_CREATED_AT").toLocalDateTime())
+                            .isCanceled(YesNullableConverter.toBoolean(rs.getString("is_canceled")))
+                            .canceledAt(rs.getTimestamp("canceled_at") == null ? null : rs.getTimestamp("canceled_at").toLocalDateTime())
+                            .rating(rs.getInt("rating"))
+                            .content(rs.getString("content"))
+                            .reviewCreatedAt(rs.getTimestamp("review_created_at") == null ? null : rs.getTimestamp("review_created_at").toLocalDateTime())
                             .build();
                     list.add(reservation);
 
+                }
+            }
+        }
+        return list;
+    }
+// ReservationWDAO.java
+    public List<ReservationWithCafeDTO> findWithCafeByUser(Connection conn, long userId) throws SQLException {
+        String sql = """
+        SELECT r.reservation_id,
+               r.user_id,
+               r.cafe_id,
+               r.reservation_date,
+               r.usage_started_at,
+               r.usage_ended_at,
+               r.day_of_week,
+               r.original_price,
+               r.discount_price,
+               r.created_at,
+               r.is_canceled,
+               r.canceled_at,
+               r.rating,
+               r.content,
+               r.review_created_at,
+               c.name AS cafe_name
+        FROM reservation r
+        JOIN cafe c ON r.cafe_id = c.cafe_id
+        WHERE r.user_id = ?
+        ORDER BY r.created_at DESC
+    """;
+
+        List<ReservationWithCafeDTO> list = new ArrayList<>();
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setLong(1, userId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    ReservationWithCafeDTO dto = ReservationWithCafeDTO.builder()
+                            .reservationId(rs.getLong("reservation_id"))
+                            .userId(rs.getLong("user_id"))
+                            .cafeId(rs.getLong("cafe_id"))
+                            .reservationDate(rs.getDate("reservation_date").toLocalDate())
+                            .usageStartedAt(rs.getInt("usage_started_at"))
+                            .usageEndedAt(rs.getInt("usage_ended_at"))
+                            .dayOfWeek(rs.getString("day_of_week"))
+                            .originalPrice(rs.getInt("original_price"))
+                            .discountPrice(rs.getInt("discount_price"))
+                            .createdAt(rs.getTimestamp("created_at").toLocalDateTime())
+                            .isCanceled(YesNullableConverter.toBoolean(rs.getString("is_canceled")))
+                            .canceledAt(rs.getTimestamp("canceled_at") == null ? null : rs.getTimestamp("canceled_at").toLocalDateTime())
+                            .rating(rs.getInt("rating"))
+                            .content(rs.getString("content"))
+                            .reviewCreatedAt(rs.getTimestamp("review_created_at") == null ? null : rs.getTimestamp("review_created_at").toLocalDateTime())
+                            .cafeName(rs.getString("cafe_name"))
+                            .build();
+                    list.add(dto);
                 }
             }
         }

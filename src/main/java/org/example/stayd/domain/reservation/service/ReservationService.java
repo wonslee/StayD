@@ -20,7 +20,7 @@ import org.example.stayd.domain.reservation.model.Seat;
 
 public class ReservationService {
 
-//    TODO: reservationDAO 하나로 합치기
+    //    TODO: reservationDAO 하나로 합치기
     private final ReservationDao reservationDao;
     private final ReservationWDAO reservationDAO;
     private final SeatDAO seatDAO = new SeatDAO();
