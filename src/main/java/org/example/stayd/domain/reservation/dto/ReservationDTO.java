@@ -55,6 +55,25 @@ public class ReservationDTO {
                 .build();
     }
 
+    public static ReservationDTO of(ReservationWithCafeDTO reservation) {
+        return ReservationDTO.builder()
+                .reservationId(reservation.getReservationId())
+                .userId(reservation.getUserId())
+                .cafeId(reservation.getCafeId())
+                .reservationDate(reservation.getReservationDate())
+                .usageStartedAt(reservation.getUsageStartedAt())
+                .usageEndedAt(reservation.getUsageEndedAt())
+                .dayOfWeek(DayOfWeek.from(reservation.getDayOfWeek()))
+                .originalPrice(reservation.getOriginalPrice())
+                .discountPrice(reservation.getDiscountPrice())
+                .createdAt(reservation.getCreatedAt())
+                .canceledAt(reservation.getCanceledAt())
+                .rating(reservation.getRating())
+                .content(reservation.getContent())
+                .reviewCreatedAt(reservation.getReviewCreatedAt())
+                .build();
+    }
+
     @Override
     public String toString() {
         return "ReservationDTO{" +

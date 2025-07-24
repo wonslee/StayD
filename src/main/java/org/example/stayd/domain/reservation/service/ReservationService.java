@@ -117,9 +117,9 @@ public class ReservationService {
                 System.out.println("reservation.getOriginalPrice() = " + reservation.getOriginalPrice());
                 System.out.println("reservation.getReservationDate() = " + reservation.getReservationDate());
                 // 3) 예약 INSERT
-                long newId = reservationDAO.create(conn, reservation);
+                long newId = reservationDAO.create(reservation);
 
-                Optional<Reservation> optionalReservation = reservationDAO.findById(conn, newId);
+                Optional<Reservation> optionalReservation = reservationDAO.findById(newId);
                 if (optionalReservation.isEmpty()) {
                     throw new IllegalStateException("예약 생성 상태 비정상");
                 } else {
@@ -143,7 +143,30 @@ public class ReservationService {
     }
 
     /**
-     * 특정 유저 예약 목록
+     * 예약 상세 조회
      */
+    public ReservationDTO getReservationDetail(long reservationId) throws SQLException {
+        Optional<Reservation> reservationOpt = reservationDAO.findById(reservationId);
+        if (reservationOpt.isEmpty()) return null;
+        return ReservationDTO.of(reservationOpt.get());
+    }
 
+    /**
+     * 예약 삭제 (존재, 권한, 상태 체크 포함)
+     */
+    public void deleteReservation(long reservationId, long userId) throws SQLException {
+        Optional<Reservation> reservationOpt = reservationDAO.findById(reservationId);
+        if (reservationOpt.isEmpty()) {
+            throw new IllegalArgumentException("예약이 존재하지 않습니다.");
+        }
+        Reservation reservation = reservationOpt.get();
+        if (reservation.isCanceled()) {
+            throw new IllegalStateException("이미 취소된 예약입니다.");
+        }
+        if (!reservation.getUserId().equals(userId)) {
+            throw new SecurityException("본인 예약만 취소할 수 있습니다.");
+        }
+        // 실제 삭제
+        reservationDao.deleteById(reservationId);
+    }
 }
