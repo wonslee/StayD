@@ -7,6 +7,7 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 import org.example.stayd.config.SceneConfig;
@@ -115,20 +116,22 @@ public class NavbarController {
     }
 
     /**
-     * 마우스가 버튼 위에 올라갔을 때 색상 변경
+     * 마우스가 버튼 위에 올라갔을 때 언더바 생성, 글자 확대
      * @param event MouseEvent
      */
     @FXML
     private void handleMouseEnter(MouseEvent event) {
-        FXUtils.handleMouseEnter(event); // FXUtils에서 처리
+        Button button = (Button) event.getSource(); // 이벤트가 발생한 버튼 객체를 가져옴
+        button.setStyle("-fx-font-size: 15px; -fx-underline: true; -fx-text-fill: #4CAF4F; -fx-background-color: white;");
     }
 
     /**
-     * 마우스가 버튼을 벗어났을 때 원래 색상으로 복원
+     * 마우스가 버튼을 벗어났을 때 원래 상태로 복원
      * @param event MouseEvent
      */
     @FXML
     private void handleMouseExit(MouseEvent event) {
-        FXUtils.handleMouseExit(event); // FXUtils에서 처리
+        Button button = (Button) event.getSource(); // 이벤트가 발생한 버튼 객체를 가져옴
+        button.setStyle("-fx-font-size: 13px; -fx-underline: false; -fx-text-fill: #4CAF4F; -fx-background-color: white;");
     }
 }

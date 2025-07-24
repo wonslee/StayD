@@ -4,25 +4,30 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.text.Font?>
 
-<HBox alignment="CENTER" prefHeight="30" prefWidth="1024.0" spacing="10" style="-fx-background-color:white" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/24.0.1" fx:controller="org.example.stayd.common.NavbarController">
-    <Button onAction="#goToCafeCreate" onMouseEntered="#handleMouseEnter" onMouseExited="#handleMouseExit" prefWidth="190" style="-fx-background-color: #A8D6AA; -fx-background-radius: 10;" text="카페 생성" textFill="WHITE">
+<?import javafx.scene.layout.Region?>
+<HBox alignment="CENTER" prefHeight="30" prefWidth="1024.0" spacing="10" style="-fx-background-color:white" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.stayd.common.NavbarController">
+    <Button onAction="#goToCafeCreate" prefWidth="190" style="-fx-background-color:white" text="카페 생성" textFill="#4CAF4F" onMouseEntered="#handleMouseEnter" onMouseExited="#handleMouseExit">
       <font>
-         <Font name="System Bold" size="13.0" />
+         <Font name="System" size="13.0" />
       </font></Button>
-    <Button onAction="#goToCafeModifyDelete" onMouseEntered="#handleMouseEnter" onMouseExited="#handleMouseExit" prefWidth="190" style="-fx-background-color: #A8D6AA; -fx-background-radius: 10;" text="카페 수정" textFill="WHITE">
+    <Region style="-fx-background-color:#4CAF4F; -fx-min-width: 0.5px; -fx-max-width: 0.5px; -fx-pref-width: 0.5px;" />
+    <Button onAction="#goToCafeModifyDelete" prefWidth="190" style="-fx-background-color:white" text="카페 수정" textFill="#4CAF4F" onMouseEntered="#handleMouseEnter" onMouseExited="#handleMouseExit">
       <font>
-         <Font name="System Bold" size="13.0" />
+         <Font name="System" size="13.0" />
       </font></Button>
-    <Button onAction="#goToReservationStatus" onMouseEntered="#handleMouseEnter" onMouseExited="#handleMouseExit" prefWidth="190" style="-fx-background-color: #A8D6AA; -fx-background-radius: 10;" text="날짜별 현황" textFill="WHITE">
+    <Region style="-fx-background-color:#4CAF4F; -fx-min-width: 0.5px; -fx-max-width: 0.5px; -fx-pref-width: 0.5px;" />
+    <Button onAction="#goToReservationStatus" prefWidth="190" style="-fx-background-color:white" text="날짜별 현황" textFill="#4CAF4F" onMouseEntered="#handleMouseEnter" onMouseExited="#handleMouseExit">
       <font>
-         <Font name="System Bold" size="13.0" />
+         <Font name="System" size="13.0" />
       </font></Button>
-    <Button onAction="#goToReservationStatusDay" onMouseEntered="#handleMouseEnter" onMouseExited="#handleMouseExit" prefWidth="190" style="-fx-background-color: #A8D6AA; -fx-background-radius: 10;" text="요일별 현황" textFill="WHITE">
+    <Region style="-fx-background-color:#4CAF4F; -fx-min-width: 0.5px; -fx-max-width: 0.5px; -fx-pref-width: 0.5px;" />
+    <Button onAction="#goToReservationStatusDay" prefWidth="190" style="-fx-background-color:white" text="요일별 현황" textFill="#4CAF4F" onMouseEntered="#handleMouseEnter" onMouseExited="#handleMouseExit">
       <font>
-         <Font name="System Bold" size="13.0" />
+         <Font name="System" size="13.0" />
       </font></Button>
-    <Button onAction="#goToDiscountSettings" onMouseEntered="#handleMouseEnter" onMouseExited="#handleMouseExit" prefWidth="190" style="-fx-background-color: #A8D6AA; -fx-background-radius: 10; " text="할인 설정" textFill="WHITE">
+    <Region style="-fx-background-color:#4CAF4F; -fx-min-width: 0.5px; -fx-max-width: 0.5px; -fx-pref-width: 0.5px;"/>
+    <Button onAction="#goToDiscountSettings" prefWidth="190" style="-fx-background-color:white" text="할인 설정" textFill="#4CAF4F" onMouseEntered="#handleMouseEnter" onMouseExited="#handleMouseExit">
         <font>
-            <Font name="System Bold" size="13.0" />
+            <Font name="System" size="13.0" />
         </font></Button>
 </HBox>
