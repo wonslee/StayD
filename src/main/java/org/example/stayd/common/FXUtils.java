@@ -64,7 +64,6 @@ public class FXUtils {
         alert.showAndWait();
     }
 
-
     public static void navigateToPage(Stage stage, String loginFxml, String message) {
         try {
             switchScene(stage, loginFxml);  // 로그인 페이지로 이동
