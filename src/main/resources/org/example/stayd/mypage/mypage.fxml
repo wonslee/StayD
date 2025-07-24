@@ -1,13 +1,55 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            prefHeight="400.0" prefWidth="600.0">
+<BorderPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="org.example.stayd.domain.mypage.MypageController"
+            prefWidth="1024" prefHeight="768"
+            style="-fx-background-color: white;">
 
-</AnchorPane>
+    <!-- TOP 영역: 헤더 -->
+    <top>
+        <AnchorPane fx:id="headerPlaceholder" prefHeight="80.0"
+                    style="-fx-background-color: transparent;"
+                    AnchorPane.leftAnchor="0.0"
+                    AnchorPane.rightAnchor="0.0"
+                    AnchorPane.topAnchor="0.0" />
+    </top>
+
+    <!-- CENTER 영역: 콘텐츠 -->
+    <center>
+        <HBox spacing="50" alignment="TOP_CENTER">
+            <padding>
+                <Insets top="40" bottom="40" left="60" right="60"/>
+            </padding>
+
+            <!-- 왼쪽: 프로필 -->
+            <VBox spacing="10" alignment="TOP_CENTER">
+                <Label text="👤" style="-fx-font-size: 48px;" />
+                <Label fx:id="nicknameLabel" style="-fx-font-weight: bold; -fx-font-size: 16px;" />
+                <Label fx:id="emailLabel"  />
+                <Label fx:id="passwordLabel" text="pw: ***************" />
+                <Button fx:id="changePwButton" text="비밀번호 변경" onAction="#handleChangePw"
+                        style="-fx-background-color: #4CAF50; -fx-text-fill: white;" />
+            </VBox>
+            <!-- 가운데: 이용 내역 -->
+            <VBox spacing="10" prefWidth="350" HBox.hgrow="ALWAYS">
+                <Label text="이용 내역" style="-fx-font-size: 16px; -fx-font-weight: bold;" />
+                <ListView fx:id="reservationListView"
+                          prefHeight="400"
+                          VBox.vgrow="ALWAYS"
+                          style="-fx-background-color: transparent; -fx-border-color: transparent;" />
+            </VBox>
+
+            <!-- 오른쪽: 내가 쓴 리뷰 -->
+            <VBox spacing="10" prefWidth="350" VBox.vgrow="ALWAYS">
+                <Label text="내가 쓴 리뷰" style="-fx-font-size: 16px; -fx-font-weight: bold;" />
+                <ListView fx:id="reviewListView" VBox.vgrow="ALWAYS"
+                          style="-fx-background-color: transparent; -fx-border-color: transparent;" />
+            </VBox>
+
+        </HBox>
+    </center>
+</BorderPane>

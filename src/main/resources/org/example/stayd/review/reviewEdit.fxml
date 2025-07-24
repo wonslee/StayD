@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<?import java.net.URL?>
+<AnchorPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="org.example.stayd.domain.review.controller.ReviewEditController"
+            prefWidth="600" prefHeight="400"
+            style="-fx-background-color: white;">
+
+    <!-- 타이틀 -->
+    <Label layoutX="30.0" layoutY="30.0" text="리뷰 수정"
+           style="-fx-font-size: 20px; -fx-font-weight: bold;" />
+
+    <!-- 별점 -->
+    <HBox fx:id="ratingBox" layoutX="30.0" layoutY="80.0" spacing="10">
+        <ToggleButton fx:id="star1" text="★" styleClass="star-btn"/>
+        <ToggleButton fx:id="star2" text="★" styleClass="star-btn"/>
+        <ToggleButton fx:id="star3" text="★" styleClass="star-btn"/>
+        <ToggleButton fx:id="star4" text="★" styleClass="star-btn"/>
+        <ToggleButton fx:id="star5" text="★" styleClass="star-btn"/>
+    </HBox>
+
+    <!-- 리뷰 입력창 -->
+    <TextArea fx:id="reviewTextArea"
+              layoutX="30.0" layoutY="130.0"
+              prefWidth="540.0" prefHeight="160.0"
+              wrapText="true"
+              promptText="리뷰를 수정해주세요."
+              style="-fx-border-color: #ccc; -fx-border-radius: 8; -fx-background-radius: 8;" />
+
+    <!-- 버튼 영역 -->
+    <HBox layoutX="190.0" layoutY="320.0" spacing="20">
+        <Button fx:id="cancelButton"
+                text="취소"
+                onAction="#handleCancel"
+                prefWidth="100"
+                style="-fx-background-color: #ccc; -fx-text-fill: #333; -fx-background-radius: 8;" />
+        <Button fx:id="saveButton"
+                text="저장"
+                onAction="#handleSave"
+                prefWidth="100"
+                style="-fx-background-color: #2ecc71; -fx-text-fill: white; -fx-background-radius: 8;" />
+    </HBox>
+
+    <!-- 별점 공통 스타일 -->
+    <stylesheets>
+        <URL value="@review.css" />
+    </stylesheets>
+</AnchorPane>
