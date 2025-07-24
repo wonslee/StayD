@@ -11,24 +11,38 @@ import java.util.Optional;
 
 public class UserDAO {
 
-    // ID 중복 확인
+    /**
+     * 아이디 중복 확인
+     * 주어진 loginId가 이미 존재하는지 확인
+     *
+     * @param loginId 확인할 아이디
+     * @return 아이디가 존재하면 true, 그렇지 않으면 false 반환
+     * @throws SQLException SQL 예외 발생 시
+     */
     public boolean existsById(String loginId) throws SQLException {
         String sql = """
                 SELECT COUNT(*) 
                 FROM users
-                 WHERE login_id = ?
+                WHERE login_id = ?
                 """;
         try (Connection conn = new DatabaseConnection().getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, loginId);
             try (ResultSet rs = ps.executeQuery()) {
-                rs.next();
-                return rs.getInt(1) > 0;
+                rs.next();  // 결과 이동
+                return rs.getInt(1) > 0;  // 아이디가 있으면 true 반환
             }
         }
     }
 
-    // 이메일 중복 확인
+    /**
+     * 이메일 중복 확인
+     * 주어진 이메일이 이미 존재하는지 확인
+     *
+     * @param email 확인할 이메일
+     * @return 이메일이 존재하면 true, 그렇지 않으면 false 반환
+     * @throws SQLException SQL 예외 발생 시
+     */
     public boolean existsByEmail(String email) throws SQLException {
         String sql = """
                 SELECT COUNT(*) 
@@ -39,13 +53,19 @@ public class UserDAO {
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, email);
             try (ResultSet rs = ps.executeQuery()) {
-                rs.next();
-                return rs.getInt(1) > 0;
+                rs.next();  // 결과 이동
+                return rs.getInt(1) > 0;  // 이메일이 있으면 true 반환
             }
         }
     }
 
-    // User 저장
+    /**
+     * 새 사용자 등록
+     * UserDTO를 받아 사용자를 users 테이블에 저장
+     *
+     * @param user UserDTO 객체 (사용자 정보)
+     * @throws SQLException SQL 예외 발생 시
+     */
     public void insertUser(UserDTO user) throws SQLException {
         String sql = """
                 INSERT INTO 
@@ -54,24 +74,25 @@ public class UserDAO {
                 """;
         try (Connection conn = new DatabaseConnection().getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, user.getLogin_id());
-            ps.setString(2, user.getEmail());
-            ps.setString(3, user.getPassword());
-            ps.setString(4, user.getRole());
-            ps.executeUpdate();
+            ps.setString(1, user.getLogin_id());  // 아이디
+            ps.setString(2, user.getEmail());     // 이메일
+            ps.setString(3, user.getPassword());  // 비밀번호
+            ps.setString(4, user.getRole());      // 사용자 역할
+            ps.executeUpdate();  // 실행
         }
     }
 
     /**
-     * loginId로 사용자 정보 조회
+     * 로그인 아이디로 사용자 정보 조회
      *
      * @param loginId 검색할 아이디
-     * @return UserDTO (login_id, password 해시, role) 담아서 Optional 반환
+     * @return 아이디에 해당하는 UserDTO (없으면 Optional.empty() 반환)
+     * @throws SQLException SQL 예외 발생 시
      */
     public Optional<UserDTO> findByLoginId(String loginId) throws SQLException {
         String sql = """
                 SELECT user_id,
-                login_id,
+                       login_id,
                        email,
                        password,
                        role
@@ -89,20 +110,22 @@ public class UserDAO {
                     user.setUser_id(rs.getInt("user_id"));
                     user.setLogin_id(rs.getString("login_id"));
                     user.setEmail(rs.getString("email"));
-                    user.setPassword(rs.getString("password")); // 해시
+                    user.setPassword(rs.getString("password")); // 해시된 비밀번호
                     user.setRole(rs.getString("role"));
-                    return Optional.of(user);
+                    return Optional.of(user);  // 결과 반환
                 }
-                return Optional.empty();
+                return Optional.empty();  // 없으면 빈 Optional 반환
             }
         }
     }
 
     /**
-     * 회원 login_id 조회
-     * @param email 조회할 이메일
-     * @return login_id (없으면 null)
-     * @throws SQLException
+     * 이메일로 로그인 아이디 조회
+     * 주어진 이메일에 해당하는 login_id를 반환
+     *
+     * @param email 이메일
+     * @return 해당 이메일에 등록된 login_id, 없으면 null 반환
+     * @throws SQLException SQL 예외 발생 시
      */
     public String findLoginIdByEmail(String email) throws SQLException {
         String sql = """
@@ -115,13 +138,21 @@ public class UserDAO {
             ps.setString(1, email);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    return rs.getString("login_id");
+                    return rs.getString("login_id");  // login_id 반환
                 }
-                return null;
+                return null;  // 이메일이 없으면 null 반환
             }
         }
     }
 
+    /**
+     * 비밀번호 업데이트
+     * 주어진 loginId에 대해 비밀번호를 업데이트
+     *
+     * @param loginId      사용자 아이디
+     * @param hashedPassword 새 비밀번호
+     * @throws SQLException SQL 예외 발생 시
+     */
     public void updatePassword(String loginId, String hashedPassword) throws SQLException {
         String sql = """
             UPDATE users
@@ -131,10 +162,9 @@ public class UserDAO {
 
         try (Connection conn = new DatabaseConnection().getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, hashedPassword);
-            ps.setString(2, loginId);
-            ps.executeUpdate();
+            ps.setString(1, hashedPassword);  // 새로운 비밀번호
+            ps.setString(2, loginId);  // 사용자 아이디
+            ps.executeUpdate();  // 업데이트 실행
         }
     }
-
 }

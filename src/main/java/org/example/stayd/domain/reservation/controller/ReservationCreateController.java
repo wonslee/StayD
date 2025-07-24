@@ -24,12 +24,19 @@ import org.example.stayd.common.SessionManager;
 import org.example.stayd.config.SceneConfig;
 import org.example.stayd.domain.cafe.dto.CafeDto;
 import org.example.stayd.domain.cafe.dto.CafeDto.DetailResponse;
+import org.example.stayd.domain.cafe.model.DiscountHours;
+import org.example.stayd.domain.cafe.service.CafeService;
 import org.example.stayd.domain.reservation.dto.ReservationDTO;
-import org.example.stayd.domain.reservation.model.DayOfWeek;
+import org.example.stayd.domain.cafe.model.OperationHours;
+import org.example.stayd.domain.cafe.model.DayOfWeek;
 import org.example.stayd.domain.reservation.model.Reservation;
 import org.example.stayd.domain.reservation.model.Seat;
 import org.example.stayd.domain.reservation.service.ReservationService;
 import org.example.stayd.domain.user.service.UserService;
+import javafx.scene.control.DateCell;
+import javafx.util.Callback;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @NoArgsConstructor
 public class ReservationCreateController {
@@ -41,6 +48,7 @@ public class ReservationCreateController {
     /* 서비스 & 상태 */
     private final ReservationService service = new ReservationService();
     private Seat selectedSeat;
+    private CafeService cafeService = new CafeService();
 
     public ReservationCreateController(DetailResponse cafe) {
         this.cafe = cafe;
@@ -52,7 +60,7 @@ public class ReservationCreateController {
     @FXML
     private ComboBox<Integer> startCombo, endCombo;
     @FXML
-    private Label totalPriceLabel, statusLabel;
+    private Label totalPriceLabel, statusLabel, discountHoursLabel;
     @FXML
     private GridPane seatGrid;
     @FXML
@@ -69,8 +77,82 @@ public class ReservationCreateController {
         }
     }
 
+
+    private void updateTimeCombosForSelectedDay() {
+        System.out.println("updateTimeCombosForSelectedDay()");
+        if (cafe == null || datePicker.getValue() == null) return;
+        String dayOfWeekStr = datePicker.getValue().getDayOfWeek().name().substring(0, 3).toUpperCase();
+        DayOfWeek selectedDay = DayOfWeek.valueOf(dayOfWeekStr);
+        try {
+            java.util.List<OperationHours> opHours = cafeService.getOperationHours(cafe.getCafeId());
+            OperationHours op = opHours.stream()
+                .filter(o -> o.dayOfWeek() == selectedDay)
+                .findFirst().orElse(null);
+            if (op != null) {
+                int open = op.operationStart();
+                int close = op.operationEnd();
+                int nowHour = (datePicker.getValue().isEqual(LocalDate.now())) ? java.time.LocalTime.now().getHour() : open;
+                java.util.List<Integer> startHours = java.util.stream.IntStream.range(open, close)
+                    .filter(h -> datePicker.getValue().isAfter(LocalDate.now()) || h > nowHour)
+                    .boxed().toList();
+                java.util.List<Integer> endHours = java.util.stream.IntStream.rangeClosed(open + 1, close)
+                    .filter(h -> datePicker.getValue().isAfter(LocalDate.now()) || h > nowHour)
+                    .boxed().toList();
+                startCombo.getItems().setAll(startHours);
+                endCombo.getItems().setAll(endHours);
+                startCombo.setValue(null);
+                endCombo.setValue(null);
+                // Enable and reset style
+                startCombo.setDisable(false);
+                endCombo.setDisable(false);
+                reserveBtn.setDisable(false);
+                startCombo.setStyle("");
+                endCombo.setStyle("");
+                reserveBtn.setText("select");
+                reserveBtn.setStyle("");
+            } else {
+                startCombo.getItems().clear();
+                endCombo.getItems().clear();
+                startCombo.setDisable(true);
+                endCombo.setDisable(true);
+                reserveBtn.setDisable(true);
+                startCombo.setStyle("-fx-border-color: red; -fx-text-fill: red;");
+                endCombo.setStyle("-fx-border-color: red; -fx-text-fill: red;");
+                reserveBtn.setText("unavailable");
+                reserveBtn.setStyle("-fx-background-color: #ffcccc; -fx-text-fill: red;");
+            }
+        } catch (Exception e) {
+            startCombo.getItems().clear();
+            endCombo.getItems().clear();
+            startCombo.setDisable(true);
+            endCombo.setDisable(true);
+            reserveBtn.setDisable(true);
+            startCombo.setStyle("-fx-border-color: red; -fx-text-fill: red;");
+            endCombo.setStyle("-fx-border-color: red; -fx-text-fill: red;");
+            reserveBtn.setText("unavailable");
+            reserveBtn.setStyle("-fx-background-color: #ffcccc; -fx-text-fill: red;");
+        }
+    }
+
     @FXML
     public void handleDateChange(ActionEvent event) {
+        updateTimeCombosForSelectedDay();
+        // Update discountHoursLabel only when date is picked
+        if (cafe != null && datePicker.getValue() != null) {
+            String dayOfWeek = datePicker.getValue().getDayOfWeek().name().substring(0, 3).toUpperCase();
+            java.util.List<org.example.stayd.domain.cafe.model.DiscountHours> discounts = cafeService.getDiscountHours(cafe.getCafeId());
+            org.example.stayd.domain.cafe.model.DiscountHours dh = discounts.stream()
+                .filter(d -> d.dayOfWeek().name().equalsIgnoreCase(dayOfWeek))
+                .findFirst().orElse(null);
+            if (dh != null) {
+                String period = String.format("%02d:00 ~ %02d:00", dh.discountStart(), dh.discountEnd());
+                discountHoursLabel.setText(period);
+            } else {
+                discountHoursLabel.setText("없음");
+            }
+        } else {
+            if (discountHoursLabel != null) discountHoursLabel.setText("");
+        }
         recalc();
     }
 
@@ -94,6 +176,10 @@ public class ReservationCreateController {
         // If FXML fields are injected, update UI
         if (seatGrid != null) {
             loadSeats();
+
+            if (datePicker.getValue() != null) {
+                updateTimeCombosForSelectedDay();
+            }
             recalc();
         }
     }
@@ -151,7 +237,6 @@ public class ReservationCreateController {
         }
     }
 
-    /* ───────── 금액 계산 ───────── */
     private void recalc() {
         if (cafe == null) {
             return;
@@ -161,9 +246,20 @@ public class ReservationCreateController {
             totalPriceLabel.setText("0");
             return;
         }
-        // TODO: 할인 기간 가져와야 함.
-        int total = (eh - sh) * cafe.getPricePerHour();
-        totalPriceLabel.setText(String.format("%,d", total));
+        String dayOfWeek = datePicker.getValue() != null
+            ? datePicker.getValue().getDayOfWeek().name().substring(0, 3).toUpperCase()
+            : "MON"; // default/fallback
+
+        int total = cafeService.calculateCafePrice(cafe.getCafeId(), dayOfWeek, sh, eh);
+        int undiscounted = (eh - sh) * cafe.getPricePerHour();
+        int discount = undiscounted - total;
+
+        // Show result price and discounted price in parentheses if discount exists
+        if (discount > 0) {
+            totalPriceLabel.setText(String.format("%,d원 (할인 %d원)", total, discount));
+        } else {
+            totalPriceLabel.setText(String.format("%,d원", total));
+        }
     }
 
     /* ───────── 예약 실행 ───────── */

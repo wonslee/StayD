@@ -21,6 +21,6 @@ module org.example.stayd {
     opens org.example.stayd.domain.mypage to javafx.fxml;
 
     exports org.example.stayd;
-
+    opens org.example.stayd.domain.cafe.model to org.hibernate.validator;
 
 }
