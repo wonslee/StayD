@@ -22,11 +22,12 @@ import org.example.stayd.domain.reservation.dao.ReservationWDAO;
 import org.example.stayd.domain.reservation.dto.ReservationWithCafeDTO;
 import org.example.stayd.domain.review.controller.ReviewController;
 import org.example.stayd.domain.review.controller.ReviewItemCellController;
-import org.example.stayd.domain.review.dao.ReviewListDao;
 import org.example.stayd.domain.review.dto.ReviewDTO;
 import org.example.stayd.domain.user.controller.ResetPwController;
 import org.example.stayd.domain.user.dto.PasswordResetDTO;
 import org.example.stayd.domain.user.dto.UserDTO;
+import org.example.stayd.domain.review.dao.ReviewListDAO;
+
 
 import java.io.IOException;
 import java.net.URL;
@@ -46,7 +47,7 @@ public class MypageController implements Initializable {
     @FXML private Button changePwButton;
 
     private final ReservationWDAO reservationWDAO = new ReservationWDAO();
-    private final ReviewListDao reviewListDao = new ReviewListDao();
+    private final ReviewListDAO reviewListDao = new ReviewListDAO();
 
     private List<ReservationWithCafeDTO> fullReservationList = new ArrayList<>();
     private List<ReviewDTO> fullReviewList = new ArrayList<>();

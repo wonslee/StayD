@@ -28,6 +28,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
 import org.example.stayd.domain.reservation.controller.ReservationCreateController;
+import org.example.stayd.domain.review.controller.ReviewListController;
 
 public class CafeDetailController implements Initializable {
 
@@ -76,7 +77,7 @@ public class CafeDetailController implements Initializable {
     private VBox reservationTabContent;
     @FXML
     private VBox reviewTabContent;
-
+    private boolean reviewLoaded = false;
     // 상태 변수들
     private boolean isFavorite = false;
     /**
@@ -324,7 +325,6 @@ public class CafeDetailController implements Initializable {
             }
         }
     }
-
     /**
      * 리뷰 탭 표시
      */
@@ -335,8 +335,7 @@ public class CafeDetailController implements Initializable {
 
             // 버튼 스타일 변경
             detailButton.setStyle("-fx-background-color: #A8D6AA; -fx-background-radius: 0; -fx-font-weight: bold;");
-            reservationButton.setStyle(
-                    "-fx-background-color: #A8D6AA; -fx-background-radius: 0; -fx-font-weight: bold;");
+            reservationButton.setStyle("-fx-background-color: #A8D6AA; -fx-background-radius: 0; -fx-font-weight: bold;");
             reviewButton.setStyle("-fx-background-color: #4CAF4F; -fx-background-radius: 0; -fx-font-weight: bold;");
 
             // 탭 컨텐츠 표시/숨김
@@ -348,9 +347,28 @@ public class CafeDetailController implements Initializable {
 
             reviewTabContent.setVisible(true);
             reviewTabContent.setManaged(true);
+
+            // 최초 로드 여부 체크
+            if (!reviewLoaded) {
+                try {
+                    // FXML 파일 로딩
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/stayd/review/review-list.fxml"));
+                    Node reviewView = loader.load();
+
+                    // 컨트롤러 가져와서 cafeId 주입
+                    ReviewListController controller = loader.getController();
+                    controller.setCafeId(cafeId); // cafeId는 현재 상세페이지 카페 ID
+
+                    // 탭 영역에 뷰 삽입
+                    reviewTabContent.getChildren().setAll(reviewView);
+
+                    reviewLoaded = true; // 로드 완료 표시
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
         }
     }
-
     /**
      * 외부에서 카페 데이터를 설정하는 메소드 (최적화됨)
      * (다른 페이지에서 카페 상세 정보를 전달받을 때 사용)
