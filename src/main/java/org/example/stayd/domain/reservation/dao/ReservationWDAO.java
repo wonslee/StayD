@@ -10,17 +10,15 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import org.example.stayd.common.DatabaseConnection;
 import org.example.stayd.common.YesNullableConverter;
 import org.example.stayd.domain.cafe.model.DayOfWeek;
 import org.example.stayd.domain.reservation.dto.ReservationWithCafeDTO;
 import org.example.stayd.domain.reservation.model.Reservation;
 
 public class ReservationWDAO {
-    // TODO: 특정 스터디카페 전체 좌석 조회
-    // TODO: ENTITY & DTO Seat, Cafe
-
     // 예약 생성
-    public long create(Connection conn, Reservation reservation) throws SQLException {
+    public long create(Reservation reservation) throws SQLException {
 
         String sql = """
                 INSERT INTO reservation(
@@ -36,7 +34,8 @@ public class ReservationWDAO {
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                 """;
         System.out.println("======reservation.getReservationDate() = " + reservation.getReservationDate());
-        try (PreparedStatement ps = conn.prepareStatement(sql, new String[]{"reservation_id"})) {
+        try (Connection conn = new DatabaseConnection().getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql, new String[]{"reservation_id"})) {
             ps.setLong(1, reservation.getUserId());
             ps.setLong(2, reservation.getCafeId());
             ps.setDate(3, Date.valueOf(reservation.getReservationDate()));
@@ -57,7 +56,7 @@ public class ReservationWDAO {
     }
 
     /* ReservationDao.java */
-    public Optional<Reservation> findById(Connection conn, long reservationId) throws SQLException {
+    public Optional<Reservation> findById(long reservationId) throws SQLException {
         String sql = """
                 SELECT reservation_id,
                        user_id,
@@ -78,7 +77,8 @@ public class ReservationWDAO {
                  WHERE reservation_id = ?
                 """;
 
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = new DatabaseConnection().getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setLong(1, reservationId);
 
             try (ResultSet rs = ps.executeQuery()) {
@@ -134,7 +134,7 @@ public class ReservationWDAO {
     }
 
     // TODO: 예약 조회 - 특정 유저 PK 기반
-    public List<Reservation> findByUser(Connection conn, long userId) throws SQLException {
+    public List<Reservation> findByUser(long userId) throws SQLException {
         String sql = """
                 SELECT reservation_id,
                        user_id,
@@ -157,7 +157,8 @@ public class ReservationWDAO {
                 """;
 
         List<Reservation> list = new ArrayList<>();
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = new DatabaseConnection().getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setLong(1, userId);
 
             try (ResultSet rs = ps.executeQuery()) {
@@ -187,7 +188,7 @@ public class ReservationWDAO {
         return list;
     }
 // ReservationWDAO.java
-    public List<ReservationWithCafeDTO> findWithCafeByUser(Connection conn, long userId) throws SQLException {
+    public List<ReservationWithCafeDTO> findWithCafeByUser(long userId) throws SQLException {
         String sql = """
         SELECT r.reservation_id,
                r.user_id,
@@ -204,7 +205,10 @@ public class ReservationWDAO {
                r.rating,
                r.content,
                r.review_created_at,
-               c.name AS cafe_name
+               c.name AS cafe_name,
+               c.phone_number,
+               c.address,
+               c.price_per_hour
         FROM reservation r
         JOIN cafe c ON r.cafe_id = c.cafe_id
         WHERE r.user_id = ?
@@ -212,7 +216,8 @@ public class ReservationWDAO {
     """;
 
         List<ReservationWithCafeDTO> list = new ArrayList<>();
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = new DatabaseConnection().getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setLong(1, userId);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
@@ -233,6 +238,9 @@ public class ReservationWDAO {
                             .content(rs.getString("content"))
                             .reviewCreatedAt(rs.getTimestamp("review_created_at") == null ? null : rs.getTimestamp("review_created_at").toLocalDateTime())
                             .cafeName(rs.getString("cafe_name"))
+                            .phoneNumber(rs.getString("phone_number"))
+                            .address(rs.getString("address"))
+                            .pricePerHour(rs.getInt("price_per_hour"))
                             .build();
                     list.add(dto);
                 }

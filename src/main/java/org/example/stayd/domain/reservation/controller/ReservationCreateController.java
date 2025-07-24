@@ -37,6 +37,7 @@ import javafx.scene.control.DateCell;
 import javafx.util.Callback;
 import java.util.Set;
 import java.util.stream.Collectors;
+import javafx.fxml.FXMLLoader;
 
 @NoArgsConstructor
 public class ReservationCreateController {
@@ -169,6 +170,7 @@ public class ReservationCreateController {
     @FXML
     public void handleReserve(ActionEvent event) {
         makeReservation();
+        checkIfUserLoggedIn(event);
     }
 
     public void setCafe(CafeDto.DetailResponse cafe) {
@@ -263,7 +265,6 @@ public class ReservationCreateController {
     }
 
     /* ───────── 예약 실행 ───────── */
-//    TODO: 예약 정상 완료 -> 마이페이지 예약 상세로 리다이렉션
     private void makeReservation() {
         if (cafe == null) {
             return;
@@ -310,6 +311,10 @@ public class ReservationCreateController {
                     userId,
                     dto
             );
+            if (newReservation != null) {
+                // 예약 성공 시 상세 페이지로 이동 (데이터 전달)
+                navigateToReservationDetail(newReservation);
+            }
             statusLabel.setStyle("-fx-text-fill:#4CAF50;");
             statusLabel.setText("예약 완료!");
             loadSeats();                    // 상태 갱신
@@ -319,13 +324,34 @@ public class ReservationCreateController {
         }
     }
 
-    private void checkIfUserLoggedIn(MouseEvent event) {
+    // 상세 페이지로 이동하는 메서드
+    private void navigateToReservationDetail(Reservation createdReservation) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/stayd/reservation/reservation-detail.fxml"));
+            Node detailView = loader.load();
+            // 컨트롤러 가져오기
+            org.example.stayd.domain.reservation.controller.ReservationDetailController detailController = loader.getController();
+            // 데이터 전달
+            detailController.setCafe(this.cafe);
+            detailController.setReservation(org.example.stayd.domain.reservation.dto.ReservationDTO.of(createdReservation));
+            detailController.updateUI();
+            // 현재 Stage에서 전환
+            Stage stage = (Stage) reserveBtn.getScene().getWindow();
+            stage.setScene(new javafx.scene.Scene((javafx.scene.Parent) detailView));
+            stage.show();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void checkIfUserLoggedIn(ActionEvent event) {
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
 
         // 로그인 상태 확인
         if (userService.isUserLoggedIn()) {
             // TODO: 정상 케이스 - 유저가 로그인되어있으면 마이페이지 - 예약 상세 페이지로 이동
-            FXUtils.navigateToPage(stage, SceneConfig.MY_PAGE_FXML, "마이페이지로 이동하는 중 오류가 발생했습니다.");
+            System.out.println("navigating to my page");
+            FXUtils.navigateToPage(stage, "/org/example/stayd/reservation/reservation-detail.fxml", "마이페이지로 이동하는 중 오류가 발생했습니다.");
         } else {
             // 비전상 케이스 - 유저가 로그인 되어있지 않으면 로그인 페이지로 이동
             FXUtils.navigateToPage(stage, SceneConfig.LOGIN_FXML, "로그인 화면으로 이동하는 중 오류가 발생했습니다.");
