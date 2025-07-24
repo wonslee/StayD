@@ -6,11 +6,18 @@ import javafx.scene.layout.HBox;
 import org.example.stayd.common.DatabaseConnection;
 import org.example.stayd.domain.mypage.MypageController;
 import org.example.stayd.domain.reservation.dao.ReservationWDAO;
+import org.example.stayd.domain.reservation.dto.ReservationDTO;
 import org.example.stayd.domain.reservation.dto.ReservationWithCafeDTO;
 import org.example.stayd.domain.review.dao.ReviewDAO;
+import org.example.stayd.domain.cafe.dto.CafeDto;
 
 import java.sql.Connection;
 import java.time.format.DateTimeFormatter;
+import javafx.scene.input.MouseEvent;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
+import javafx.stage.Stage;
+import org.example.stayd.common.FXUtils;
 
 public class ReservationItemCellController {
 
@@ -20,14 +27,28 @@ public class ReservationItemCellController {
     @FXML private Button writeReviewButton;
 
     private ReservationWithCafeDTO reservation;
+    private ReservationDTO reservationDTO;
+    private CafeDto.DetailResponse cafeDetail;
     private MypageController mypageController;
 
     public void setMypageController(MypageController controller) {
         this.mypageController = controller;
     }
 
+    public void setReservationDTO(ReservationDTO dto) {
+        this.reservationDTO = dto;
+    }
+    public void setCafeDetail(CafeDto.DetailResponse cafe) {
+        this.cafeDetail = cafe;
+    }
+
     public void setData(ReservationWithCafeDTO reservation) {
+        System.out.println("reservation = " + reservation);
         this.reservation = reservation;
+        this.reservationDTO = ReservationDTO.of(reservation);
+        this.cafeDetail = reservation.toCafeDetailResponse();
+        System.out.println("reservationDTO = " + reservationDTO);
+        System.out.println("cafeDetail = " + cafeDetail);
         System.out.println("리뷰 체크 - rating: " + reservation.getRating() + ", content: " + reservation.getContent());
 
 
@@ -44,6 +65,24 @@ public class ReservationItemCellController {
                 mypageController.handleWriteReviewButton(reservation);
             }
         });
+    }
+
+
+    @FXML
+    private void handleReservationBoxClick(MouseEvent event) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/stayd/reservation/reservation-detail.fxml"));
+            Node detailView = loader.load();
+            org.example.stayd.domain.reservation.controller.ReservationDetailController detailController = loader.getController();
+            detailController.setReservation(this.reservationDTO);
+            detailController.setCafe(this.cafeDetail);
+            detailController.updateUI();
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            stage.setScene(new javafx.scene.Scene((javafx.scene.Parent) detailView));
+            stage.show();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @FXML

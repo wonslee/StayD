@@ -78,7 +78,7 @@ public class MypageController implements Initializable {
         try (Connection conn = new DatabaseConnection().getConnection()) {
             long userId = SessionManager.getInstance().getLoggedInUser().getUserId();
             try {
-                fullReservationList = reservationWDAO.findWithCafeByUser(conn, userId);
+                fullReservationList = reservationWDAO.findWithCafeByUser(userId);
             } catch (Exception e) {
                 System.out.println("예약 목록 가져오는 중 예외 발생");
                 e.printStackTrace();
@@ -103,6 +103,7 @@ public class MypageController implements Initializable {
                             Parent cellRoot = loader.load();
 
                             ReservationItemCellController controller = loader.getController();
+                            System.out.println(reservation);
                             controller.setData(reservation);
                             controller.setMypageController(MypageController.this);
 

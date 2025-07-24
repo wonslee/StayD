@@ -13,7 +13,7 @@
     <AnchorPane fx:id="headerPlaceholder" prefHeight="130.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
 
     <!-- 예약 정보 -->
-    <VBox spacing="5">
+    <VBox fx:id="reservationBox" spacing="5" onMouseClicked="#handleReservationBoxClick">
         <Label fx:id="cafeNameLabel" text="스터디카페 이름" style="-fx-font-weight: bold;" />
         <Label fx:id="reservationDateLabel" text="예약일: YYYY-MM-DD" />
         <Label fx:id="timeLabel" text="이용 시간: HH시 ~ HH시" />
