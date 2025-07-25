@@ -4,6 +4,8 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
+<?import javafx.scene.effect.DropShadow?>
+<?import javafx.scene.paint.Color?>
 <AnchorPane xmlns:fx="http://javafx.com/fxml"
             fx:controller="org.example.stayd.domain.reservation.controller.SeatSelectionController"
             prefWidth="716" prefHeight="538"
@@ -27,6 +29,16 @@
             <Label text="●" style="-fx-text-fill:#4CAF50;"/><Label text="Selected"/>
         </HBox>
 
-        <Button fx:id="selectBtn" text="select " prefWidth="160" prefHeight="42"/>
+<!--        <Button fx:id="selectBtn" text="select " prefWidth="160" prefHeight="42"/>-->
+        <Button text="예약" fx:id="selectBtn" prefWidth="180" prefHeight="40"
+                textFill="#4caf4f" style="-fx-background-color: white; -fx-font-weight: bold; -fx-background-radius: 10;">
+            <effect>
+                <DropShadow>
+                    <color>
+                        <Color opacity="0.2779456377029419"/>
+                    </color>
+                </DropShadow>
+            </effect>
+        </Button>
     </VBox>
 </AnchorPane>

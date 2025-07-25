@@ -10,6 +10,8 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
+<?import javafx.scene.paint.Color?>
+<?import javafx.scene.effect.DropShadow?>
 <VBox xmlns:fx="http://javafx.com/fxml"
       fx:controller="org.example.stayd.domain.reservation.controller.ReservationDetailController"
       spacing="24" alignment="TOP_CENTER">
@@ -138,11 +140,27 @@
     <!-- 버튼 영역 -->
     <HBox spacing="20" alignment="CENTER">
         <Button fx:id="backButton" text="목록으로" prefWidth="120" prefHeight="40"
-                style="-fx-background-color: #A8D6AA; -fx-text-fill: white; -fx-background-radius: 8; -fx-font-weight: bold;"
-                onAction="#handleBack"/>
+                style="-fx-background-color: white; -fx-font-weight: bold; -fx-background-radius: 10;"
+                onAction="#handleBack" textFill="#4caf4f" onMouseEntered="#onModifyButtonEnter" onMouseExited="#onModifyButtonExit">
+        <effect>
+            <DropShadow>
+                <color>
+                    <Color opacity="0.2779456377029419"/>
+                </color>
+            </DropShadow>
+        </effect>
+        </Button>
         <Button fx:id="cancelReservationButton" text="예약 취소" prefWidth="120" prefHeight="40"
-                style="-fx-background-color: #F44336; -fx-text-fill: white; -fx-background-radius: 8; -fx-font-weight: bold;"
-                onAction="#handleCancelReservation"/>
+                style="-fx-background-color: white; -fx-font-weight: bold; -fx-background-radius: 10;"
+                onAction="#handleCancelReservation" textFill="#ff6b6b" onMouseEntered="#onDeleteButtonEnter" onMouseExited="#onDeleteButtonExit">
+        <effect>
+            <DropShadow>
+                <color>
+                    <Color opacity="0.2779456377029419"/>
+                </color>
+            </DropShadow>
+        </effect>
+        </Button>
     </HBox>
 
     <!-- 상태 메시지 -->
