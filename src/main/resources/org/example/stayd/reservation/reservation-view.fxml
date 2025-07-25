@@ -64,33 +64,16 @@
                GridPane.rowIndex="1" GridPane.columnIndex="3"/>
     </GridPane>
 
-    <HBox spacing="16" alignment="CENTER_LEFT">
-        <!-- 좌석 현황 -->
-        <VBox spacing="20">
-            <Label text="좌석 현황" style="-fx-font-size:16; -fx-font-weight:bold;"/>
-            <GridPane fx:id="seatGrid" hgap="8" vgap="8"/>
-            <HBox spacing="16" alignment="CENTER">
-                <Label text="●" style="-fx-text-fill:#BDBDBD;"/>
-                <Label text="Available"/>
-                <Label text="●" style="-fx-text-fill:#F44336;"/>
-                <Label text="Reserved"/>
-                <Label text="●" style="-fx-text-fill:#4CAF50;"/>
-                <Label text="Selected"/>
-            </HBox>
-        </VBox>
+    <Separator/>
 
-        <!-- 차트 -->
-        <VBox style="-fx-background-color: white;">
-            <Label text="예약 현황 차트" style="-fx-font-size:16; -fx-font-weight:bold;"/>
-            <BarChart fx:id="reservationBarChart" prefWidth="500" prefHeight="300" style="-fx-background-color: white;">
-                <xAxis>
-                    <CategoryAxis fx:id="xAxis"/>
-                </xAxis>
-                <yAxis>
-                    <NumberAxis fx:id="yAxis"/>
-                </yAxis>
-            </BarChart>
-        </VBox>
+    <!-- ── 좌석 ── -->
+    <Label text="좌석 현황"  style="-fx-font-size:16; -fx-font-weight:bold;"/>
+    <GridPane fx:id="seatGrid"  hgap="8" vgap="8"/>
+
+    <HBox spacing="16" alignment="CENTER">
+        <Label text="●" style="-fx-text-fill:#BDBDBD;"/><Label text="Available"/>
+        <Label text="●" style="-fx-text-fill:#F44336;"/><Label text="Reserved"/>
+        <Label text="●" style="-fx-text-fill:#4CAF50;"/><Label text="Selected"/>
     </HBox>
 
     <Button text="예약" fx:id="reserveBtn" prefWidth="180" prefHeight="40" onAction="#handleReserve"
