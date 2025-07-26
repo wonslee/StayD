@@ -18,6 +18,13 @@ import javafx.scene.Node;
 import org.example.stayd.common.FXUtils;
 import org.example.stayd.common.SessionManager;
 
+/**
+ * 예약 상세 조회 화면의 JavaFX 컨트롤러 클래스입니다.
+ * <p>
+ * 예약 상세 정보 표시, 예약 취소, 리뷰 작성 등
+ * 예약 관련 상세 기능을 담당합니다.
+ * </p>
+ */
 public class ReservationDetailController {
 
     // FXML 필드들
@@ -62,27 +69,56 @@ public class ReservationDetailController {
     private final ReservationService reservationService;
     private Consumer<Void> onReservationCanceledCallback;
 
-    // 기본 생성자 (FXML 로더용)
+    /**
+     * ReservationDetailController의 기본 생성자입니다.
+     * <p>
+     * ReservationService를 초기화합니다.
+     * </p>
+     */
     public ReservationDetailController() {
         this.reservationService = new ReservationService();
     }
 
-    // 데이터 설정 메서드들
+    /**
+     * 카페 정보를 설정합니다.
+     * <p>
+     * 예약 상세 정보와 함께 사용됩니다.
+     * </p>
+     * @param cafe 카페 상세 정보 DTO
+     */
     public void setCafe(CafeDto.DetailResponse cafe) {
         this.cafe = cafe;
     }
 
+    /**
+     * 예약 정보를 설정합니다.
+     * <p>
+     * 예약 상세 정보 표시 및 UI 갱신에 사용됩니다.
+     * </p>
+     * @param reservation 예약 DTO
+     */
     public void setReservation(ReservationDTO reservation) {
         this.reservation = reservation;
     }
 
+    /**
+     * FXML 로드 후 자동 호출되는 초기화 메서드입니다.
+     * <p>
+     * 데이터는 setter를 통해 나중에 주입됩니다.
+     * </p>
+     */
     @FXML
     public void initialize() {
         // initialize는 FXML 로드 후 자동 호출되지만,
         // 데이터는 setter를 통해 나중에 설정됨
     }
 
-    // 데이터 설정 후 UI 업데이트를 위한 메서드
+    /**
+     * 예약 및 카페 정보를 기반으로 UI를 갱신합니다.
+     * <p>
+     * 각 정보 섹션(카페, 예약, 결제, 리뷰)을 개별적으로 갱신하며, 예외 시 에러 메시지를 표시합니다.
+     * </p>
+     */
     public void updateUI() {
         if (reservation != null && cafe != null) {
             populateCafeInfo();
@@ -95,6 +131,9 @@ public class ReservationDetailController {
         }
     }
 
+    /**
+     * 카페 정보를 UI에 표시합니다.
+     */
     private void populateCafeInfo() {
         cafeNameLabel.setText(cafe.getName());
         cafeAddressLabel.setText(cafe.getAddress());
@@ -102,6 +141,12 @@ public class ReservationDetailController {
         cafePriceLabel.setText(String.format("%,d원/시간", cafe.getPricePerHour()));
     }
 
+    /**
+     * 예약 정보를 UI에 표시합니다.
+     * <p>
+     * 날짜, 시간, 요일, 생성일 등 포맷팅하여 표시합니다.
+     * </p>
+     */
     private void populateReservationInfo() {
         reservationIdLabel.setText(String.valueOf(reservation.getReservationId()));
         userIdLabel.setText(String.valueOf(reservation.getUserId()));
@@ -126,6 +171,12 @@ public class ReservationDetailController {
         }
     }
 
+    /**
+     * 결제 정보를 UI에 표시합니다.
+     * <p>
+     * 원가, 할인, 최종 결제금액, 취소 상태를 표시합니다.
+     * </p>
+     */
     private void populatePaymentInfo() {
         originalPriceLabel.setText(String.format("%,d원", reservation.getOriginalPrice()));
         discountPriceLabel.setText(String.format("%,d원", reservation.getDiscountPrice()));
@@ -141,6 +192,12 @@ public class ReservationDetailController {
                 "-fx-text-fill: #4CAF50; -fx-font-weight: bold;");
     }
 
+    /**
+     * 리뷰 정보를 UI에 표시합니다.
+     * <p>
+     * 리뷰가 있을 때만 섹션을 표시하며, 별점, 작성일, 내용 등을 표시합니다.
+     * </p>
+     */
     private void populateReviewInfo() {
         // 리뷰가 있는 경우에만 섹션 표시
         if (reservation.getRating() != null && reservation.getContent() != null) {
@@ -164,6 +221,12 @@ public class ReservationDetailController {
         }
     }
 
+    /**
+     * 예약 취소 버튼의 활성화 상태를 갱신합니다.
+     * <p>
+     * 이미 취소된 예약이거나 과거 예약인 경우 비활성화합니다.
+     * </p>
+     */
     private void updateCancelButtonState() {
         // 이미 취소된 예약이거나 과거 예약인 경우 취소 버튼 비활성화
         if (reservation.isCanceled()) {
@@ -172,6 +235,11 @@ public class ReservationDetailController {
         }
     }
 
+    /**
+     * 요일 문자열을 한글 요일명으로 변환합니다.
+     * @param dayOfWeek 요일 문자열 (MON~SUN)
+     * @return 한글 요일명
+     */
     private String convertDayOfWeek(String dayOfWeek) {
         return switch (dayOfWeek) {
             case "MON" -> "월요일";
@@ -185,6 +253,13 @@ public class ReservationDetailController {
         };
     }
 
+    /**
+     * 뒤로가기 버튼 클릭 시 마이페이지로 이동합니다.
+     * <p>
+     * 현재 Stage를 mypage.fxml로 전환합니다.
+     * </p>
+     * @param event 버튼 클릭 이벤트
+     */
     @FXML
     private void handleBack(ActionEvent event) {
         // mypage.fxml로 이동
@@ -192,6 +267,14 @@ public class ReservationDetailController {
         FXUtils.navigateToPage(stage, "/org/example/stayd/mypage/mypage.fxml", "마이페이지로 이동하는 중 오류가 발생했습니다.");
     }
 
+    /**
+     * 예약 취소 버튼 클릭 시 호출되는 이벤트 핸들러입니다.
+     * <p>
+     * 예약 취소 확인 다이얼로그를 띄우고, 확인 시 실제 예약 취소를 처리합니다.
+     * 취소 성공 시 마이페이지로 이동합니다.
+     * </p>
+     * @param event 버튼 클릭 이벤트
+     */
     @FXML
     private void handleCancelReservation(ActionEvent event) {
         if (reservation.isCanceled()) {
@@ -222,6 +305,11 @@ public class ReservationDetailController {
         });
     }
 
+    /**
+     * 사용자에게 알림 다이얼로그를 표시합니다.
+     * @param message 알림 메시지
+     * @param alertType 알림 타입
+     */
     private void showAlert(String message, AlertType alertType) {
         Alert alert = new Alert(alertType);
         alert.setTitle("알림");
@@ -230,13 +318,13 @@ public class ReservationDetailController {
         alert.showAndWait();
     }
 
+    /**
+     * 에러 메시지를 상태 라벨에 표시합니다.
+     * @param message 에러 메시지
+     */
     private void showError(String message) {
         statusLabel.setText(message);
         statusLabel.setVisible(true);
     }
 
-    // 콜백 설정 메서드
-    public void setOnReservationCanceledCallback(Consumer<Void> callback) {
-        this.onReservationCanceledCallback = callback;
-    }
 }

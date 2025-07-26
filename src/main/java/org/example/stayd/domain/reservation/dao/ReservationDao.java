@@ -12,6 +12,13 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * 예약 관련 데이터베이스 접근을 담당하는 DAO 클래스입니다.
+ * <p>
+ * 예약 생성, 조회, 취소 등 예약 관련 모든 DB 작업을 수행합니다.
+ * Oracle PL/SQL 프로시저 및 JDBC를 활용합니다.
+ * </p>
+ */
 public class ReservationDao {
     private Connection connection;
 
@@ -20,11 +27,11 @@ public class ReservationDao {
     }
 
     /**
-     * 요일별 예약 현황을 가져오는 메서드
+     * 지정한 요일의 예약 현황을 조회합니다.
      *
-     * @param dayOfWeek 요일 (MON, TUE, ... 등)
-     * @return 예약 현황 목록
-     * @throws SQLException 데이터베이스 접근 중 발생할 수 있는 예외
+     * @param dayOfWeek 요일 (예: "MON", "TUE")
+     * @return 해당 요일의 예약 목록
+     * @throws SQLException 데이터베이스 접근 중 오류 발생 시
      */
     public List<ReservationDTO> getReservationStatusByDay(String dayOfWeek) throws SQLException {
         List<ReservationDTO> reservationList = new ArrayList<>();

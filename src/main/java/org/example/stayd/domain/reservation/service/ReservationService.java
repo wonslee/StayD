@@ -18,9 +18,15 @@ import org.example.stayd.domain.reservation.dto.ReservationDTO;
 import org.example.stayd.domain.reservation.model.Reservation;
 import org.example.stayd.domain.reservation.model.Seat;
 
+/**
+ * 예약 관련 비즈니스 로직을 담당하는 서비스 클래스입니다.
+ * <p>
+ * 예약 생성, 예약 현황 조회, 예약 취소 등
+ * 도메인 규칙 및 검증, 트랜잭션 관리, 예외 처리 등 핵심 로직을 구현합니다.
+ * </p>
+ */
 public class ReservationService {
 
-    //    TODO: reservationDAO 하나로 합치기
     private final ReservationDao reservationDao;
     private final ReservationWDAO reservationDAO;
     private final SeatDAO seatDAO = new SeatDAO();
@@ -44,11 +50,11 @@ public class ReservationService {
     }
 
     /**
-     * 선택한 요일에 대한 예약 현황을 가져오는 메서드
+     * 선택한 요일의 예약 현황을 조회합니다.
      *
-     * @param selectedDay 선택한 요일 (예: "MON", "TUE" 등)
-     * @return 예약 현황 목록 (List<ReservationDTO>)
-     * @throws SQLException SQL 쿼리 실행 중 발생할 수 있는 예외
+     * @param selectedDay 요일 (예: "MON", "TUE")
+     * @return 예약 현황 목록
+     * @throws SQLException 데이터베이스 접근 중 오류 발생 시
      */
     public List<ReservationDTO> getReservationStatusByDay(String selectedDay) throws SQLException {
         // 선택한 요일에 대한 예약 현황 데이터를 반환
@@ -57,10 +63,22 @@ public class ReservationService {
 
 
     /**
-     * 예약 생성
+     * 예약을 생성합니다.
+     * <p>
+     * 1. 예약 정보 유효성 검증 (Bean Validation, 커스텀 검증)
+     * 2. 좌석 가용성 확인 및 락킹
+     * 3. 좌석 상태 업데이트
+     * 4. 예약 정보 DB 저장
+     * </p>
      *
-     * @param seatId 예약하려는 좌석
-     * @return 생성된 Reservation
+     * @param cafeId 카페 ID
+     * @param seatId 좌석 ID
+     * @param userId 사용자 ID
+     * @param reservationDTO 예약 정보 DTO
+     * @return 생성된 예약 정보
+     * @throws SQLException 데이터베이스 접근 중 오류 발생 시
+     * @throws ConstraintViolationException 예약 정보 유효성 검증 실패 시
+     * @throws IllegalStateException 좌석이 이미 예약된 경우 등 비즈니스 로직 위반 시
      */
 //    TODO: 유저 로그인 여부 검증
     public Reservation createReservation(
