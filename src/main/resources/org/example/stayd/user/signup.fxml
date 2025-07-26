@@ -29,7 +29,7 @@
                style="-fx-background-radius: 10;"/>
 
     <!-- 이메일 확인 라벨 -->
-    <Label fx:id="emailValidationLabel" layoutX="330" layoutY="330" textFill="red"/>
+    <Label fx:id="emailValidationLabel" layoutX="330" layoutY="340" textFill="red"/>
 
     <!-- PW 필드 -->
     <PasswordField fx:id="passwordTextField" layoutX="330" layoutY="365" prefHeight="50.0" prefWidth="350.0"

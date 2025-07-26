@@ -70,10 +70,10 @@
     <Label text="좌석 현황"  style="-fx-font-size:16; -fx-font-weight:bold;"/>
     <GridPane fx:id="seatGrid"  hgap="8" vgap="8"/>
 
-    <HBox spacing="16" alignment="CENTER">
-        <Label text="●" style="-fx-text-fill:#BDBDBD;"/><Label text="Available"/>
-        <Label text="●" style="-fx-text-fill:#F44336;"/><Label text="Reserved"/>
-        <Label text="●" style="-fx-text-fill:#4CAF50;"/><Label text="Selected"/>
+    <HBox spacing="16">
+    <Label text="●" style="-fx-text-fill:#BDBDBD;"/><Label text="이용 가능"/>
+    <Label text="●" style="-fx-text-fill:#F44336;"/><Label text="예약됨"/>
+    <Label text="●" style="-fx-text-fill:#4CAF50;"/><Label text="선택됨"/>
     </HBox>
 
     <Button text="예약" fx:id="reserveBtn" prefWidth="180" prefHeight="40" onAction="#handleReserve"
