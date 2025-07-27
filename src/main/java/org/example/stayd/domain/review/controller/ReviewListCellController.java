@@ -8,10 +8,11 @@ import javafx.scene.layout.HBox;
 import org.example.stayd.domain.review.dto.ReviewListDTO;
 
 import java.io.IOException;
-import java.time.format.DateTimeFormatter;
+
 
 /**
  * 리뷰 1건을 출력하는 셀 컨트롤러 (커스텀 셀)
+ * - 사용자 ID, 리뷰 내용, 평점, 작성일 표시
  */
 public class ReviewListCellController extends ListCell<ReviewListDTO> {
 
@@ -28,11 +29,15 @@ public class ReviewListCellController extends ListCell<ReviewListDTO> {
     private HBox root;
 
     private FXMLLoader loader;
-
+    /**
+     * 셀 내용을 업데이트하여 사용자 ID, 평점, 작성일, 내용을 출력
+     *
+     * @param review 리뷰 DTO
+     * @param empty 셀이 비어 있는지 여부
+     */
     @Override
     protected void updateItem(ReviewListDTO review, boolean empty) {
         super.updateItem(review, empty);
-        // updateItem 안에는 updateItem 로직만!
 
         if (empty || review == null) {
             setText(null);
@@ -47,16 +52,15 @@ public class ReviewListCellController extends ListCell<ReviewListDTO> {
                     e.printStackTrace();
                 }
             }
-
-            // 여기서 직접 바인딩하거나, 아래 setData(dto) 호출해도 됨
             setData(review);
 
             setText(null);
             setGraphic(root);
         }
     }
-
-    // ✅ updateItem 바깥에 선언된 setData 메서드
+    /**
+     * FXML 컴포넌트에 리뷰 데이터를 바인딩
+     */
     public void setData(ReviewListDTO dto) {
         userIdLabel.setText(dto.getLoginId());
         contentLabel.setText(dto.getContent());

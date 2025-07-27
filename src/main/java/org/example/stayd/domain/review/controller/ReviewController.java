@@ -17,6 +17,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 
+/**
+ * 리뷰 작성 화면을 제어하는 컨트롤러 클래스.
+ * - 예약 정보 바인딩
+ * - 별점 선택
+ * - 리뷰 작성 및 등록 기능 포함
+ */
 public class ReviewController {
 
     private final ReviewDAO reviewDAO = new ReviewDAO();
@@ -41,6 +47,10 @@ public class ReviewController {
     private final ReservationWDAO reservationWDAO = new ReservationWDAO();
     private Consumer<Void> onReviewSubmittedCallback;
 
+    /**
+     * 예약 정보를 화면에 표시
+     * @param dto 예약 정보 DTO
+     */
     public void setReservation(ReservationWithCafeDTO dto) {
         this.selectedReservation = dto;
 
@@ -53,11 +63,16 @@ public class ReviewController {
             if (branchName != null) branchName.setText(dto.getCafeName() + " 지점");
         }
     }
-
+    /**
+     * 리뷰 등록 후 수행할 콜백을 설정
+     * @param callback 등록 후 콜백 함수
+     */
     public void setOnReviewSubmittedCallback(Consumer<Void> callback) {
         this.onReviewSubmittedCallback = callback;
     }
-
+    /**
+     * 컨트롤러 초기화 시 별점 버튼들을 초기화하고 이벤트를 설정
+     */
     @FXML
     private void initialize() {
         stars = Arrays.asList(star1, star2, star3, star4, star5);
@@ -67,12 +82,19 @@ public class ReviewController {
         }
     }
 
+    /**
+     * 별점 버튼들을 선택된 개수만큼 활성화
+     * @param count 선택된 별점 수
+     */
     private void selectStars(int count) {
         for (int i = 0; i < stars.size(); i++) {
             stars.get(i).setSelected(i < count);
         }
     }
-
+    /**
+     * 선택된 별점을 반환
+     * @return 선택된 별점 값 (1~5)
+     */
     private int getSelectedRating() {
         int rating = 0;
         for (int i = 0; i < stars.size(); i++) {
@@ -82,7 +104,12 @@ public class ReviewController {
         }
         return rating;
     }
-
+    /**
+     * 리뷰 제출 버튼 클릭 시 실행되는 메서드
+     * - 별점과 내용 입력 확인
+     * - 리뷰 작성 가능 여부 확인 (중복, 완료 상태)
+     * - DB 저장 및 팝업 종료
+     */
     @FXML
     public void handleSubmit(ActionEvent event) {
         System.out.println("✅ handleSubmit() 실행됨");
@@ -149,12 +176,17 @@ public class ReviewController {
             showAlert("오류가 발생했습니다.");
         }
     }
-
+    /**
+     * 리뷰 작성 취소 버튼 클릭 시 팝업을 닫음
+     */
     @FXML
     public void handleCancel(ActionEvent event) {
         cancelButton.getScene().getWindow().hide();
     }
-
+    /**
+     * 경고창을 띄움
+     * @param msg 출력할 메시지
+     */
     private void showAlert(String msg) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setHeaderText(null);

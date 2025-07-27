@@ -1,7 +1,11 @@
 package org.example.stayd.domain.review.dto;
 
 import java.time.LocalDateTime;
-
+/**
+ * 리뷰 정보를 담는 DTO 클래스
+ * - 예약 ID, 카페 ID, 사용자 ID 등 식별자 포함
+ * - 리뷰 내용, 평점, 작성일 등 포함
+ */
 public class ReviewDTO {
 
     private long reservationId;
@@ -25,11 +29,12 @@ public class ReviewDTO {
         this.content = content;
         this.reviewCreatedAt = reviewCreatedAt;
     }
-
+    /** 예약 ID 반환 */
     public long getReservationId() {
         return reservationId;
     }
 
+    /** 예약 ID 설정 */
     public void setReservationId(long reservationId) {
         this.reservationId = reservationId;
     }
@@ -61,7 +66,7 @@ public class ReviewDTO {
     public int getRating() {
         return rating;
     }
-
+    /** 평점 반환 */
     public void setRating(int rating) {
         this.rating = rating;
     }
@@ -73,11 +78,11 @@ public class ReviewDTO {
     public void setContent(String content) {
         this.content = content;
     }
-
+    /** 리뷰 작성일 반환 */
     public LocalDateTime getReviewCreatedAt() {
         return reviewCreatedAt;
     }
-
+    /** 리뷰 작성일 설정 */
     public void setReviewCreatedAt(LocalDateTime reviewCreatedAt) {
         this.reviewCreatedAt = reviewCreatedAt;
     }

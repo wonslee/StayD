@@ -15,13 +15,15 @@ import javafx.stage.Modality;
 import org.example.stayd.common.SessionManager;
 import org.example.stayd.domain.review.dao.ReviewDAO;
 import org.example.stayd.domain.review.dto.ReviewDTO;
-import org.example.stayd.domain.review.controller.ReviewEditController;
-import org.example.stayd.domain.reservation.dao.ReservationWDAO;
 import org.example.stayd.domain.mypage.MypageController;
 import org.example.stayd.common.DatabaseConnection;
 
 import java.sql.Connection;
-
+/**
+ * 마이페이지 리뷰 셀 컨트롤러
+ * - 리뷰 1건을 셀로 출력 (카페명, 내용, 별점 등)
+ * - 수정/삭제 버튼 표시 및 이벤트 처리
+ */
 public class ReviewItemCellController {
 
     @FXML private Label ratingLabel;
@@ -34,7 +36,10 @@ public class ReviewItemCellController {
     private ReviewDTO review;
     private MypageController mypageController;
     @FXML private Label cafeNameLabel;
-
+    /**
+     * 리뷰 데이터를 셀에 세팅
+     * 작성자와 로그인 사용자가 동일한 경우 수정/삭제 버튼을 노출
+     */
     public void setData(ReviewDTO dto) {
         this.review = dto;
 
@@ -49,11 +54,15 @@ public class ReviewItemCellController {
         editReviewButton.setVisible(isMyReview);
         deleteReviewButton.setVisible(isMyReview);
     }
-
+    /**
+     * 마이페이지 컨트롤러를 연결한다 (콜백용)
+     */
     public void setMypageController(MypageController controller) {
         this.mypageController = controller;
     }
-
+    /**
+     * 수정 버튼 클릭 시 리뷰 수정 팝업을 띄움
+     */
     @FXML
     private void onEditClicked() {
         try {
@@ -77,7 +86,9 @@ public class ReviewItemCellController {
             e.printStackTrace();
         }
     }
-
+    /**
+     * 삭제 버튼 클릭 시 확인창을 띄우고, 리뷰를 삭제한 후 리스트를 갱신
+     */
     @FXML
     private void onDeleteClicked() {
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);

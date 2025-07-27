@@ -1,16 +1,21 @@
 package org.example.stayd.domain.review.dao;
 
-import org.example.stayd.common.YesNullableConverter;
-import org.example.stayd.domain.review.dto.ReviewListDTO;
 
+import org.example.stayd.domain.review.dto.ReviewListDTO;
 import java.sql.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-
+/**
+ * 리뷰 관련 DB 작업을 처리하는 DAO 클래스
+ * - 리뷰 저장, 수정, 삭제
+ * - 예약 완료 여부 및 중복 리뷰 체크
+ */
 public class ReviewDAO {
-//리뷰 등록
+    /**
+     * 예약에 리뷰를 저장
+     */
     public boolean saveReview(Connection conn, long reservationId, int rating, String content) throws SQLException {
         String sql = "UPDATE reservation SET rating = ?, content = ?, review_created_at = SYSTIMESTAMP WHERE reservation_id = ?";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -21,7 +26,9 @@ public class ReviewDAO {
 
         }
     }
-//리뷰 수정
+    /**
+     * 예약에 등록된 리뷰를 수정
+     */
     public boolean updateReview(Connection conn, long reservationId, int rating, String content) throws SQLException {
         String sql = "UPDATE reservation SET rating = ?, content = ?, review_created_at = SYSTIMESTAMP WHERE reservation_id = ?";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -31,7 +38,9 @@ public class ReviewDAO {
             return ps.executeUpdate() > 0;
         }
     }
-//리뷰 삭제
+    /**
+     * 예약에 등록된 리뷰를 삭제
+     */
     public boolean deleteReview(Connection conn, long reservationId) throws SQLException {
         String sql = "UPDATE reservation SET rating = NULL, content = NULL, review_created_at = NULL WHERE reservation_id = ?";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -39,7 +48,11 @@ public class ReviewDAO {
             return ps.executeUpdate() > 0;
         }
     }
-// 해당 예약에 리뷰가 있는지
+
+    /**
+     * 해당 예약에 이미 리뷰가 등록되어 있는지 확인
+     */
+
     public boolean existsReviewByReservationId(Connection conn, long reservationId) throws SQLException {
         String sql = "SELECT COUNT(*) FROM reservation WHERE reservation_id = ? AND content IS NOT NULL";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -49,7 +62,9 @@ public class ReviewDAO {
             }
         }
     }
-// 이용시간이 지났는지
+    /**
+     * 해당 예약이 이용 완료 상태인지 확인
+     */
     public boolean isReservationFinished(Connection conn, long reservationId) throws SQLException {
         String sql = "SELECT usage_ended_at, reservation_date FROM reservation WHERE reservation_id = ?";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -81,14 +96,6 @@ public class ReviewDAO {
             ps.setLong(1, cafeId);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-//                    ReviewListDTO dto = ReviewListDTO.builder()
-//                            .userId(rs.getLong("user_id"))
-//                            .rating(rs.getInt("rating"))
-//                            .content(rs.getString("content"))
-//                            .reviewCreatedAt(rs.getTimestamp("review_created_at").toLocalDateTime())
-//                            .build();
-//                    dto.setLoginId(rs.getString("login_id"));  // ⚠️ builder 안에 없어서 setter 따로 호출
-//                    list.add(dto);
                     ReviewListDTO dto = new ReviewListDTO();
                     dto.setUserId(rs.getLong("user_id"));
                     dto.setRating(rs.getInt("rating"));

@@ -4,14 +4,18 @@ import org.example.stayd.domain.review.dto.ReviewDTO;
 import org.example.stayd.domain.review.dto.ReviewListDTO;
 
 import java.sql.*;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-
+/**
+ * 리뷰 리스트 전용 DAO 클래스
+ * - 카페별 리뷰 목록 조회
+ * - 사용자별 리뷰 목록 조회
+ * - 카페 평균 평점 조회
+ */
 public class ReviewListDAO {
 
     /**
-     * 특정 유저가 작성한 리뷰 목록 조회 (카페 이름 포함)
+     * 해당 카페에 등록된 모든 리뷰 목록을 조회
      */
     public List<ReviewListDTO> findReviewsByCafeId(Connection conn, long cafeId) throws SQLException {
         String sql = """
@@ -26,7 +30,7 @@ public class ReviewListDAO {
           FROM reservation r
           JOIN cafe c ON r.cafe_id = c.cafe_id
           JOIN users u ON r.user_id = u.user_id
-         WHERE r.cafe_id = ?  -- ✅ 수정됨!
+         WHERE r.cafe_id = ?  
            AND r.rating IS NOT NULL
            AND r.content IS NOT NULL
            AND r.review_created_at IS NOT NULL
@@ -53,7 +57,7 @@ public class ReviewListDAO {
     }
 
     /**
-     * 특정 스터디카페의 평균 평점 계산
+     * 해당 카페의 평균 평점을 조회
      */
     public double findAverageRatingByCafeId(Connection conn, long cafeId) throws SQLException {
         String sql = """
@@ -74,7 +78,9 @@ public class ReviewListDAO {
 
         return 0.0; // 리뷰가 없는 경우 기본값
     }
-
+    /**
+     * 로그인한 사용자가 작성한 리뷰 목록을 조회
+     */
     public List<ReviewDTO> findByUserId(Connection conn, long userId) throws SQLException {
         String sql = """
         SELECT r.reservation_id,

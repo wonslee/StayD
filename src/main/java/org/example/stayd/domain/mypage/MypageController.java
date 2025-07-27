@@ -36,10 +36,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
+/**
+ * 마이페이지 컨트롤러
+ * - 로그인한 사용자의 예약 내역과 내가 쓴 리뷰를 조회하여 ListView로 출력
+ * - 비밀번호 변경 기능, 리뷰 작성 팝업 호출 기능 포함
+ */
+
 public class MypageController implements Initializable {
 
+    // FXML로 연결된 컴포넌트
     @FXML private AnchorPane headerPlaceholder;
-
     @FXML private ListView<ReservationWithCafeDTO> reservationListView;
     @FXML private ListView<ReviewDTO> reviewListView;
     @FXML private Label nicknameLabel;
@@ -52,6 +58,9 @@ public class MypageController implements Initializable {
     private List<ReservationWithCafeDTO> fullReservationList = new ArrayList<>();
     private List<ReviewDTO> fullReviewList = new ArrayList<>();
 
+    /**
+     * 화면 초기화 시, 로그인한 사용자의 예약 및 리뷰 목록을 불러옴
+     */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         loadHeader();            // 헤더 삽입
@@ -67,7 +76,9 @@ public class MypageController implements Initializable {
 
         System.out.println("로그인 유저: " + SessionManager.getInstance().getLoggedInUser());
     }
-
+    /**
+     * 공통 헤더 FXML을 로드하여 헤더 영역에 추가
+     */
     private void loadHeader() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/stayd/common/header.fxml"));
@@ -78,6 +89,9 @@ public class MypageController implements Initializable {
         }
     }
 
+    /**
+     * 로그인한 사용자의 예약 목록을 불러와 ListView에 출력
+     */
     private void loadReservationList() {
         try (Connection conn = new DatabaseConnection().getConnection()) {
             long userId = SessionManager.getInstance().getLoggedInUser().getUserId();
@@ -129,7 +143,9 @@ public class MypageController implements Initializable {
             System.out.println("예약 불러오기 중 오류 발생");
         }
     }
-
+    /**
+     * 로그인한 사용자가 작성한 리뷰 목록을 불러와 ListView에 출력
+     */
     public void refreshReviewList() {
         try (Connection conn = new DatabaseConnection().getConnection()) {
             long userId = SessionManager.getInstance().getLoggedInUser().getUserId();
@@ -170,7 +186,10 @@ public class MypageController implements Initializable {
             e.printStackTrace();
         }
     }
-
+    /**
+     * 리뷰 작성 버튼을 눌렀을 때 호출됨. 리뷰 작성 팝업을 띄운다.
+     * @param reservation 리뷰를 작성할 예약 정보
+     */
     public void handleWriteReviewButton(ReservationWithCafeDTO reservation) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/stayd/review/review.fxml"));
@@ -189,6 +208,9 @@ public class MypageController implements Initializable {
             e.printStackTrace();
         }
     }
+    /**
+     * 비밀번호 변경 버튼을 눌렀을 때 비밀번호 변경 화면으로 전환한다.
+     */
     @FXML
     private void handleChangePw(ActionEvent event) {
         try {

@@ -12,7 +12,11 @@ import org.example.stayd.common.DatabaseConnection;
 import java.sql.Connection;
 import java.util.Arrays;
 import java.util.List;
-
+/**
+ * 리뷰 수정 컨트롤러
+ * - 기존 리뷰 내용을 불러와 수정할 수 있도록 제공
+ * - 수정된 리뷰를 저장 또는 취소
+ */
 public class ReviewEditController {
 
     @FXML private ToggleButton star1;
@@ -31,7 +35,10 @@ public class ReviewEditController {
     private Runnable onReviewUpdatedCallback;
 
     private final ReservationWDAO reservationWDAO = new ReservationWDAO();
-
+    /**
+     * 컨트롤러 초기화
+     * 별점 버튼 초기화 및 이벤트 설정
+     */
     @FXML
     public void initialize() {
         stars = Arrays.asList(star1, star2, star3, star4, star5);
@@ -40,24 +47,33 @@ public class ReviewEditController {
             stars.get(i).setOnAction(e -> selectStars(index + 1));
         }
     }
-
+    /**
+     * 리뷰 데이터를 세팅하여 별점과 내용 초기화
+     */
     public void setReview(ReviewDTO review) {
         this.review = review;
         reviewTextArea.setText(review.getContent());
         selectStars(review.getRating());
     }
-
+    /**
+     * 수정 완료 후 동작할 콜백을 등록
+     */
     public void setOnReviewUpdatedCallback(Runnable callback) {
         this.onReviewUpdatedCallback = callback;
     }
 
-
+    /**
+     * 선택된 별점만큼 버튼 활성화
+     */
     private void selectStars(int count) {
         for (int i = 0; i < stars.size(); i++) {
             stars.get(i).setSelected(i < count);
         }
     }
-
+    /**
+     * 현재 선택된 별점 수를 반환
+     * @return 별점 수
+     */
     private int getSelectedRating() {
         int rating = 0;
         for (int i = 0; i < stars.size(); i++) {
@@ -67,7 +83,9 @@ public class ReviewEditController {
         }
         return rating;
     }
-
+    /**
+     * 저장 버튼 클릭 시 리뷰를 DB에 수정 반영
+     */
     @FXML
     private void handleSave() {
         int rating = getSelectedRating();
@@ -94,7 +112,9 @@ public class ReviewEditController {
             showAlert("오류가 발생했습니다.");
         }
     }
-
+    /**
+     * 취소 버튼 클릭 시 창을 닫음
+     */
     @FXML
     private void handleCancel() {
         close();
@@ -104,7 +124,9 @@ public class ReviewEditController {
         Stage stage = (Stage) cancelButton.getScene().getWindow();
         stage.close();
     }
-
+    /**
+     * 경고창을 띄움
+     */
     private void showAlert(String msg) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setHeaderText(null);

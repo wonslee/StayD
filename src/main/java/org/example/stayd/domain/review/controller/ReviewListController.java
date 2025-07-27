@@ -12,7 +12,10 @@ import java.net.URL;
 import java.sql.Connection;
 import java.util.List;
 import java.util.ResourceBundle;
-
+/**
+ * 리뷰 리스트 컨트롤러
+ * - 특정 카페에 대한 리뷰 목록을 ListView로 출력
+ */
 public class ReviewListController implements Initializable {
 
     @FXML private Label averageRatingLabel;           // 평균 평점 표시용 라벨
@@ -20,7 +23,9 @@ public class ReviewListController implements Initializable {
 
     private final ReviewListDAO reviewListDAO = new ReviewListDAO();
     private int cafeId; // 이건 외부에서 setCafeId로 주입받음
-
+    /**
+     * 초기화 메서드 (cafeId 주입 이후 loadReviews 호출됨)
+     */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         // 초기화 시에는 아무것도 안 함 (cafeId 설정 후 loadReviews 호출)
