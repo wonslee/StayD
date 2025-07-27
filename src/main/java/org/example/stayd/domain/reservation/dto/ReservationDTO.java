@@ -40,7 +40,6 @@ public class ReservationDTO {
     private String content;
     private LocalDateTime reviewCreatedAt;
 
-    // TODO: 얘네 고민
     /* JDBC ↔ DTO 변환 편의 */
 
     /**
@@ -84,6 +83,23 @@ public class ReservationDTO {
                 .rating(reservation.getRating())
                 .content(reservation.getContent())
                 .reviewCreatedAt(reservation.getReviewCreatedAt())
+                .build();
+    }
+
+    public Reservation toEntity() {
+        return Reservation.builder()
+                .reservationId(reservationId)
+                .userId(userId)
+                .cafeId(cafeId)
+                .reservationDate(reservationDate)
+                .dayOfWeek(dayOfWeek)
+                .usageStartedAt(usageStartedAt)
+                .usageEndedAt(usageEndedAt)
+                .originalPrice(originalPrice)
+                .discountPrice(discountPrice)
+                .createdAt(createdAt)
+                .isCanceled(isCanceled())
+                .canceledAt(canceledAt)
                 .build();
     }
 

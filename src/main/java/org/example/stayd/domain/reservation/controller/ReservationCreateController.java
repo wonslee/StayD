@@ -369,7 +369,11 @@ public class ReservationCreateController {
             return;
         }
 
+        long userId = SessionManager.getInstance().getLoggedInUser().getUser_id();
+
         ReservationDTO dto = ReservationDTO.builder()
+                .cafeId(cafe.getCafeId())
+                .userId(userId)
                 .reservationDate(date)
                 .usageStartedAt(sh)
                 .usageEndedAt(eh)
@@ -378,14 +382,10 @@ public class ReservationCreateController {
                 .discountPrice((eh - sh) * cafe.getPricePerHour()) // 할인 미적용
                 .build();
 
-        long userId = SessionManager.getInstance().getLoggedInUser().getUser_id();
-
         try {
             Reservation newReservation = service.createReservation(
-                    cafe.getCafeId(),
-                    selectedSeat.getSeatId(),
-                    userId,
-                    dto
+                    dto,
+                    selectedSeat.getSeatId()
             );
             if (newReservation != null) {
                 // 예약 성공 시 상세 페이지로 이동 (데이터 전달)

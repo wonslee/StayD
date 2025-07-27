@@ -80,60 +80,35 @@ public class ReservationService {
      * @throws ConstraintViolationException 예약 정보 유효성 검증 실패 시
      * @throws IllegalStateException 좌석이 이미 예약된 경우 등 비즈니스 로직 위반 시
      */
-//    TODO: 유저 로그인 여부 검증
     public Reservation createReservation(
-            long cafeId,
-            long seatId,
-            long userId,
-            ReservationDTO reservationDTO
+            ReservationDTO reservationDTO,
+            long seatId
     ) throws SQLException {
-
-        Reservation reservation = Reservation.builder()
-                .cafeId(cafeId)
-                .userId(userId)
-                .reservationDate(reservationDTO.getReservationDate())
-                .usageStartedAt(reservationDTO.getUsageStartedAt())
-                .usageEndedAt(reservationDTO.getUsageEndedAt())
-                .dayOfWeek(reservationDTO.getDayOfWeek())
-                .originalPrice(reservationDTO.getOriginalPrice())
-                .discountPrice(reservationDTO.getDiscountPrice())
-                .build();
-        System.out.println("reservation = " + reservation);
-        System.out.println("reservation.getReservationDate() = " + reservation.getReservationDate());
+        Reservation reservation = reservationDTO.toEntity();
 
         try {
-
             // Bean Validation
             var v = validator.validate(reservation);
-            System.out.println("v = " + v);
-            System.out.println("v.isEmpty() = " + v.isEmpty());
             reservation.validateCustom();
             if (!v.isEmpty()) {
                 throw new ConstraintViolationException(v);
             }
-        } catch (Exception e) {
+        } catch (ConstraintViolationException e) {
             e.printStackTrace();
         }
 
         try (Connection conn = new DatabaseConnection().getConnection()) {
-            System.out.println("conn.getCatalog() = " + conn.getCatalog());
             try {
-                System.out.println("좌석 잠금 & 가용성 확인 (SELECT … FOR UPDATE)");
                 // 1) 좌석 잠금 & 가용성 확인 (SELECT … FOR UPDATE)
                 if (!seatDAO.lockAndCheckAvailable(conn, seatId)) {
                     throw new IllegalStateException("이미 예약된 좌석입니다.");
                 }
 
-                System.out.println("좌석 사용 Y → N 업데이트");
                 // 2) 좌석 사용 Y → N 업데이트
                 if (!seatDAO.updateAvailability(conn, seatId, false)) {
                     throw new IllegalStateException("좌석 상태 갱신 실패");
                 }
 
-                System.out.println("예약 INSERT");
-                System.out.println("reservation.getCafeId() = " + reservation.getCafeId());
-                System.out.println("reservation.getOriginalPrice() = " + reservation.getOriginalPrice());
-                System.out.println("reservation.getReservationDate() = " + reservation.getReservationDate());
                 // 3) 예약 INSERT
                 long newId = reservationDAO.create(reservation);
 
