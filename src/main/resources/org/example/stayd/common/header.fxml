@@ -8,7 +8,7 @@
 <HBox fx:id="headerHBox" alignment="CENTER" prefHeight="130.0" prefWidth="1024.0" spacing="30" style="-fx-background-color: white;" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.stayd.common.HeaderController">
     <!-- 로고 이미지 -->
         <ImageView fitHeight="130.0" fitWidth="150.0" pickOnBounds="true" preserveRatio="true" style="-fx-translate-x: 50;" onMouseClicked="#goToHome">
-            <Image url="@/images/header/logo.png" />
+            <Image url="@../../../../images/header/logo.png" />
     </ImageView>
 
     <!-- 빈 공간 -->
@@ -17,7 +17,7 @@
     <!-- 유저 프로필 아이콘: 오른쪽에 배치 -->
     <ImageView fitHeight="130.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true" style="-fx-translate-x: -50;" onMouseClicked="#goToUserPage">
         <image>
-            <Image url="@/images/header/icon_user_profile.png" />
+            <Image url="@../../../../images/header/icon_user_profile.png" />
         </image>
     </ImageView>
 </HBox>
