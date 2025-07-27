@@ -1,11 +1,11 @@
+// 작성자 : 방대혁, 이해든, 최영준
 package org.example.stayd;
 
+import java.io.IOException;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-
-import java.io.IOException;
 
 public class MainApplication extends Application {
     @Override

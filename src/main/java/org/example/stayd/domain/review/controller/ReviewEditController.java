@@ -1,29 +1,40 @@
+// 작성자 : 이해든, 방대혁
 package org.example.stayd.domain.review.controller;
-
-import javafx.fxml.FXML;
-import javafx.scene.control.*;
-import javafx.scene.input.MouseEvent;
-import javafx.stage.Stage;
-import org.example.stayd.domain.review.dao.ReviewDAO;
-import org.example.stayd.domain.review.dto.ReviewDTO;
-import org.example.stayd.domain.reservation.dao.ReservationWDAO;
-import org.example.stayd.common.DatabaseConnection;
 
 import java.sql.Connection;
 import java.util.Arrays;
 import java.util.List;
+import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.ToggleButton;
+import javafx.scene.input.MouseEvent;
+import javafx.stage.Stage;
+import org.example.stayd.common.DatabaseConnection;
+import org.example.stayd.domain.reservation.dao.ReservationWDAO;
+import org.example.stayd.domain.review.dao.ReviewDAO;
+import org.example.stayd.domain.review.dto.ReviewDTO;
 
 public class ReviewEditController {
 
-    @FXML private ToggleButton star1;
-    @FXML private ToggleButton star2;
-    @FXML private ToggleButton star3;
-    @FXML private ToggleButton star4;
-    @FXML private ToggleButton star5;
+    @FXML
+    private ToggleButton star1;
+    @FXML
+    private ToggleButton star2;
+    @FXML
+    private ToggleButton star3;
+    @FXML
+    private ToggleButton star4;
+    @FXML
+    private ToggleButton star5;
 
-    @FXML private TextArea reviewTextArea;
-    @FXML private Button saveButton;
-    @FXML private Button cancelButton;
+    @FXML
+    private TextArea reviewTextArea;
+    @FXML
+    private Button saveButton;
+    @FXML
+    private Button cancelButton;
 
     private final ReviewDAO reviewDAO = new ReviewDAO();
     private List<ToggleButton> stars;

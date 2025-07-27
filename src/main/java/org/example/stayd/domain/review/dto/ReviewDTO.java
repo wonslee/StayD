@@ -1,3 +1,4 @@
+// 작성자 : 이해든
 package org.example.stayd.domain.review.dto;
 
 import java.time.LocalDateTime;
@@ -13,7 +14,8 @@ public class ReviewDTO {
     private String content;
     private LocalDateTime reviewCreatedAt;
 
-    public ReviewDTO() {}
+    public ReviewDTO() {
+    }
 
     public ReviewDTO(long reservationId, long cafeId, long userId, String cafeName,
                      int rating, String content, LocalDateTime reviewCreatedAt) {
@@ -81,6 +83,7 @@ public class ReviewDTO {
     public void setReviewCreatedAt(LocalDateTime reviewCreatedAt) {
         this.reviewCreatedAt = reviewCreatedAt;
     }
+
     public String getLoginId() {
         return loginId;
     }

@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- 작성자 : 이원석, 방대혁 -->
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
@@ -6,15 +7,12 @@
 <?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Separator?>
+<?import javafx.scene.effect.DropShadow?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
-<?import javafx.scene.effect.DropShadow?>
 <?import javafx.scene.paint.Color?>
-<?import javafx.scene.chart.BarChart?>
-<?import javafx.scene.chart.CategoryAxis?>
-<?import javafx.scene.chart.NumberAxis?>
 <VBox xmlns:fx="http://javafx.com/fxml"
       fx:controller="org.example.stayd.domain.reservation.controller.ReservationCreateController"
       spacing="28">
@@ -67,13 +65,16 @@
     <Separator/>
 
     <!-- ── 좌석 ── -->
-    <Label text="좌석 현황"  style="-fx-font-size:16; -fx-font-weight:bold;"/>
-    <GridPane fx:id="seatGrid"  hgap="8" vgap="8"/>
+    <Label text="좌석 현황" style="-fx-font-size:16; -fx-font-weight:bold;"/>
+    <GridPane fx:id="seatGrid" hgap="8" vgap="8"/>
 
     <HBox spacing="16">
-    <Label text="●" style="-fx-text-fill:#BDBDBD;"/><Label text="이용 가능"/>
-    <Label text="●" style="-fx-text-fill:#F44336;"/><Label text="예약됨"/>
-    <Label text="●" style="-fx-text-fill:#4CAF50;"/><Label text="선택됨"/>
+        <Label text="●" style="-fx-text-fill:#BDBDBD;"/>
+        <Label text="이용 가능"/>
+        <Label text="●" style="-fx-text-fill:#F44336;"/>
+        <Label text="예약됨"/>
+        <Label text="●" style="-fx-text-fill:#4CAF50;"/>
+        <Label text="선택됨"/>
     </HBox>
 
     <Button text="예약" fx:id="reserveBtn" prefWidth="180" prefHeight="40" onAction="#handleReserve"

@@ -1,17 +1,8 @@
+// 작성자 : 방대혁
 package org.example.stayd.domain.user.controller;
 
-import javafx.application.Platform;
-import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
-import javafx.scene.control.*;
-import javafx.stage.Stage;
-import org.example.stayd.common.EmailService;
-import org.example.stayd.common.FXUtils;
-import org.example.stayd.config.SceneConfig;
-import org.example.stayd.domain.user.dto.PasswordResetDTO;
-import org.example.stayd.domain.user.service.UserService;
+import static javafx.application.Platform.runLater;
+import static org.example.stayd.common.FXUtils.showAlert;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -19,9 +10,20 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Properties;
 import java.util.UUID;
-
-import static javafx.application.Platform.runLater;
-import static org.example.stayd.common.FXUtils.showAlert;
+import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.scene.control.TextInputDialog;
+import javafx.stage.Stage;
+import org.example.stayd.common.EmailService;
+import org.example.stayd.config.SceneConfig;
+import org.example.stayd.domain.user.dto.PasswordResetDTO;
+import org.example.stayd.domain.user.service.UserService;
 
 public class FindPwController {
 
@@ -42,8 +44,7 @@ public class FindPwController {
     private PasswordResetDTO resetDto;  // 비밀번호 재설정 DTO
 
     /**
-     * 화면 초기화 시 호출되는 메서드.
-     * 이메일과 아이디 입력 시, 유효성 검사를 통해 버튼을 활성화/비활성화함.
+     * 화면 초기화 시 호출되는 메서드. 이메일과 아이디 입력 시, 유효성 검사를 통해 버튼을 활성화/비활성화함.
      */
     @FXML
     public void initialize() {
@@ -67,10 +68,7 @@ public class FindPwController {
     }
 
     /**
-     * 인증 코드 요청 버튼 클릭 시 호출되는 메서드
-     * 1. 이메일 형식 검증
-     * 2. 아이디와 이메일 일치 여부 확인
-     * 3. 인증 코드 생성 및 이메일로 발송
+     * 인증 코드 요청 버튼 클릭 시 호출되는 메서드 1. 이메일 형식 검증 2. 아이디와 이메일 일치 여부 확인 3. 인증 코드 생성 및 이메일로 발송
      */
     @FXML
     private void onSendCode() {
@@ -133,9 +131,9 @@ public class FindPwController {
                 String body = """
                         안녕하세요.
                         요청하신 회원님의 인증번호는 다음과 같습니다:
-                        
+                                                
                         인증 코드: %s
-                        
+                                                
                         감사합니다.
                         """.formatted(pendingToken);
 

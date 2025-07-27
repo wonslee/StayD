@@ -1,3 +1,4 @@
+// 작성자 : 이원석
 package org.example.stayd.common;
 
 public class BusinessLogicConstants {
@@ -18,7 +19,6 @@ public class BusinessLogicConstants {
     public static final int MIN_OPERATION_HOUR = 0;
     public static final int MAX_OPERATION_HOUR = 23;
     public static final int MAX_CAFE_PHONE_NUMBER_LENGTH = 255;
-
 
     // TODO: 스케줄러 시간대 & 주기
 

@@ -1,9 +1,9 @@
+// 작성자 : 최영준
 package org.example.stayd.domain.cafe.model;
 
+import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.time.LocalDateTime;
 
 /**
  * 스터디 카페 엔티티 클래스
@@ -22,7 +22,8 @@ public class CafeModel {
     private LocalDateTime createdAt;
 
     // 기본 생성자
-    public CafeModel() {}
+    public CafeModel() {
+    }
 
     // 생성자 (ID 제외)
     public CafeModel(Long ownerId, String name, String address, Integer pricePerHour,

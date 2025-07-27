@@ -1,3 +1,4 @@
+-- 작성자 : 최영준
 -- 카페 검색 및 정렬 함수
 CREATE OR REPLACE FUNCTION search_cafes_advanced(
     p_keyword IN VARCHAR2 DEFAULT NULL,         -- 검색 키워드

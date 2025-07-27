@@ -1,3 +1,4 @@
+-- 작성자 : 방대혁
 CREATE OR REPLACE PROCEDURE register_user (
   p_login_id   IN VARCHAR2,
   p_email      IN VARCHAR2,

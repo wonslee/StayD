@@ -1,3 +1,4 @@
+-- 작성자 : 최영준
 -- 스터디 카페 생성 프로시저 (영어 요일로 저장)
 CREATE OR REPLACE PROCEDURE create_study_cafe(
     p_owner_id IN NUMBER,

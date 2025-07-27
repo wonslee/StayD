@@ -1,11 +1,11 @@
+// 작성자 : 최영준
 package org.example.stayd.common;
 
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 요일 변환 유틸리티 클래스
- * 한글 요일 ↔ 영어 요일 변환
+ * 요일 변환 유틸리티 클래스 한글 요일 ↔ 영어 요일 변환
  */
 public class DayOfWeekConverter {
 
@@ -37,6 +37,7 @@ public class DayOfWeekConverter {
 
     /**
      * 한글 요일을 영어 요일로 변환
+     *
      * @param koreanDay 한글 요일 (월, 화, 수, 목, 금, 토, 일)
      * @return 영어 요일 (MON, TUE, WED, THU, FRI, SAT, SUN)
      */
@@ -56,6 +57,7 @@ public class DayOfWeekConverter {
 
     /**
      * 영어 요일을 한글 요일로 변환
+     *
      * @param englishDay 영어 요일 (MON, TUE, WED, THU, FRI, SAT, SUN)
      * @return 한글 요일 (월, 화, 수, 목, 금, 토, 일)
      */

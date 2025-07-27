@@ -1,11 +1,25 @@
+// 작성자 : 방대혁
 package org.example.stayd.domain.user.controller;
 
+import static org.example.stayd.common.FXUtils.showAlert;
+
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.Optional;
+import java.util.Properties;
+import java.util.UUID;
+import java.util.regex.Pattern;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Label;
+import javafx.scene.control.PasswordField;
+import javafx.scene.control.TextField;
+import javafx.scene.control.TextInputDialog;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.Window;
@@ -14,18 +28,6 @@ import org.example.stayd.common.FXUtils;
 import org.example.stayd.config.SceneConfig;
 import org.example.stayd.domain.user.dto.UserDTO;
 import org.example.stayd.domain.user.service.UserService;
-
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.time.Duration;
-import java.time.Instant;
-import java.util.Optional;
-import java.util.Properties;
-import java.util.UUID;
-import java.util.regex.Pattern;
-
-import static org.example.stayd.common.FXUtils.showAlert;
 
 public class SignupController {
 
@@ -60,8 +62,7 @@ public class SignupController {
     private UserDTO pendingDto;  // 임시 사용자 DTO
 
     /**
-     * 초기화 메서드
-     * - 아이디, 이메일, 비밀번호, 비밀번호 확인의 유효성 검사 및 버튼 활성화 제어
+     * 초기화 메서드 - 아이디, 이메일, 비밀번호, 비밀번호 확인의 유효성 검사 및 버튼 활성화 제어
      */
     @FXML
     public void initialize() {
@@ -134,8 +135,7 @@ public class SignupController {
     }
 
     /**
-     * 비밀번호 확인 일치 로직
-     * - 비밀번호와 비밀번호 확인이 일치하는지 확인
+     * 비밀번호 확인 일치 로직 - 비밀번호와 비밀번호 확인이 일치하는지 확인
      */
     private void validatePasswordMatch() {
         String pw = passwordTextField.getText();
@@ -150,8 +150,7 @@ public class SignupController {
     }
 
     /**
-     * 버튼 활성화/비활성화 제어
-     * - 아이디, 이메일, 비밀번호 및 비밀번호 확인이 모두 유효한 경우에만 가입 버튼을 활성화
+     * 버튼 활성화/비활성화 제어 - 아이디, 이메일, 비밀번호 및 비밀번호 확인이 모두 유효한 경우에만 가입 버튼을 활성화
      */
     private void updateSignUpEnabled() {
         boolean idOk = "사용 가능한 아이디입니다.".equals(idValidationLabel.getText());
@@ -163,8 +162,7 @@ public class SignupController {
     }
 
     /**
-     * 회원가입 버튼 클릭 시 호출되는 메서드
-     * - 아이디, 이메일, 비밀번호를 검증하고, 인증 코드를 발송하며, 비밀번호를 재설정하기 위한 화면으로 전환
+     * 회원가입 버튼 클릭 시 호출되는 메서드 - 아이디, 이메일, 비밀번호를 검증하고, 인증 코드를 발송하며, 비밀번호를 재설정하기 위한 화면으로 전환
      */
     @FXML
     private void onSignUp() {
@@ -224,7 +222,8 @@ public class SignupController {
                 });
             } catch (Exception e) {
                 Platform.runLater(() -> {
-                    showAlert(signUpButton.getScene().getWindow(), Alert.AlertType.ERROR, "발송 실패", "이메일 발송에 실패했습니다. 다시 시도하세요.");
+                    showAlert(signUpButton.getScene().getWindow(), Alert.AlertType.ERROR, "발송 실패",
+                            "이메일 발송에 실패했습니다. 다시 시도하세요.");
                     signUpButton.setDisable(false);
                 });
             }
@@ -232,8 +231,7 @@ public class SignupController {
     }
 
     /**
-     * 인증 코드 입력 및 검증 후 회원가입 완료
-     * - 사용자에게 입력을 받아 인증하고, 회원가입을 완료
+     * 인증 코드 입력 및 검증 후 회원가입 완료 - 사용자에게 입력을 받아 인증하고, 회원가입을 완료
      */
     private void promptForVerification() {
         TextInputDialog dlg = new TextInputDialog();
@@ -271,8 +269,7 @@ public class SignupController {
     }
 
     /**
-     * 라벨 색 변환
-     * - 라벨 텍스트와 색상 설정
+     * 라벨 색 변환 - 라벨 텍스트와 색상 설정
      */
     private void setLabel(Label label, String text, boolean positive) {
         label.setText(text);
@@ -280,8 +277,7 @@ public class SignupController {
     }
 
     /**
-     * 로그인 페이지 이동
-     * - 회원가입 후 로그인 페이지로 이동
+     * 로그인 페이지 이동 - 회원가입 후 로그인 페이지로 이동
      */
     @FXML
     private void goToLogin() {
@@ -290,7 +286,8 @@ public class SignupController {
             FXUtils.switchScene(stage, SceneConfig.LOGIN_FXML);
         } catch (IOException e) {
             e.printStackTrace();
-            showAlert(signUpButton.getScene().getWindow(), Alert.AlertType.ERROR, "화면 전환 오류", "로그인 화면을 불러오는 중 오류가 발생했습니다.");
+            showAlert(signUpButton.getScene().getWindow(), Alert.AlertType.ERROR, "화면 전환 오류",
+                    "로그인 화면을 불러오는 중 오류가 발생했습니다.");
         }
     }
 }

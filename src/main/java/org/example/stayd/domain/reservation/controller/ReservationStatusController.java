@@ -1,35 +1,25 @@
+// 작성자 : 이원석, 방대혁
 package org.example.stayd.domain.reservation.controller;
 
-import java.io.IOException;
+import static org.example.stayd.common.FXUtils.showAlert;
+
 import java.sql.Date;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.List;
-
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
-import javafx.scene.Scene;
 import javafx.scene.chart.BarChart;
 import javafx.scene.chart.CategoryAxis;
-import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Alert;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
-import javafx.stage.Stage;
 import org.example.stayd.common.FXUtils;
-import org.example.stayd.config.SceneConfig;
 import org.example.stayd.domain.reservation.dto.ReservationDTO;
 import org.example.stayd.domain.reservation.service.ReservationService;
-
-import static org.example.stayd.common.FXUtils.showAlert;
 
 public class ReservationStatusController {
 
@@ -40,7 +30,7 @@ public class ReservationStatusController {
     @FXML
     private DatePicker datePicker;  // 날짜 선택을 위한 DatePicker
 
-    private ReservationService reservationService;
+    private final ReservationService reservationService;
 
     /**
      * 생성자: ReservationService 객체 초기화
@@ -50,8 +40,7 @@ public class ReservationStatusController {
     }
 
     /**
-     * 날짜 선택 시 호출되는 메서드
-     * 사용자가 선택한 날짜에 해당하는 예약 현황을 조회하고, 차트를 업데이트
+     * 날짜 선택 시 호출되는 메서드 사용자가 선택한 날짜에 해당하는 예약 현황을 조회하고, 차트를 업데이트
      */
     public void loadReservationStatus() {
         LocalDate localDate = datePicker.getValue();  // DatePicker에서 선택된 날짜
@@ -63,7 +52,8 @@ public class ReservationStatusController {
 
             try {
                 // 선택된 날짜에 해당하는 예약 현황 데이터 가져오기
-                List<ReservationDTO> reservationList = reservationService.getReservationStatusByLoggedInUser(selectedDate);
+                List<ReservationDTO> reservationList = reservationService.getReservationStatusByLoggedInUser(
+                        selectedDate);
 
                 // 예약 리스트가 비어 있는지 확인
                 if (reservationList.isEmpty()) {
@@ -83,8 +73,7 @@ public class ReservationStatusController {
     }
 
     /**
-     * 예약 현황 차트를 업데이트하는 메서드
-     * 예약 데이터를 바탕으로 24시간 동안의 예약 건수를 시각화
+     * 예약 현황 차트를 업데이트하는 메서드 예약 데이터를 바탕으로 24시간 동안의 예약 건수를 시각화
      */
     private void updateChart(List<ReservationDTO> reservationList) {
         int[] reservationCounts = new int[24];  // 24시간 동안 예약 건수를 저장할 배열
@@ -153,8 +142,7 @@ public class ReservationStatusController {
     }
 
     /**
-     * 예약 건수에 따른 색상 반환
-     * 예약 건수에 따라 색상을 다르게 표시 (예: 예약 건수가 많으면 빨간색, 적으면 대표 색)
+     * 예약 건수에 따른 색상 반환 예약 건수에 따라 색상을 다르게 표시 (예: 예약 건수가 많으면 빨간색, 적으면 대표 색)
      */
     private Color getColorBasedOnCount(int count) {
         if (count > 10) {
@@ -166,15 +154,18 @@ public class ReservationStatusController {
 
     /**
      * 색상을 hex 값으로 변환
+     *
      * @param color Color 객체
      * @return hex 색상 코드
      */
     private String colorToHex(Color color) {
-        return String.format("#%02X%02X%02X", (int) (color.getRed() * 255), (int) (color.getGreen() * 255), (int) (color.getBlue() * 255));
+        return String.format("#%02X%02X%02X", (int) (color.getRed() * 255), (int) (color.getGreen() * 255),
+                (int) (color.getBlue() * 255));
     }
 
     /**
      * 마우스가 버튼 위에 올라갔을 때 색상 변경
+     *
      * @param event MouseEvent
      */
     @FXML
@@ -184,6 +175,7 @@ public class ReservationStatusController {
 
     /**
      * 마우스가 버튼을 벗어났을 때 원래 색상으로 복원
+     *
      * @param event MouseEvent
      */
     @FXML

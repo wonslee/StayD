@@ -1,5 +1,8 @@
+// 작성자 : 이원석
 package org.example.stayd.domain.reservation.controller;
 
+import java.net.URL;
+import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -7,16 +10,15 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.GridPane;
 
-import java.net.URL;
-import java.util.ResourceBundle;
-
 public class SeatSelectionController implements Initializable {
     private static final int ROWS = 5;
     private static final int COLS = 4;
 
     // -------- FXML에서 주입 ----------
-    @FXML private GridPane seatGrid;
-    @FXML private Button    selectBtn;
+    @FXML
+    private GridPane seatGrid;
+    @FXML
+    private Button selectBtn;
 
     private final ToggleButton[][] seats = new ToggleButton[ROWS][COLS];
 
@@ -43,7 +45,9 @@ public class SeatSelectionController implements Initializable {
         }
     }
 
-    /** 개별 좌석 클릭 */
+    /**
+     * 개별 좌석 클릭
+     */
     @FXML
     private void seatClicked(ActionEvent e) {
         ToggleButton btn = (ToggleButton) e.getSource();
@@ -51,7 +55,9 @@ public class SeatSelectionController implements Initializable {
         // TODO: 버튼 클릭시 - 초록색으로 색 변경. 해당 좌석 정보 가져와서 DB 저장할 준비
     }
 
-    /** ‘선택’ 버튼 클릭 */
+    /**
+     * ‘선택’ 버튼 클릭
+     */
     @FXML
     private void selectClicked(ActionEvent e) {
         // TODO: DB상에 예약 데이터 저장 (스터디카페 예약 정보 모두 가져와야 함)

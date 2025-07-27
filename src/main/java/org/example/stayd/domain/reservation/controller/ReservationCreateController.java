@@ -1,3 +1,4 @@
+// 작성자 : 이원석, 방대혁
 package org.example.stayd.domain.reservation.controller;
 
 import static org.example.stayd.common.BusinessLogicConstants.DEFAULT_SEAT_COLS;
@@ -8,6 +9,7 @@ import java.util.List;
 import java.util.stream.IntStream;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -24,24 +26,24 @@ import org.example.stayd.common.SessionManager;
 import org.example.stayd.config.SceneConfig;
 import org.example.stayd.domain.cafe.dto.CafeDto;
 import org.example.stayd.domain.cafe.dto.CafeDto.DetailResponse;
-import org.example.stayd.domain.cafe.model.DiscountHours;
+import org.example.stayd.domain.cafe.model.DayOfWeek;
+import org.example.stayd.domain.cafe.model.OperationHours;
 import org.example.stayd.domain.cafe.service.CafeService;
 import org.example.stayd.domain.reservation.dto.ReservationDTO;
-import org.example.stayd.domain.cafe.model.OperationHours;
-import org.example.stayd.domain.cafe.model.DayOfWeek;
 import org.example.stayd.domain.reservation.model.Reservation;
 import org.example.stayd.domain.reservation.model.Seat;
 import org.example.stayd.domain.reservation.service.ReservationService;
 import org.example.stayd.domain.user.service.UserService;
-import javafx.scene.control.DateCell;
-import javafx.util.Callback;
-import java.util.Set;
-import java.util.stream.Collectors;
-import javafx.fxml.FXMLLoader;
 
+/**
+ * 예약 생성 화면의 JavaFX 컨트롤러 클래스입니다.
+ * <p>
+ * UI 이벤트 처리, 입력값 검증, 예약 생성 요청, 좌석 현황 갱신 등 View와 Service 계층을 연결하는 역할을 합니다.
+ * </p>
+ */
 @NoArgsConstructor
 public class ReservationCreateController {
-    private UserService userService = new UserService();
+    private final UserService userService = new UserService();
 
     /* 주입될 DTO */
     private CafeDto.DetailResponse cafe;
@@ -49,7 +51,7 @@ public class ReservationCreateController {
     /* 서비스 & 상태 */
     private final ReservationService service = new ReservationService();
     private Seat selectedSeat;
-    private CafeService cafeService = new CafeService();
+    private final CafeService cafeService = new CafeService();
 
     public ReservationCreateController(DetailResponse cafe) {
         this.cafe = cafe;
@@ -68,7 +70,12 @@ public class ReservationCreateController {
     private Button reserveBtn;
 
 
-    /* 초기화는 FXML 로드 직후 호출 */
+    /**
+     * FXML 로드 직후 자동 호출되는 초기화 메서드입니다.
+     * <p>
+     * 시간 콤보박스를 초기화하고, 카페 정보가 있으면 좌석 현황을 불러오고 가격을 계산합니다.
+     * </p>
+     */
     @FXML
     public void initialize() {
         initTimeCombos();
@@ -78,27 +85,37 @@ public class ReservationCreateController {
         }
     }
 
-
+    /**
+     * 선택한 날짜와 카페의 운영시간에 따라 시작/종료 시간 콤보박스를 동적으로 갱신합니다.
+     * <p>
+     * 운영하지 않는 날이거나 예외 발생 시 콤보박스와 예약 버튼을 비활성화합니다.
+     * </p>
+     *
+     * @throws Exception 카페 운영시간 조회 실패 등
+     */
     private void updateTimeCombosForSelectedDay() {
         System.out.println("updateTimeCombosForSelectedDay()");
-        if (cafe == null || datePicker.getValue() == null) return;
+        if (cafe == null || datePicker.getValue() == null) {
+            return;
+        }
         String dayOfWeekStr = datePicker.getValue().getDayOfWeek().name().substring(0, 3).toUpperCase();
         DayOfWeek selectedDay = DayOfWeek.valueOf(dayOfWeekStr);
         try {
             java.util.List<OperationHours> opHours = cafeService.getOperationHours(cafe.getCafeId());
             OperationHours op = opHours.stream()
-                .filter(o -> o.dayOfWeek() == selectedDay)
-                .findFirst().orElse(null);
+                    .filter(o -> o.dayOfWeek() == selectedDay)
+                    .findFirst().orElse(null);
             if (op != null) {
                 int open = op.operationStart();
                 int close = op.operationEnd();
-                int nowHour = (datePicker.getValue().isEqual(LocalDate.now())) ? java.time.LocalTime.now().getHour() : open;
+                int nowHour =
+                        (datePicker.getValue().isEqual(LocalDate.now())) ? java.time.LocalTime.now().getHour() : open;
                 java.util.List<Integer> startHours = java.util.stream.IntStream.range(open, close)
-                    .filter(h -> datePicker.getValue().isAfter(LocalDate.now()) || h > nowHour)
-                    .boxed().toList();
+                        .filter(h -> datePicker.getValue().isAfter(LocalDate.now()) || h > nowHour)
+                        .boxed().toList();
                 java.util.List<Integer> endHours = java.util.stream.IntStream.rangeClosed(open + 1, close)
-                    .filter(h -> datePicker.getValue().isAfter(LocalDate.now()) || h > nowHour)
-                    .boxed().toList();
+                        .filter(h -> datePicker.getValue().isAfter(LocalDate.now()) || h > nowHour)
+                        .boxed().toList();
                 startCombo.getItems().setAll(startHours);
                 endCombo.getItems().setAll(endHours);
                 startCombo.setValue(null);
@@ -135,16 +152,25 @@ public class ReservationCreateController {
         }
     }
 
+    /**
+     * 날짜 선택 시 호출되는 이벤트 핸들러입니다.
+     * <p>
+     * 선택한 날짜에 따라 좌석 현황 및 할인 시간대 정보를 갱신하고, 가격을 재계산합니다.
+     * </p>
+     *
+     * @param event 날짜 선택 이벤트
+     */
     @FXML
     public void handleDateChange(ActionEvent event) {
         updateTimeCombosForSelectedDay();
         // Update discountHoursLabel only when date is picked
         if (cafe != null && datePicker.getValue() != null) {
             String dayOfWeek = datePicker.getValue().getDayOfWeek().name().substring(0, 3).toUpperCase();
-            java.util.List<org.example.stayd.domain.cafe.model.DiscountHours> discounts = cafeService.getDiscountHours(cafe.getCafeId());
+            java.util.List<org.example.stayd.domain.cafe.model.DiscountHours> discounts = cafeService.getDiscountHours(
+                    cafe.getCafeId());
             org.example.stayd.domain.cafe.model.DiscountHours dh = discounts.stream()
-                .filter(d -> d.dayOfWeek().name().equalsIgnoreCase(dayOfWeek))
-                .findFirst().orElse(null);
+                    .filter(d -> d.dayOfWeek().name().equalsIgnoreCase(dayOfWeek))
+                    .findFirst().orElse(null);
             if (dh != null) {
                 String period = String.format("%02d:00 ~ %02d:00", dh.discountStart(), dh.discountEnd());
                 discountHoursLabel.setText(period);
@@ -152,27 +178,61 @@ public class ReservationCreateController {
                 discountHoursLabel.setText("없음");
             }
         } else {
-            if (discountHoursLabel != null) discountHoursLabel.setText("");
+            if (discountHoursLabel != null) {
+                discountHoursLabel.setText("");
+            }
         }
         recalc();
     }
 
+    /**
+     * 시작 시간 콤보박스 변경 시 호출되는 이벤트 핸들러입니다.
+     * <p>
+     * 종료 시간, 가격 등 관련 UI를 갱신합니다.
+     * </p>
+     *
+     * @param event 콤보박스 변경 이벤트
+     */
     @FXML
     public void handleStartComboChange(ActionEvent event) {
         recalc();
     }
 
+    /**
+     * 종료 시간 콤보박스 변경 시 호출되는 이벤트 핸들러입니다.
+     * <p>
+     * 가격 등 관련 UI를 갱신합니다.
+     * </p>
+     *
+     * @param event 콤보박스 변경 이벤트
+     */
     @FXML
     public void handleEndComboChange(ActionEvent event) {
         recalc();
     }
 
+    /**
+     * 예약 버튼 클릭 시 호출되는 이벤트 핸들러입니다.
+     * <p>
+     * 입력값 검증 후 예약 생성 요청을 보냅니다. 예약 성공 시 상세 페이지로 이동합니다.
+     * </p>
+     *
+     * @param event 버튼 클릭 이벤트
+     */
     @FXML
     public void handleReserve(ActionEvent event) {
         makeReservation();
         checkIfUserLoggedIn(event);
     }
 
+    /**
+     * 카페 정보를 설정하고, 좌석 현황과 시간 콤보박스를 초기화합니다.
+     * <p>
+     * FXML 필드가 주입된 이후에 호출되어야 정상 동작합니다.
+     * </p>
+     *
+     * @param cafe 카페 상세 정보 DTO
+     */
     public void setCafe(CafeDto.DetailResponse cafe) {
         this.cafe = cafe;
         // If FXML fields are injected, update UI
@@ -187,15 +247,26 @@ public class ReservationCreateController {
     }
 
 
-    /* ───────── 시간 콤보 채우기 ───────── */
+    /**
+     * 시간 콤보박스를 0~24시로 초기화합니다.
+     * <p>
+     * 운영시간 컬럼이 있으면 실제 운영시간으로 대체할 수 있습니다.
+     * </p>
+     */
     private void initTimeCombos() {
         int open = 0, close = 24; // 운영시간 컬럼이 있으면 교체
         startCombo.getItems().setAll(IntStream.range(open, close).boxed().toList());
         endCombo.getItems().setAll(IntStream.rangeClosed(open + 1, close).boxed().toList());
     }
 
-    //    TODO: CafeService로 이동
-    /* ───────── 좌석 로딩 ───────── */
+    /**
+     * 카페의 좌석 정보를 불러와서 좌석 그리드에 버튼으로 표시합니다.
+     * <p>
+     * 좌석의 가용성에 따라 버튼의 스타일과 활성화 상태를 다르게 표시하며, 좌석 선택 시 선택된 좌석을 저장합니다.
+     * </p>
+     *
+     * @throws SQLException 좌석 정보 조회 실패 시
+     */
     private void loadSeats() {
         try {
             selectedSeat = null;
@@ -239,6 +310,12 @@ public class ReservationCreateController {
         }
     }
 
+    /**
+     * 현재 선택된 시간, 카페, 할인 정책에 따라 총 가격을 계산하여 UI에 표시합니다.
+     * <p>
+     * 할인 적용 시 할인 금액도 함께 표시합니다.
+     * </p>
+     */
     private void recalc() {
         if (cafe == null) {
             return;
@@ -249,8 +326,8 @@ public class ReservationCreateController {
             return;
         }
         String dayOfWeek = datePicker.getValue() != null
-            ? datePicker.getValue().getDayOfWeek().name().substring(0, 3).toUpperCase()
-            : "MON"; // default/fallback
+                ? datePicker.getValue().getDayOfWeek().name().substring(0, 3).toUpperCase()
+                : "MON"; // default/fallback
 
         int total = cafeService.calculateCafePrice(cafe.getCafeId(), dayOfWeek, sh, eh);
         int undiscounted = (eh - sh) * cafe.getPricePerHour();
@@ -264,7 +341,14 @@ public class ReservationCreateController {
         }
     }
 
-    /* ───────── 예약 실행 ───────── */
+    /**
+     * 예약 생성 로직을 수행합니다.
+     * <p>
+     * 1. 로그인 여부 확인, 2. 입력값 검증, 3. 예약 DTO 생성, 4. 서비스 호출, 5. 성공 시 상세 페이지 이동
+     * </p>
+     *
+     * @throws Exception 예약 생성 실패 시 예외 발생 (DB 오류, 검증 실패 등)
+     */
     private void makeReservation() {
         if (cafe == null) {
             return;
@@ -293,7 +377,11 @@ public class ReservationCreateController {
             return;
         }
 
+        long userId = SessionManager.getInstance().getLoggedInUser().getUser_id();
+
         ReservationDTO dto = ReservationDTO.builder()
+                .cafeId(cafe.getCafeId())
+                .userId(userId)
                 .reservationDate(date)
                 .usageStartedAt(sh)
                 .usageEndedAt(eh)
@@ -302,14 +390,10 @@ public class ReservationCreateController {
                 .discountPrice((eh - sh) * cafe.getPricePerHour()) // 할인 미적용
                 .build();
 
-        long userId = SessionManager.getInstance().getLoggedInUser().getUser_id();
-
         try {
             Reservation newReservation = service.createReservation(
-                    cafe.getCafeId(),
-                    selectedSeat.getSeatId(),
-                    userId,
-                    dto
+                    dto,
+                    selectedSeat.getSeatId()
             );
             if (newReservation != null) {
                 // 예약 성공 시 상세 페이지로 이동 (데이터 전달)
@@ -324,16 +408,25 @@ public class ReservationCreateController {
         }
     }
 
-    // 상세 페이지로 이동하는 메서드
+    /**
+     * 예약 생성 성공 시 예약 상세 페이지로 이동합니다.
+     * <p>
+     * 생성된 예약 정보와 카페 정보를 상세 컨트롤러에 전달합니다.
+     * </p>
+     *
+     * @param createdReservation 생성된 예약 객체
+     */
     private void navigateToReservationDetail(Reservation createdReservation) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/stayd/reservation/reservation-detail.fxml"));
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource("/org/example/stayd/reservation/reservation-detail.fxml"));
             Node detailView = loader.load();
             // 컨트롤러 가져오기
             org.example.stayd.domain.reservation.controller.ReservationDetailController detailController = loader.getController();
             // 데이터 전달
             detailController.setCafe(this.cafe);
-            detailController.setReservation(org.example.stayd.domain.reservation.dto.ReservationDTO.of(createdReservation));
+            detailController.setReservation(
+                    org.example.stayd.domain.reservation.dto.ReservationDTO.of(createdReservation));
             detailController.updateUI();
             // 현재 Stage에서 전환
             Stage stage = (Stage) reserveBtn.getScene().getWindow();
@@ -344,14 +437,22 @@ public class ReservationCreateController {
         }
     }
 
+    /**
+     * 예약 버튼 클릭 후 로그인 상태를 확인하여, 로그인되어 있지 않으면 로그인 페이지로 이동합니다.
+     * <p>
+     * 로그인 상태라면 마이페이지(예약 상세)로 이동합니다.
+     * </p>
+     *
+     * @param event 예약 버튼 클릭 이벤트
+     */
     private void checkIfUserLoggedIn(ActionEvent event) {
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
 
         // 로그인 상태 확인
         if (userService.isUserLoggedIn()) {
-            // TODO: 정상 케이스 - 유저가 로그인되어있으면 마이페이지 - 예약 상세 페이지로 이동
             System.out.println("navigating to my page");
-            FXUtils.navigateToPage(stage, "/org/example/stayd/reservation/reservation-detail.fxml", "마이페이지로 이동하는 중 오류가 발생했습니다.");
+            FXUtils.navigateToPage(stage, "/org/example/stayd/reservation/reservation-detail.fxml",
+                    "마이페이지로 이동하는 중 오류가 발생했습니다.");
         } else {
             // 비전상 케이스 - 유저가 로그인 되어있지 않으면 로그인 페이지로 이동
             FXUtils.navigateToPage(stage, SceneConfig.LOGIN_FXML, "로그인 화면으로 이동하는 중 오류가 발생했습니다.");

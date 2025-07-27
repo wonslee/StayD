@@ -1,5 +1,11 @@
+// 작성자 : 방대혁
 package org.example.stayd.domain.user.controller;
 
+import static org.example.stayd.common.FXUtils.showAlert;
+
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.Properties;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
@@ -7,17 +13,10 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
-import javafx.stage.Window;
 import org.example.stayd.common.EmailService;
 import org.example.stayd.common.FXUtils;
 import org.example.stayd.config.SceneConfig;
 import org.example.stayd.domain.user.service.UserService;
-
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.Properties;
-
-import static org.example.stayd.common.FXUtils.showAlert;
 
 public class FindIdController {
 
@@ -34,8 +33,7 @@ public class FindIdController {
     private final String propertiesFile = "src/main/resources/application.properties";  // 이메일 설정 파일 경로
 
     /**
-     * 화면 초기화 시 실행되는 메서드
-     * 이메일 입력란에 텍스트가 입력되면 유효성 검사 후 버튼 활성화 여부를 설정
+     * 화면 초기화 시 실행되는 메서드 이메일 입력란에 텍스트가 입력되면 유효성 검사 후 버튼 활성화 여부를 설정
      */
     @FXML
     public void initialize() {
@@ -50,8 +48,7 @@ public class FindIdController {
     }
 
     /**
-     * 아이디 찾기 버튼 클릭 시 호출되는 메서드
-     * 이메일을 통해 아이디를 찾고, 이메일로 아이디를 전송하는 기능을 수행
+     * 아이디 찾기 버튼 클릭 시 호출되는 메서드 이메일을 통해 아이디를 찾고, 이메일로 아이디를 전송하는 기능을 수행
      */
     @FXML
     private void onFindId() {
@@ -100,9 +97,9 @@ public class FindIdController {
                 String body = """
                         안녕하세요.
                         요청하신 회원님의 아이디는 다음과 같습니다:
-                        
+                                                
                         %s
-                        
+                                                
                         감사합니다.
                         """.formatted(foundId);
 
@@ -125,7 +122,8 @@ public class FindIdController {
                                 SceneConfig.LOGIN_FXML
                         );
                     } catch (IOException ex) {
-                        showAlert(findIdButton.getScene().getWindow(), Alert.AlertType.ERROR, "화면 전환 오류", "로그인 화면으로 이동하는 중 오류가 발생했습니다.");
+                        showAlert(findIdButton.getScene().getWindow(), Alert.AlertType.ERROR, "화면 전환 오류",
+                                "로그인 화면으로 이동하는 중 오류가 발생했습니다.");
                     }
                 });
             } catch (Exception e) {

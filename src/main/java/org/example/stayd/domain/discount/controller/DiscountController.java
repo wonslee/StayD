@@ -1,16 +1,18 @@
+// 작성자 : 방대혁
 package org.example.stayd.domain.discount.controller;
 
+import static org.example.stayd.common.FXUtils.showAlert;
+
+import java.time.LocalDate;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.DatePicker;
+import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
-import org.example.stayd.common.FXUtils;
 import org.example.stayd.domain.discount.dto.DiscountDTO;
 import org.example.stayd.domain.discount.service.DiscountService;
-
-import java.sql.Date;
-import java.time.LocalDate;
-
-import static org.example.stayd.common.FXUtils.showAlert;
 
 public class DiscountController {
 
@@ -25,7 +27,7 @@ public class DiscountController {
     @FXML
     private Button saveButton; // 저장 버튼
 
-    private DiscountService discountService;  // DiscountService 객체
+    private final DiscountService discountService;  // DiscountService 객체
 
     public DiscountController() {
         this.discountService = new DiscountService();
@@ -42,8 +44,7 @@ public class DiscountController {
     }
 
     /**
-     * 할인 설정 저장 버튼 클릭 시 호출되는 메서드
-     * 할인 날짜, 시작 시간, 종료 시간, 할인율을 DB에 저장
+     * 할인 설정 저장 버튼 클릭 시 호출되는 메서드 할인 날짜, 시작 시간, 종료 시간, 할인율을 DB에 저장
      */
     // 할인 설정 저장 버튼 클릭 시 호출되는 메서드
     @FXML
@@ -61,7 +62,8 @@ public class DiscountController {
             String dayOfWeek = selectedDate.getDayOfWeek().name().substring(0, 3);  // MON, TUE, WED 등
 
             // 유효성 체크 (시간 범위와 할인율이 올바른지 확인)
-            if (startTime == null || endTime == null || startTime < 0 || startTime > 23 || endTime < 0 || endTime > 23 || discountRateValue < 0 || discountRateValue > 100) {
+            if (startTime == null || endTime == null || startTime < 0 || startTime > 23 || endTime < 0 || endTime > 23
+                    || discountRateValue < 0 || discountRateValue > 100) {
                 showAlert(null, Alert.AlertType.ERROR, "입력 오류", "유효하지 않은 입력값입니다. 시간을 0~23 사이로, 할인율을 0~100 사이로 입력해주세요.");
                 return;
             }
@@ -85,6 +87,7 @@ public class DiscountController {
 
     /**
      * 마우스가 버튼 위에 올라갔을 때 색상 변경
+     *
      * @param event MouseEvent
      */
     @FXML
@@ -96,6 +99,7 @@ public class DiscountController {
 
     /**
      * 마우스가 버튼을 벗어났을 때 원래 색상으로 복원
+     *
      * @param event MouseEvent
      */
     @FXML

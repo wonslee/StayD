@@ -1,19 +1,16 @@
+// 작성자 : 최영준, 방대혁, 이원석
 package org.example.stayd.domain.cafe.service;
 
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import org.example.stayd.common.DayOfWeekConverter;
 import org.example.stayd.common.SessionManager;
 import org.example.stayd.domain.cafe.dao.CafeDao;
 import org.example.stayd.domain.cafe.dto.CafeDto;
 import org.example.stayd.domain.cafe.model.CafeModel;
-import org.example.stayd.domain.cafe.model.OperationHours;
 import org.example.stayd.domain.cafe.model.DiscountHours;
-
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-
-
-import org.example.stayd.common.PerformanceMonitor;
+import org.example.stayd.domain.cafe.model.OperationHours;
 import org.example.stayd.domain.user.dto.UserDTO;
 
 /**
@@ -34,6 +31,7 @@ public class CafeService {
 
     /**
      * 스터디 카페 생성
+     *
      * @param request 카페 생성 요청 정보
      * @param ownerId 카페 소유자 ID (현재는 더미 데이터)
      * @return 생성 결과
@@ -85,6 +83,7 @@ public class CafeService {
 
     /**
      * 카페 생성 요청 검증
+     *
      * @param request 생성 요청
      * @throws IllegalArgumentException 검증 실패 시
      */
@@ -109,6 +108,7 @@ public class CafeService {
 
     /**
      * 카페 수정 요청 검증
+     *
      * @param request 수정 요청
      * @throws IllegalArgumentException 검증 실패 시
      */
@@ -137,6 +137,7 @@ public class CafeService {
 
     /**
      * 카페 기본 정보 공통 검증
+     *
      * @throws IllegalArgumentException 검증 실패 시
      */
     private void validateCafeBasicInfo(String name, String address, Integer pricePerHour,
@@ -161,6 +162,7 @@ public class CafeService {
             throw new IllegalArgumentException("카페 이름은 50자 이하로 입력해주세요.");
         }
     }
+
     private void validateCafeAddress(String address) {
         if (address == null || address.trim().isEmpty()) {
             throw new IllegalArgumentException("카페 주소를 입력해주세요.");
@@ -169,11 +171,13 @@ public class CafeService {
             throw new IllegalArgumentException("주소는 100자 이하로 입력해주세요.");
         }
     }
+
     private void validatePricePerHour(Integer pricePerHour) {
         if (pricePerHour == null || pricePerHour < 1000) {
             throw new IllegalArgumentException("시간당 가격은 1000원 이상이어야 합니다.");
         }
     }
+
     private void validateDescription(String description, int maxLength) {
         if (description == null || description.trim().isEmpty()) {
             throw new IllegalArgumentException("카페 설명을 입력해주세요.");
@@ -182,6 +186,7 @@ public class CafeService {
             throw new IllegalArgumentException("설명은 " + maxLength + "자 이하로 입력해주세요.");
         }
     }
+
     private void validatePhoneNumber(String phoneNumber) {
         if (phoneNumber == null || phoneNumber.trim().isEmpty()) {
             throw new IllegalArgumentException("전화번호를 입력해주세요.");
@@ -190,11 +195,13 @@ public class CafeService {
             throw new IllegalArgumentException("올바른 전화번호 형식이 아닙니다.");
         }
     }
+
     private void validateOperatingDays(List<String> operatingDays) {
         if (operatingDays == null || operatingDays.isEmpty()) {
             throw new IllegalArgumentException("영업일을 선택해주세요.");
         }
     }
+
     private void validateOperatingHours(Integer startHour, Integer endHour) {
         if (startHour == null || endHour == null) {
             throw new IllegalArgumentException("운영시간을 설정해주세요.");
@@ -209,8 +216,11 @@ public class CafeService {
             throw new IllegalArgumentException("종료 시간은 시작 시간보다 늦어야 합니다.");
         }
     }
+
     private boolean isValidPhoneNumber(String phoneNumber) {
-        if (phoneNumber == null) return false;
+        if (phoneNumber == null) {
+            return false;
+        }
 
         // 하이픈 제거 후 검증
         String cleanNumber = phoneNumber.replaceAll("-", "");
@@ -221,9 +231,10 @@ public class CafeService {
 
     /**
      * 운영시간 목록 생성 (한글 → 영어 변환)
+     *
      * @param operatingDays 영업일 목록 (한글: 월, 화, 수, 목, 금, 토, 일)
-     * @param startHour 시작 시간
-     * @param endHour 종료 시간
+     * @param startHour     시작 시간
+     * @param endHour       종료 시간
      * @return 운영시간 DTO 목록 (영어 요일로 변환됨)
      */
     private List<CafeDto.OperatingHours> createOperatingHours(List<String> operatingDays,
@@ -263,6 +274,7 @@ public class CafeService {
 
     /**
      * 카페 오너 권한, 로그인 검증
+     *
      * @param userId 사용자 ID
      * @throws IllegalArgumentException 권한이 없는 경우
      */
@@ -282,6 +294,7 @@ public class CafeService {
 
     /**
      * 카페 ID로 단건 조회
+     *
      * @param cafeId 조회할 카페 ID
      * @return CafeModel (없으면 null)
      */
@@ -297,6 +310,7 @@ public class CafeService {
 
     /**
      * 모든 카페 목록 조회 (PL/SQL 함수 사용)
+     *
      * @param sortByRating true: 평점순, false: 최신순
      * @return 카페 DTO 목록
      */
@@ -325,7 +339,8 @@ public class CafeService {
 
     /**
      * 카페 이름으로 검색 (PL/SQL 함수 사용)
-     * @param keyword 검색 키워드
+     *
+     * @param keyword      검색 키워드
      * @param sortByRating true: 평점순, false: 최신순
      * @return 검색된 카페 DTO 목록
      */
@@ -364,6 +379,7 @@ public class CafeService {
 
     /**
      * 카페 ID로 상세 정보 조회 (상세 페이지용)
+     *
      * @param cafeId 카페 ID
      * @return 카페 DTO (없으면 null)
      */
@@ -380,7 +396,8 @@ public class CafeService {
 
     /**
      * 찜하기 상태 업데이트 (나중에 구현)
-     * @param cafeId 카페 ID
+     *
+     * @param cafeId     카페 ID
      * @param isFavorite 찜하기 상태
      */
     public void updateFavoriteStatus(int cafeId, boolean isFavorite) {
@@ -391,6 +408,7 @@ public class CafeService {
 
     /**
      * 카페 정보 수정
+     *
      * @param request 수정 요청 정보
      * @param ownerId 카페 소유자 ID
      * @return 수정 결과
@@ -427,7 +445,8 @@ public class CafeService {
 
     /**
      * 카페 삭제
-     * @param cafeId 삭제할 카페 ID
+     *
+     * @param cafeId  삭제할 카페 ID
      * @param ownerId 카페 소유자 ID
      * @return 삭제 결과
      */
@@ -451,7 +470,8 @@ public class CafeService {
 
     /**
      * 카페 소유자 확인
-     * @param cafeId 카페 ID
+     *
+     * @param cafeId  카페 ID
      * @param ownerId 소유자 ID
      * @return 소유자 여부
      */
@@ -474,32 +494,35 @@ public class CafeService {
 
             // Find operation hours for the selected day
             OperationHours op = opHours.stream()
-                .filter(o -> o.dayOfWeek().toStringValue().equalsIgnoreCase(dayOfWeek))
-                .findFirst().orElse(null);
+                    .filter(o -> o.dayOfWeek().toStringValue().equalsIgnoreCase(dayOfWeek))
+                    .findFirst().orElse(null);
             if (op == null || startHour < op.operationStart() || endHour > op.operationEnd()) {
                 throw new IllegalArgumentException("선택한 시간이 운영시간을 벗어납니다.");
             }
 
             // Find discount hours for the selected day (may be none)
             DiscountHours discount = discountHours.stream()
-                .filter(d -> d.dayOfWeek().toStringValue().equalsIgnoreCase(dayOfWeek))
-                .findFirst().orElse(null);
+                    .filter(d -> d.dayOfWeek().toStringValue().equalsIgnoreCase(dayOfWeek))
+                    .findFirst().orElse(null);
 
             int discounted = 0, nonDiscounted = 0;
             double discountRate = 0.0;
             if (discount != null) {
                 discountRate = discount.discountRate(); // percent, e.g. 20.0
                 for (int h = startHour; h < endHour; h++) {
-                    if (h >= discount.discountStart() && h < discount.discountEnd()) discounted++;
-                    else nonDiscounted++;
+                    if (h >= discount.discountStart() && h < discount.discountEnd()) {
+                        discounted++;
+                    } else {
+                        nonDiscounted++;
+                    }
                 }
             } else {
                 nonDiscounted = endHour - startHour;
             }
 
             return (int) Math.round(
-                pricePerHour * nonDiscounted +
-                pricePerHour * discounted * (1 - discountRate / 100.0)
+                    pricePerHour * nonDiscounted +
+                            pricePerHour * discounted * (1 - discountRate / 100.0)
             );
         } catch (Exception e) {
             e.printStackTrace();
@@ -527,6 +550,7 @@ public class CafeService {
 
     /**
      * 특정 오너의 가장 최신 카페 ID 조회
+     *
      * @param ownerId 카페 오너 ID
      * @return 가장 최근에 생성된 카페 ID (없으면 null)
      */

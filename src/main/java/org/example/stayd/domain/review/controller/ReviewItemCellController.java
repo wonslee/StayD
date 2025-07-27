@@ -1,39 +1,42 @@
+// 작성자 : 이해든, 방대혁
 package org.example.stayd.domain.review.controller;
 
+import java.sql.Connection;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.control.Label;
-import javafx.scene.control.Button;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.input.MouseEvent;
-import javafx.stage.Stage;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.Label;
+import javafx.scene.input.MouseEvent;
 import javafx.stage.Modality;
-
+import javafx.stage.Stage;
+import org.example.stayd.common.DatabaseConnection;
 import org.example.stayd.common.SessionManager;
+import org.example.stayd.domain.mypage.MypageController;
 import org.example.stayd.domain.review.dao.ReviewDAO;
 import org.example.stayd.domain.review.dto.ReviewDTO;
-import org.example.stayd.domain.review.controller.ReviewEditController;
-import org.example.stayd.domain.reservation.dao.ReservationWDAO;
-import org.example.stayd.domain.mypage.MypageController;
-import org.example.stayd.common.DatabaseConnection;
-
-import java.sql.Connection;
 
 public class ReviewItemCellController {
 
-    @FXML private Label ratingLabel;
-    @FXML private Label contentLabel;
-    @FXML private Label dateLabel;
+    @FXML
+    private Label ratingLabel;
+    @FXML
+    private Label contentLabel;
+    @FXML
+    private Label dateLabel;
 
-    @FXML private Button editReviewButton;
-    @FXML private Button deleteReviewButton;
+    @FXML
+    private Button editReviewButton;
+    @FXML
+    private Button deleteReviewButton;
     private final ReviewDAO reviewDAO = new ReviewDAO();
     private ReviewDTO review;
     private MypageController mypageController;
-    @FXML private Label cafeNameLabel;
+    @FXML
+    private Label cafeNameLabel;
 
     public void setData(ReviewDTO dto) {
         this.review = dto;

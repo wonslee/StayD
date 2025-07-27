@@ -1,3 +1,4 @@
+// 작성자 : 최영준
 package org.example.stayd.common;
 
 import java.util.function.Supplier;

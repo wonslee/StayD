@@ -1,3 +1,4 @@
+-- 작성자 : 최영준
 -- 스터디 카페 삭제 프로시저 (수정 버전)
 CREATE OR REPLACE PROCEDURE delete_study_cafe(
     p_cafe_id IN NUMBER,

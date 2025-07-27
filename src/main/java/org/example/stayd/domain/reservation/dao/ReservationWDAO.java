@@ -1,3 +1,4 @@
+// 작성자 : 이원석, 이해든
 package org.example.stayd.domain.reservation.dao;
 
 import java.sql.Connection;
@@ -35,7 +36,7 @@ public class ReservationWDAO {
                 """;
         System.out.println("======reservation.getReservationDate() = " + reservation.getReservationDate());
         try (Connection conn = new DatabaseConnection().getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql, new String[]{"reservation_id"})) {
+             PreparedStatement ps = conn.prepareStatement(sql, new String[]{"reservation_id"})) {
             ps.setLong(1, reservation.getUserId());
             ps.setLong(2, reservation.getCafeId());
             ps.setDate(3, Date.valueOf(reservation.getReservationDate()));
@@ -78,14 +79,13 @@ public class ReservationWDAO {
                 """;
 
         try (Connection conn = new DatabaseConnection().getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql)) {
+             PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setLong(1, reservationId);
 
             try (ResultSet rs = ps.executeQuery()) {
                 if (!rs.next()) {
                     return Optional.empty();
                 }
-
 
                 long id = rs.getLong("reservation_id");
                 long userId = rs.getLong("user_id");
@@ -175,10 +175,12 @@ public class ReservationWDAO {
                             .discountPrice(rs.getInt("discount_price"))
                             .createdAt(rs.getTimestamp("created_at").toLocalDateTime())
                             .isCanceled(YesNullableConverter.toBoolean(rs.getString("is_canceled")))
-                            .canceledAt(rs.getTimestamp("canceled_at") == null ? null : rs.getTimestamp("canceled_at").toLocalDateTime())
+                            .canceledAt(rs.getTimestamp("canceled_at") == null ? null
+                                    : rs.getTimestamp("canceled_at").toLocalDateTime())
                             .rating(rs.getInt("rating"))
                             .content(rs.getString("content"))
-                            .reviewCreatedAt(rs.getTimestamp("review_created_at") == null ? null : rs.getTimestamp("review_created_at").toLocalDateTime())
+                            .reviewCreatedAt(rs.getTimestamp("review_created_at") == null ? null
+                                    : rs.getTimestamp("review_created_at").toLocalDateTime())
                             .build();
                     list.add(reservation);
 
@@ -187,33 +189,34 @@ public class ReservationWDAO {
         }
         return list;
     }
-// ReservationWDAO.java
+
+    // ReservationWDAO.java
     public List<ReservationWithCafeDTO> findWithCafeByUser(long userId) throws SQLException {
         String sql = """
-        SELECT r.reservation_id,
-               r.user_id,
-               r.cafe_id,
-               r.reservation_date,
-               r.usage_started_at,
-               r.usage_ended_at,
-               r.day_of_week,
-               r.original_price,
-               r.discount_price,
-               r.created_at,
-               r.is_canceled,
-               r.canceled_at,
-               r.rating,
-               r.content,
-               r.review_created_at,
-               c.name AS cafe_name,
-               c.phone_number,
-               c.address,
-               c.price_per_hour
-        FROM reservation r
-        JOIN cafe c ON r.cafe_id = c.cafe_id
-        WHERE r.user_id = ?
-        ORDER BY r.created_at DESC
-    """;
+                    SELECT r.reservation_id,
+                           r.user_id,
+                           r.cafe_id,
+                           r.reservation_date,
+                           r.usage_started_at,
+                           r.usage_ended_at,
+                           r.day_of_week,
+                           r.original_price,
+                           r.discount_price,
+                           r.created_at,
+                           r.is_canceled,
+                           r.canceled_at,
+                           r.rating,
+                           r.content,
+                           r.review_created_at,
+                           c.name AS cafe_name,
+                           c.phone_number,
+                           c.address,
+                           c.price_per_hour
+                    FROM reservation r
+                    JOIN cafe c ON r.cafe_id = c.cafe_id
+                    WHERE r.user_id = ?
+                    ORDER BY r.created_at DESC
+                """;
 
         List<ReservationWithCafeDTO> list = new ArrayList<>();
         try (Connection conn = new DatabaseConnection().getConnection();
@@ -233,10 +236,12 @@ public class ReservationWDAO {
                             .discountPrice(rs.getInt("discount_price"))
                             .createdAt(rs.getTimestamp("created_at").toLocalDateTime())
                             .isCanceled(YesNullableConverter.toBoolean(rs.getString("is_canceled")))
-                            .canceledAt(rs.getTimestamp("canceled_at") == null ? null : rs.getTimestamp("canceled_at").toLocalDateTime())
+                            .canceledAt(rs.getTimestamp("canceled_at") == null ? null
+                                    : rs.getTimestamp("canceled_at").toLocalDateTime())
                             .rating(rs.getInt("rating"))
                             .content(rs.getString("content"))
-                            .reviewCreatedAt(rs.getTimestamp("review_created_at") == null ? null : rs.getTimestamp("review_created_at").toLocalDateTime())
+                            .reviewCreatedAt(rs.getTimestamp("review_created_at") == null ? null
+                                    : rs.getTimestamp("review_created_at").toLocalDateTime())
                             .cafeName(rs.getString("cafe_name"))
                             .phoneNumber(rs.getString("phone_number"))
                             .address(rs.getString("address"))

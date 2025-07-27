@@ -1,8 +1,18 @@
+// 작성자 : 이해든, 방대혁
 package org.example.stayd.domain.review.controller;
 
-import javafx.fxml.FXML;
-import javafx.scene.control.*;
+import java.sql.Connection;
+import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
+import java.util.List;
+import java.util.function.Consumer;
 import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.HBox;
 import org.example.stayd.common.DatabaseConnection;
 import org.example.stayd.common.SessionManager;
@@ -11,29 +21,35 @@ import org.example.stayd.domain.reservation.dto.ReservationWithCafeDTO;
 import org.example.stayd.domain.review.dao.ReviewDAO;
 import org.example.stayd.domain.user.dto.UserDTO;
 
-import java.sql.Connection;
-import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
-import java.util.List;
-import java.util.function.Consumer;
-
 public class ReviewController {
 
     private final ReviewDAO reviewDAO = new ReviewDAO();
-    @FXML private TextArea reviewTextArea;
-    @FXML private Button submitButton, cancelButton;
+    @FXML
+    private TextArea reviewTextArea;
+    @FXML
+    private Button submitButton, cancelButton;
 
-    @FXML private ToggleButton star1;
-    @FXML private ToggleButton star2;
-    @FXML private ToggleButton star3;
-    @FXML private ToggleButton star4;
-    @FXML private ToggleButton star5;
-    @FXML private HBox ratingBox;
+    @FXML
+    private ToggleButton star1;
+    @FXML
+    private ToggleButton star2;
+    @FXML
+    private ToggleButton star3;
+    @FXML
+    private ToggleButton star4;
+    @FXML
+    private ToggleButton star5;
+    @FXML
+    private HBox ratingBox;
 
-    @FXML private Label cafeName;
-    @FXML private Label useDate;
-    @FXML private Label useTime;
-    @FXML private Label branchName;
+    @FXML
+    private Label cafeName;
+    @FXML
+    private Label useDate;
+    @FXML
+    private Label useTime;
+    @FXML
+    private Label branchName;
 
     private List<ToggleButton> stars;
 
@@ -50,7 +66,9 @@ public class ReviewController {
             cafeName.setText(dto.getCafeName());
             useDate.setText(dto.getReservationDate().format(DateTimeFormatter.ofPattern("yyyy년 MM월 dd일")));
             useTime.setText(dto.getUsageStartedAt() + ":00 - " + dto.getUsageEndedAt() + ":00");
-            if (branchName != null) branchName.setText(dto.getCafeName() + " 지점");
+            if (branchName != null) {
+                branchName.setText(dto.getCafeName() + " 지점");
+            }
         }
     }
 

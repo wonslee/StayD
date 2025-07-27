@@ -1,3 +1,4 @@
+// 작성자 : 이원석
 package org.example.stayd.common;
 
 import lombok.NoArgsConstructor;

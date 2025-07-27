@@ -1,12 +1,14 @@
+// 작성자 : 이해든
 package org.example.stayd.domain.review.dao;
 
-import org.example.stayd.domain.review.dto.ReviewDTO;
-import org.example.stayd.domain.review.dto.ReviewListDTO;
-
-import java.sql.*;
-import java.time.LocalDateTime;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import org.example.stayd.domain.review.dto.ReviewDTO;
+import org.example.stayd.domain.review.dto.ReviewListDTO;
 
 public class ReviewListDAO {
 
@@ -15,23 +17,23 @@ public class ReviewListDAO {
      */
     public List<ReviewListDTO> findReviewsByCafeId(Connection conn, long cafeId) throws SQLException {
         String sql = """
-        SELECT r.reservation_id,
-               r.cafe_id,
-               r.user_id,
-               u.login_id,
-               r.rating,
-               r.content,
-               r.review_created_at,
-               c.name AS cafe_name
-          FROM reservation r
-          JOIN cafe c ON r.cafe_id = c.cafe_id
-          JOIN users u ON r.user_id = u.user_id
-         WHERE r.cafe_id = ?  -- ✅ 수정됨!
-           AND r.rating IS NOT NULL
-           AND r.content IS NOT NULL
-           AND r.review_created_at IS NOT NULL
-         ORDER BY r.review_created_at DESC
-    """;
+                    SELECT r.reservation_id,
+                           r.cafe_id,
+                           r.user_id,
+                           u.login_id,
+                           r.rating,
+                           r.content,
+                           r.review_created_at,
+                           c.name AS cafe_name
+                      FROM reservation r
+                      JOIN cafe c ON r.cafe_id = c.cafe_id
+                      JOIN users u ON r.user_id = u.user_id
+                     WHERE r.cafe_id = ?  -- ✅ 수정됨!
+                       AND r.rating IS NOT NULL
+                       AND r.content IS NOT NULL
+                       AND r.review_created_at IS NOT NULL
+                     ORDER BY r.review_created_at DESC
+                """;
 
         List<ReviewListDTO> list = new ArrayList<>();
 
@@ -57,11 +59,11 @@ public class ReviewListDAO {
      */
     public double findAverageRatingByCafeId(Connection conn, long cafeId) throws SQLException {
         String sql = """
-            SELECT AVG(rating) AS avg_rating
-              FROM reservation
-             WHERE cafe_id = ?
-               AND rating IS NOT NULL
-        """;
+                    SELECT AVG(rating) AS avg_rating
+                      FROM reservation
+                     WHERE cafe_id = ?
+                       AND rating IS NOT NULL
+                """;
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setLong(1, cafeId);
@@ -77,23 +79,23 @@ public class ReviewListDAO {
 
     public List<ReviewDTO> findByUserId(Connection conn, long userId) throws SQLException {
         String sql = """
-        SELECT r.reservation_id,
-               r.cafe_id,
-               r.user_id,
-               u.login_id,
-               r.rating,
-               r.content,
-               r.review_created_at,
-               c.name AS cafe_name
-          FROM reservation r
-          JOIN cafe c ON r.cafe_id = c.cafe_id
-          JOIN users u ON r.user_id = u.user_id
-         WHERE r.user_id = ?
-           AND r.rating IS NOT NULL
-           AND r.content IS NOT NULL
-           AND r.review_created_at IS NOT NULL
-         ORDER BY r.review_created_at DESC
-    """;
+                    SELECT r.reservation_id,
+                           r.cafe_id,
+                           r.user_id,
+                           u.login_id,
+                           r.rating,
+                           r.content,
+                           r.review_created_at,
+                           c.name AS cafe_name
+                      FROM reservation r
+                      JOIN cafe c ON r.cafe_id = c.cafe_id
+                      JOIN users u ON r.user_id = u.user_id
+                     WHERE r.user_id = ?
+                       AND r.rating IS NOT NULL
+                       AND r.content IS NOT NULL
+                       AND r.review_created_at IS NOT NULL
+                     ORDER BY r.review_created_at DESC
+                """;
 
         List<ReviewDTO> list = new ArrayList<>();
 
