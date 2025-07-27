@@ -36,13 +36,18 @@ public class ReservationDao {
         int cafeId = getCafeIdByUserId(userId);
 
         if (cafeId != -1) {
-            String query = "SELECT usage_started_at, usage_ended_at, day_of_week FROM reservation WHERE cafe_id = ? AND day_of_week = ? AND is_canceled IS NULL";
+            // PL/SQL 프로시저 호출
+            String query = "{call get_reservation_status_by_day(?, ?, ?)}";  // 프로시저 호출
 
-            try (PreparedStatement stmt = connection.prepareStatement(query)) {
-                stmt.setInt(1, cafeId);  // cafe_id로 필터링
-                stmt.setString(2, dayOfWeek);  // 요일 값으로 필터링
+            try (CallableStatement stmt = connection.prepareCall(query)) {
+                stmt.setInt(1, cafeId);  // cafe_id
+                stmt.setString(2, dayOfWeek);  // day_of_week
+                stmt.registerOutParameter(3, Types.REF_CURSOR);  // 출력 커서
 
-                try (ResultSet rs = stmt.executeQuery()) {
+                stmt.execute();
+
+                // 출력 커서를 통해 결과 처리
+                try (ResultSet rs = (ResultSet) stmt.getObject(3)) {
                     while (rs.next()) {
                         ReservationDTO reservation = ReservationDTO.builder()
                                 .usageStartedAt(rs.getInt("usage_started_at"))
