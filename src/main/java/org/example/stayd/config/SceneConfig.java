@@ -1,18 +1,19 @@
+// 작성자 : 방대혁
 package org.example.stayd.config;
 
 public class SceneConfig {
 
     // 로그인 화면 FXML 경로
-    public static final String LOGIN_FXML  = "/org/example/stayd/user/login.fxml";
+    public static final String LOGIN_FXML = "/org/example/stayd/user/login.fxml";
 
     // 회원가입 화면 FXML 경로
     public static final String SIGNUP_FXML = "/org/example/stayd/user/signup.fxml";
 
     // 아이디 찾기 화면 FXML 경로
-    public static final String FIND_ID_FXML  = "/org/example/stayd/user/findId.fxml";
+    public static final String FIND_ID_FXML = "/org/example/stayd/user/findId.fxml";
 
     // 비밀번호 찾기 화면 FXML 경로
-    public static final String FIND_PW_FXML  = "/org/example/stayd/user/findPw.fxml";
+    public static final String FIND_PW_FXML = "/org/example/stayd/user/findPw.fxml";
 
     // 비밀번호 재설정 화면 FXML 경로
     public static final String RESET_PW_FXML = "/org/example/stayd/user/resetPw.fxml";
@@ -39,8 +40,8 @@ public class SceneConfig {
     public static final String CAFE_Modify_Delete_FXML = "/org/example/stayd/cafe/cafeModifyDeleteView.fxml";
 
     // 화면 크기 설정 (너비)
-    public static final double WIDTH       = 1024;
+    public static final double WIDTH = 1024;
 
     // 화면 크기 설정 (높이)
-    public static final double HEIGHT      = 768;
+    public static final double HEIGHT = 768;
 }

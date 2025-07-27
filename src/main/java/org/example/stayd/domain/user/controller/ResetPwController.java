@@ -1,4 +1,7 @@
+// 작성자 : 방대혁
 package org.example.stayd.domain.user.controller;
+
+import static org.example.stayd.common.FXUtils.showAlert;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
@@ -10,8 +13,6 @@ import org.example.stayd.common.FXUtils;
 import org.example.stayd.config.SceneConfig;
 import org.example.stayd.domain.user.dto.PasswordResetDTO;
 import org.example.stayd.domain.user.service.UserService;
-
-import static org.example.stayd.common.FXUtils.showAlert;
 
 public class ResetPwController {
 
@@ -31,8 +32,7 @@ public class ResetPwController {
     private final UserService userService = new UserService();  // 사용자 서비스 객체
 
     /**
-     * 초기화 메서드
-     * - 비밀번호 유효성 검사 및 비밀번호 확인 일치 검사 기능 초기화
+     * 초기화 메서드 - 비밀번호 유효성 검사 및 비밀번호 확인 일치 검사 기능 초기화
      */
     public void initData(PasswordResetDTO resetDto) {
         this.resetDto = resetDto;  // 비밀번호 재설정 DTO 초기화
@@ -56,8 +56,7 @@ public class ResetPwController {
     }
 
     /**
-     * 새로운 비밀번호의 유효성 검사
-     * - 최소 8자 이상, 영문·숫자·특수문자가 포함되어야 함
+     * 새로운 비밀번호의 유효성 검사 - 최소 8자 이상, 영문·숫자·특수문자가 포함되어야 함
      */
     private void validatePassword() {
         String password = newPasswordField.getText().trim();
@@ -86,8 +85,7 @@ public class ResetPwController {
     }
 
     /**
-     * 버튼 활성화 여부 제어
-     * - 비밀번호 유효성 및 확인 일치 검사 통과 시 버튼을 활성화
+     * 버튼 활성화 여부 제어 - 비밀번호 유효성 및 확인 일치 검사 통과 시 버튼을 활성화
      */
     private void updateResetButtonEnabled() {
         boolean pwOk = newPasswordValidationLabel.getText().isEmpty();
@@ -96,8 +94,7 @@ public class ResetPwController {
     }
 
     /**
-     * 비밀번호 재설정 버튼 클릭 시 호출되는 메서드
-     * - 비밀번호 입력값 유효성 체크 후, 비밀번호 재설정 처리
+     * 비밀번호 재설정 버튼 클릭 시 호출되는 메서드 - 비밀번호 입력값 유효성 체크 후, 비밀번호 재설정 처리
      */
     @FXML
     private void onResetPassword() {

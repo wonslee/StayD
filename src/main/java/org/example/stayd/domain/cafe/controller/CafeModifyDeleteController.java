@@ -1,13 +1,28 @@
+// 작성자 : 최영준, 방대혁
 package org.example.stayd.domain.cafe.controller;
 
+import java.net.URL;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.ResourceBundle;
+import java.util.Set;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleButton;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.text.Font;
@@ -17,13 +32,6 @@ import org.example.stayd.common.SessionManager;
 import org.example.stayd.config.SceneConfig;
 import org.example.stayd.domain.cafe.dto.CafeDto;
 import org.example.stayd.domain.cafe.service.CafeService;
-
-import javax.mail.Session;
-import java.io.IOException;
-import java.net.URL;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
-import java.util.*;
 
 public class CafeModifyDeleteController implements Initializable {
 
@@ -100,7 +108,7 @@ public class CafeModifyDeleteController implements Initializable {
     private Long currentCafeId; // 현재 카페 ID
     //    private final Long DUMMY_OWNER_ID = 5L; // 더미 사용자 ID
     private final Long OWNER_ID = (long) SessionManager.getInstance().getLoggedInUser()
-        .getUser_id();
+            .getUser_id();
 
 
     @Override
@@ -139,7 +147,7 @@ public class CafeModifyDeleteController implements Initializable {
             // DB에서 카페 데이터 가져오기
             CafeDto.DetailResponse cafe = cafeService.getCafeDetail(cafeId);
             System.out.println(
-                "cafeService.getCafeDetail 호출 후, 결과: " + (cafe != null ? "성공" : "null"));
+                    "cafeService.getCafeDetail 호출 후, 결과: " + (cafe != null ? "성공" : "null"));
             if (cafe == null) {
                 showAlert(Alert.AlertType.ERROR, "오류", "해당 카페를 찾을 수 없습니다.");
                 return;
@@ -249,7 +257,7 @@ public class CafeModifyDeleteController implements Initializable {
     private void adjustTime(TextField timeField, int hours) {
         try {
             LocalTime currentTime = LocalTime.parse(timeField.getText(),
-                DateTimeFormatter.ofPattern("HH:mm"));
+                    DateTimeFormatter.ofPattern("HH:mm"));
             LocalTime newTime = currentTime.plusHours(hours);
             timeField.setText(newTime.format(DateTimeFormatter.ofPattern("HH:mm")));
         } catch (Exception e) {
@@ -343,9 +351,9 @@ public class CafeModifyDeleteController implements Initializable {
 
             // 운영시간 파싱
             LocalTime startTime = LocalTime.parse(startTimeField.getText(),
-                DateTimeFormatter.ofPattern("HH:mm"));
+                    DateTimeFormatter.ofPattern("HH:mm"));
             LocalTime endTime = LocalTime.parse(endTimeField.getText(),
-                DateTimeFormatter.ofPattern("HH:mm"));
+                    DateTimeFormatter.ofPattern("HH:mm"));
             request.setOperatingStartHour(startTime.getHour());
             request.setOperatingEndHour(endTime.getHour());
 
@@ -430,9 +438,9 @@ public class CafeModifyDeleteController implements Initializable {
         // 시간 검증
         try {
             LocalTime startTime = LocalTime.parse(startTimeField.getText(),
-                DateTimeFormatter.ofPattern("HH:mm"));
+                    DateTimeFormatter.ofPattern("HH:mm"));
             LocalTime endTime = LocalTime.parse(endTimeField.getText(),
-                DateTimeFormatter.ofPattern("HH:mm"));
+                    DateTimeFormatter.ofPattern("HH:mm"));
 
             if (!startTime.isBefore(endTime)) {
                 errors.add("종료 시간은 시작 시간보다 늦어야 합니다.");
@@ -453,28 +461,28 @@ public class CafeModifyDeleteController implements Initializable {
     @FXML
     private void onModifyButtonEnter(MouseEvent event) {
         modifyButton.setStyle(
-            "-fx-background-color: #4caf4f; -fx-font-weight: bold; -fx-background-radius: 10;");
+                "-fx-background-color: #4caf4f; -fx-font-weight: bold; -fx-background-radius: 10;");
         modifyButton.setTextFill(javafx.scene.paint.Color.WHITE);
     }
 
     @FXML
     private void onModifyButtonExit(MouseEvent event) {
         modifyButton.setStyle(
-            "-fx-background-color: white; -fx-font-weight: bold; -fx-background-radius: 10;");
+                "-fx-background-color: white; -fx-font-weight: bold; -fx-background-radius: 10;");
         modifyButton.setTextFill(javafx.scene.paint.Color.web("#4caf4f"));
     }
 
     @FXML
     private void onDeleteButtonEnter(MouseEvent event) {
         deleteButton.setStyle(
-            "-fx-background-color: #ff6b6b; -fx-font-weight: bold; -fx-background-radius: 10; ");
+                "-fx-background-color: #ff6b6b; -fx-font-weight: bold; -fx-background-radius: 10; ");
         deleteButton.setTextFill(javafx.scene.paint.Color.WHITE);
     }
 
     @FXML
     private void onDeleteButtonExit(MouseEvent event) {
         deleteButton.setStyle(
-            "-fx-background-color: white; -fx-font-weight: bold; -fx-background-radius: 10;");
+                "-fx-background-color: white; -fx-font-weight: bold; -fx-background-radius: 10;");
         deleteButton.setTextFill(javafx.scene.paint.Color.web("#ff6b6b"));
     }
 
@@ -494,6 +502,7 @@ public class CafeModifyDeleteController implements Initializable {
 
     /**
      * 마우스가 버튼 위에 올라갔을 때 색상 변경
+     *
      * @param event MouseEvent
      */
     @FXML
@@ -503,6 +512,7 @@ public class CafeModifyDeleteController implements Initializable {
 
     /**
      * 마우스가 버튼을 벗어났을 때 원래 색상으로 복원
+     *
      * @param event MouseEvent
      */
     @FXML

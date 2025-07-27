@@ -1,10 +1,9 @@
+// 작성자 : 최영준, 방대혁, 이원석
 package org.example.stayd.domain.cafe.dto;
 
+import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.util.List;
-import org.example.stayd.domain.reservation.dto.ReservationWithCafeDTO;
 
 /**
  * 스터디 카페 생성을 위한 DTO 클래스
@@ -29,7 +28,8 @@ public class CafeDto {
         private Integer operatingEndHour;   // 운영 종료 시간 (0~23)
 
         // 기본 생성자
-        public CreateRequest() {}
+        public CreateRequest() {
+        }
 
         @Override
         public String toString() {
@@ -57,7 +57,8 @@ public class CafeDto {
         private String message;
         private boolean success;
 
-        public CreateResponse() {}
+        public CreateResponse() {
+        }
 
         public CreateResponse(Long cafeId, String message, boolean success) {
             this.cafeId = cafeId;
@@ -85,7 +86,8 @@ public class CafeDto {
         private Integer operationStart;
         private Integer operationEnd;
 
-        public OperatingHours() {}
+        public OperatingHours() {
+        }
 
         public OperatingHours(String dayOfWeek, Integer operationStart, Integer operationEnd) {
             this.dayOfWeek = dayOfWeek;
@@ -118,7 +120,8 @@ public class CafeDto {
         private Integer operatingEndHour;
 
         // 🔹 기본 생성자
-        public DetailResponse() {}
+        public DetailResponse() {
+        }
 
         // 🔹 전체 매개변수 생성자
         public DetailResponse(Long cafeId, String name, String address, Integer pricePerHour,
@@ -174,7 +177,8 @@ public class CafeDto {
         private String operatingHours;  // "09:00-18:00" 형태
 
         // 기본 생성자
-        public SimpleCafeDto() {}
+        public SimpleCafeDto() {
+        }
 
         // 리스트용 생성자
         public SimpleCafeDto(int id, String name, double rating, int reviewCount, String imageUrl) {
@@ -204,6 +208,7 @@ public class CafeDto {
             this.operatingHours = operatingHours;
         }
     }
+
     /**
      * 카페 수정 요청 DTO
      */
@@ -221,7 +226,8 @@ public class CafeDto {
         private Integer operatingStartHour;
         private Integer operatingEndHour;
 
-        public UpdateRequest() {}
+        public UpdateRequest() {
+        }
 
         @Override
         public String toString() {
@@ -249,7 +255,8 @@ public class CafeDto {
         private boolean success;
         private String message;
 
-        public UpdateResponse() {}
+        public UpdateResponse() {
+        }
 
         public UpdateResponse(boolean success, String message) {
             this.success = success;
@@ -274,7 +281,8 @@ public class CafeDto {
         private boolean success;
         private String message;
 
-        public DeleteResponse() {}
+        public DeleteResponse() {
+        }
 
         public DeleteResponse(boolean success, String message) {
             this.success = success;

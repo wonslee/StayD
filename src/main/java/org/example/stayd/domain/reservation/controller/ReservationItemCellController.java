@@ -1,30 +1,34 @@
+// 작성자 : 이해든, 이원석, 방대혁
 package org.example.stayd.domain.reservation.controller;
-
-import javafx.fxml.FXML;
-import javafx.scene.control.*;
-import javafx.scene.layout.HBox;
-import org.example.stayd.common.DatabaseConnection;
-import org.example.stayd.domain.mypage.MypageController;
-import org.example.stayd.domain.reservation.dao.ReservationWDAO;
-import org.example.stayd.domain.reservation.dto.ReservationDTO;
-import org.example.stayd.domain.reservation.dto.ReservationWithCafeDTO;
-import org.example.stayd.domain.review.dao.ReviewDAO;
-import org.example.stayd.domain.cafe.dto.CafeDto;
 
 import java.sql.Connection;
 import java.time.format.DateTimeFormatter;
-import javafx.scene.input.MouseEvent;
+import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Label;
+import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
-import org.example.stayd.common.FXUtils;
+import org.example.stayd.common.DatabaseConnection;
+import org.example.stayd.domain.cafe.dto.CafeDto;
+import org.example.stayd.domain.mypage.MypageController;
+import org.example.stayd.domain.reservation.dto.ReservationDTO;
+import org.example.stayd.domain.reservation.dto.ReservationWithCafeDTO;
+import org.example.stayd.domain.review.dao.ReviewDAO;
 
 public class ReservationItemCellController {
 
-    @FXML private Label cafeNameLabel;
-    @FXML private Label reservationDateLabel;
-    @FXML private Label timeLabel;
-    @FXML private Button writeReviewButton;
+    @FXML
+    private Label cafeNameLabel;
+    @FXML
+    private Label reservationDateLabel;
+    @FXML
+    private Label timeLabel;
+    @FXML
+    private Button writeReviewButton;
 
     private ReservationWithCafeDTO reservation;
     private ReservationDTO reservationDTO;
@@ -38,6 +42,7 @@ public class ReservationItemCellController {
     public void setReservationDTO(ReservationDTO dto) {
         this.reservationDTO = dto;
     }
+
     public void setCafeDetail(CafeDto.DetailResponse cafe) {
         this.cafeDetail = cafe;
     }
@@ -51,12 +56,13 @@ public class ReservationItemCellController {
         System.out.println("cafeDetail = " + cafeDetail);
         System.out.println("리뷰 체크 - rating: " + reservation.getRating() + ", content: " + reservation.getContent());
 
-
-        cafeNameLabel.setText( reservation.getCafeName());
-        reservationDateLabel.setText("예약일: " + reservation.getReservationDate().format(DateTimeFormatter.ofPattern("yyyy년 M월 d일")));
+        cafeNameLabel.setText(reservation.getCafeName());
+        reservationDateLabel.setText(
+                "예약일: " + reservation.getReservationDate().format(DateTimeFormatter.ofPattern("yyyy년 M월 d일")));
         timeLabel.setText("이용 시간: " + reservation.getUsageStartedAt() + "시 ~ " + reservation.getUsageEndedAt() + "시");
 
-        boolean reviewed = reservation.getRating() > 0 || (reservation.getContent() != null && !reservation.getContent().isEmpty());
+        boolean reviewed = reservation.getRating() > 0 || (reservation.getContent() != null && !reservation.getContent()
+                .isEmpty());
         writeReviewButton.setDisable(reviewed);
         writeReviewButton.setVisible(!reviewed);
 
@@ -71,7 +77,8 @@ public class ReservationItemCellController {
     @FXML
     private void handleReservationBoxClick(MouseEvent event) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/stayd/reservation/reservation-detail.fxml"));
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource("/org/example/stayd/reservation/reservation-detail.fxml"));
             Node detailView = loader.load();
             org.example.stayd.domain.reservation.controller.ReservationDetailController detailController = loader.getController();
             detailController.setReservation(this.reservationDTO);

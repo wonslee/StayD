@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- 작성자 : 최영준, 방대혁 -->
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
@@ -16,33 +17,34 @@
 <?import javafx.scene.paint.Color?>
 <?import javafx.scene.shape.Line?>
 <?import javafx.scene.text.Font?>
-
-<BorderPane maxHeight="768.0" maxWidth="1028.0" prefHeight="768.0" prefWidth="1028.0" style="-fx-background-color:white" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.stayd.domain.cafe.controller.CafeCreateController">
+<BorderPane maxHeight="768.0" maxWidth="1028.0" prefHeight="768.0" prefWidth="1028.0" style="-fx-background-color:white"
+            xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="org.example.stayd.domain.cafe.controller.CafeCreateController">
 
     <!-- 헤더, 네비게이션 바: 빈 공간 -->
     <top>
         <VBox>
             <!-- 헤더 포함 -->
-            <fx:include source="../common/header.fxml" />
+            <fx:include source="../common/header.fxml"/>
 
             <!-- 네비게이션 바 포함 -->
-            <fx:include source="../common/navbar.fxml" />
+            <fx:include source="../common/navbar.fxml"/>
         </VBox>
     </top>
     <bottom>
         <VBox alignment="CENTER" spacing="30.0" BorderPane.alignment="CENTER">
             <padding>
-                <Insets bottom="150.0" left="110.0" right="50.0" />
+                <Insets bottom="150.0" left="110.0" right="50.0"/>
             </padding>
 
             <!-- 제목 -->
             <HBox alignment="CENTER_LEFT" maxWidth="800.0" prefHeight="23.0" prefWidth="800.0">
                 <Label style="-fx-font-size: 18px;" textFill="#4caf4f">
                     <font>
-                        <Font name="System Bold Italic" size="24.0" />
+                        <Font name="System Bold Italic" size="24.0"/>
                     </font>
                     <HBox.margin>
-                        <Insets />
+                        <Insets/>
                     </HBox.margin>
                 </Label>
             </HBox>
@@ -50,7 +52,7 @@
             <!-- 구분선 -->
             <Separator maxHeight="800.0" maxWidth="900.0" prefWidth="300.0">
                 <VBox.margin>
-                    <Insets right="50.0" />
+                    <Insets right="50.0"/>
                 </VBox.margin>
             </Separator>
 
@@ -62,88 +64,125 @@
                     <VBox spacing="8">
                         <HBox alignment="CENTER_LEFT" spacing="10.0">
                             <ImageView fitHeight="20" fitWidth="20" preserveRatio="true">
-                                <Image url="@../../../../images/cafeImages/Home.png" />
+                                <Image url="@../../../../images/cafeImages/Home.png"/>
                             </ImageView>
-                            <Label style="-fx-font-weight: bold;" text="스터디 카페 이름" />
+                            <Label style="-fx-font-weight: bold;" text="스터디 카페 이름"/>
                         </HBox>
-                        <TextField fx:id="cafeNameField" maxWidth="300.0" prefHeight="30.0" prefWidth="150.0" promptText="스터디 카페 이름을 작성해 주세요." />
+                        <TextField fx:id="cafeNameField" maxWidth="300.0" prefHeight="30.0" prefWidth="150.0"
+                                   promptText="스터디 카페 이름을 작성해 주세요."/>
                     </VBox>
 
                     <!-- 위치 -->
                     <VBox spacing="8">
                         <HBox alignment="CENTER_LEFT" spacing="10">
                             <ImageView fitHeight="20" fitWidth="20" preserveRatio="true">
-                                <Image url="@../../../../images/cafeImages/Mappin.png" />
+                                <Image url="@../../../../images/cafeImages/Mappin.png"/>
                             </ImageView>
-                            <Label style="-fx-font-weight: bold;" text="위치" />
+                            <Label style="-fx-font-weight: bold;" text="위치"/>
                         </HBox>
-                        <TextField fx:id="locationField" maxWidth="300.0" prefHeight="30.0" prefWidth="150.0" promptText="스터디 카페 위치를 작성해 주세요." />
+                        <TextField fx:id="locationField" maxWidth="300.0" prefHeight="30.0" prefWidth="150.0"
+                                   promptText="스터디 카페 위치를 작성해 주세요."/>
                     </VBox>
 
                     <!-- 영업일 -->
                     <VBox spacing="8">
                         <HBox alignment="CENTER_LEFT" spacing="10">
                             <ImageView fitHeight="20" fitWidth="20" preserveRatio="true">
-                                <Image url="@../../../../images/cafeImages/Calendar.png" />
+                                <Image url="@../../../../images/cafeImages/Calendar.png"/>
                             </ImageView>
-                            <Label style="-fx-font-weight: bold;" text="영업일" />
+                            <Label style="-fx-font-weight: bold;" text="영업일"/>
                         </HBox>
                         <HBox spacing="5.0">
-                            <ToggleButton fx:id="mondayButton" onAction="#toggleDay" opacity="0.5" prefWidth="30.0" style="-fx-border-color: #90EE90; -fx-background-color: #e8f5e8; -fx-border-radius: 5; -fx-background-radius: 5;" text="월" textFill="#4cad4e">
-                        <font>
-                           <Font size="12.0" />
-                        </font></ToggleButton>
-                            <ToggleButton fx:id="tuesdayButton" onAction="#toggleDay" opacity="0.5" prefWidth="30.0" style="-fx-background-color: #e8f5e8; -fx-border-color: #90EE90; -fx-border-radius: 5; -fx-background-radius: 5;" text="화" textFill="#4cad4e" >
+                            <ToggleButton fx:id="mondayButton" onAction="#toggleDay" opacity="0.5" prefWidth="30.0"
+                                          style="-fx-border-color: #90EE90; -fx-background-color: #e8f5e8; -fx-border-radius: 5; -fx-background-radius: 5;"
+                                          text="월" textFill="#4cad4e">
                                 <font>
-                                    <Font size="12.0" />
-                                </font></ToggleButton>
-                            <ToggleButton fx:id="wednesdayButton" onAction="#toggleDay" opacity="0.5" prefWidth="30.0" style="-fx-background-color: #e8f5e8; -fx-border-color: #90EE90; -fx-border-radius: 5; -fx-background-radius: 5;" text="수" textFill="#4cad4e" >
+                                    <Font size="12.0"/>
+                                </font>
+                            </ToggleButton>
+                            <ToggleButton fx:id="tuesdayButton" onAction="#toggleDay" opacity="0.5" prefWidth="30.0"
+                                          style="-fx-background-color: #e8f5e8; -fx-border-color: #90EE90; -fx-border-radius: 5; -fx-background-radius: 5;"
+                                          text="화" textFill="#4cad4e">
                                 <font>
-                                    <Font size="12.0" />
-                                </font></ToggleButton>
-                            <ToggleButton fx:id="thursdayButton" onAction="#toggleDay" opacity="0.5" prefWidth="30.0" style="-fx-background-color: #e8f5e8; -fx-border-color: #90EE90; -fx-border-radius: 5; -fx-background-radius: 5;" text="목" textFill="#4cad4e" >
+                                    <Font size="12.0"/>
+                                </font>
+                            </ToggleButton>
+                            <ToggleButton fx:id="wednesdayButton" onAction="#toggleDay" opacity="0.5" prefWidth="30.0"
+                                          style="-fx-background-color: #e8f5e8; -fx-border-color: #90EE90; -fx-border-radius: 5; -fx-background-radius: 5;"
+                                          text="수" textFill="#4cad4e">
                                 <font>
-                                    <Font size="12.0" />
-                                </font></ToggleButton>
-                            <ToggleButton fx:id="fridayButton" onAction="#toggleDay" opacity="0.5" prefWidth="30.0" style="-fx-background-color: #e8f5e8; -fx-border-color: #90EE90; -fx-border-radius: 5; -fx-background-radius: 5;" text="금" textFill="#4cad4e" >
+                                    <Font size="12.0"/>
+                                </font>
+                            </ToggleButton>
+                            <ToggleButton fx:id="thursdayButton" onAction="#toggleDay" opacity="0.5" prefWidth="30.0"
+                                          style="-fx-background-color: #e8f5e8; -fx-border-color: #90EE90; -fx-border-radius: 5; -fx-background-radius: 5;"
+                                          text="목" textFill="#4cad4e">
                                 <font>
-                                    <Font size="12.0" />
-                                </font></ToggleButton>
-                            <ToggleButton fx:id="saturdayButton" onAction="#toggleDay" opacity="0.5" prefWidth="30.0" style="-fx-background-color: #e8f5e8; -fx-border-color: #90EE90; -fx-border-radius: 5; -fx-background-radius: 5;" text="토" textFill="#4cad4e" >
+                                    <Font size="12.0"/>
+                                </font>
+                            </ToggleButton>
+                            <ToggleButton fx:id="fridayButton" onAction="#toggleDay" opacity="0.5" prefWidth="30.0"
+                                          style="-fx-background-color: #e8f5e8; -fx-border-color: #90EE90; -fx-border-radius: 5; -fx-background-radius: 5;"
+                                          text="금" textFill="#4cad4e">
                                 <font>
-                                    <Font size="12.0" />
-                                </font></ToggleButton>
-                            <ToggleButton fx:id="sundayButton" onAction="#toggleDay" opacity="0.5" prefWidth="30.0" style="-fx-background-color: #e8f5e8; -fx-border-color: #90EE90; -fx-border-radius: 5; -fx-background-radius: 5;" text="일" textFill="#4cad4e" >
+                                    <Font size="12.0"/>
+                                </font>
+                            </ToggleButton>
+                            <ToggleButton fx:id="saturdayButton" onAction="#toggleDay" opacity="0.5" prefWidth="30.0"
+                                          style="-fx-background-color: #e8f5e8; -fx-border-color: #90EE90; -fx-border-radius: 5; -fx-background-radius: 5;"
+                                          text="토" textFill="#4cad4e">
                                 <font>
-                                    <Font size="12.0" />
-                                </font></ToggleButton>
+                                    <Font size="12.0"/>
+                                </font>
+                            </ToggleButton>
+                            <ToggleButton fx:id="sundayButton" onAction="#toggleDay" opacity="0.5" prefWidth="30.0"
+                                          style="-fx-background-color: #e8f5e8; -fx-border-color: #90EE90; -fx-border-radius: 5; -fx-background-radius: 5;"
+                                          text="일" textFill="#4cad4e">
+                                <font>
+                                    <Font size="12.0"/>
+                                </font>
+                            </ToggleButton>
                         </HBox>
                         <!-- 선택된 요일을 담는 숨겨진 필드 -->
-                        <TextField fx:id="selectedDaysField" managed="false" visible="false" />
+                        <TextField fx:id="selectedDaysField" managed="false" visible="false"/>
                     </VBox>
 
                     <!-- 운영 시간 -->
                     <VBox spacing="8">
                         <HBox alignment="CENTER_LEFT" spacing="10">
                             <ImageView fitHeight="20" fitWidth="20" preserveRatio="true">
-                                <Image url="@../../../../images/cafeImages/Clock.png" />
+                                <Image url="@../../../../images/cafeImages/Clock.png"/>
                             </ImageView>
-                            <Label style="-fx-font-weight: bold;" text="운영 시간" />
+                            <Label style="-fx-font-weight: bold;" text="운영 시간"/>
                         </HBox>
                         <HBox alignment="CENTER_LEFT" spacing="10">
-                            <TextField fx:id="startTimeField" editable="false" prefHeight="22.0" prefWidth="66.0" text="09:00" />
-                            <Button fx:id="startTimeUpButton" mnemonicParsing="false" onAction="#increaseStartTime" onMouseEntered="#handleMouseEnter" onMouseExited="#handleMouseExit" style="-fx-background-color: #A8D6AA; -fx-background-radius: 10;" text="▲" textFill="white" />
-                            <Button fx:id="startTimeDownButton" mnemonicParsing="false" onAction="#decreaseStartTime" onMouseEntered="#handleMouseEnter" onMouseExited="#handleMouseExit" style="-fx-background-color: #A8D6AA; -fx-background-radius: 10;" text="▼" textFill="white" />
-                            <Label text="~" />
-                            <TextField fx:id="endTimeField" editable="false" prefHeight="22.0" prefWidth="66.0" text="18:00" />
-                            <Button fx:id="endTimeUpButton" mnemonicParsing="false" onAction="#increaseEndTime" onMouseEntered="#handleMouseEnter" onMouseExited="#handleMouseExit" style="-fx-background-color: #A8D6AA; -fx-background-radius: 10;" text="▲" textFill="white" />
-                            <Button fx:id="endTimeDownButton" mnemonicParsing="false" onAction="#decreaseEndTime" onMouseEntered="#handleMouseEnter" onMouseExited="#handleMouseExit" style="-fx-background-color: #A8D6AA; -fx-background-radius: 10;" text="▼" textFill="white" />
+                            <TextField fx:id="startTimeField" editable="false" prefHeight="22.0" prefWidth="66.0"
+                                       text="09:00"/>
+                            <Button fx:id="startTimeUpButton" mnemonicParsing="false" onAction="#increaseStartTime"
+                                    onMouseEntered="#handleMouseEnter" onMouseExited="#handleMouseExit"
+                                    style="-fx-background-color: #A8D6AA; -fx-background-radius: 10;" text="▲"
+                                    textFill="white"/>
+                            <Button fx:id="startTimeDownButton" mnemonicParsing="false" onAction="#decreaseStartTime"
+                                    onMouseEntered="#handleMouseEnter" onMouseExited="#handleMouseExit"
+                                    style="-fx-background-color: #A8D6AA; -fx-background-radius: 10;" text="▼"
+                                    textFill="white"/>
+                            <Label text="~"/>
+                            <TextField fx:id="endTimeField" editable="false" prefHeight="22.0" prefWidth="66.0"
+                                       text="18:00"/>
+                            <Button fx:id="endTimeUpButton" mnemonicParsing="false" onAction="#increaseEndTime"
+                                    onMouseEntered="#handleMouseEnter" onMouseExited="#handleMouseExit"
+                                    style="-fx-background-color: #A8D6AA; -fx-background-radius: 10;" text="▲"
+                                    textFill="white"/>
+                            <Button fx:id="endTimeDownButton" mnemonicParsing="false" onAction="#decreaseEndTime"
+                                    onMouseEntered="#handleMouseEnter" onMouseExited="#handleMouseExit"
+                                    style="-fx-background-color: #A8D6AA; -fx-background-radius: 10;" text="▼"
+                                    textFill="white"/>
                         </HBox>
                     </VBox>
                 </VBox>
                 <Line endX="100.0" scaleX="0.5" startX="100.0" startY="-250.0" translateX="-40.0">
                     <HBox.margin>
-                        <Insets />
+                        <Insets/>
                     </HBox.margin>
                 </Line>
 
@@ -153,14 +192,21 @@
                     <VBox spacing="8">
                         <HBox alignment="CENTER_LEFT" spacing="10">
                             <ImageView fitHeight="20" fitWidth="20" preserveRatio="true">
-                                <Image url="@../../../../images/cafeImages/Dollarsign.png" />
+                                <Image url="@../../../../images/cafeImages/Dollarsign.png"/>
                             </ImageView>
-                            <Label style="-fx-font-weight: bold;" text="시간당 가격" />
+                            <Label style="-fx-font-weight: bold;" text="시간당 가격"/>
                         </HBox>
                         <HBox alignment="CENTER_LEFT" spacing="8">
-                            <TextField fx:id="priceField" editable="false" prefHeight="22.0" prefWidth="60.0" text="1000" />
-                            <Button fx:id="priceUpButton" mnemonicParsing="false" onAction="#increasePrice" onMouseEntered="#handleMouseEnter" onMouseExited="#handleMouseExit" style="-fx-background-color: #A8D6AA; -fx-background-radius: 10;" text="▲" textFill="white" />
-                            <Button fx:id="priceDownButton" mnemonicParsing="false" onAction="#decreasePrice" onMouseEntered="#handleMouseEnter" onMouseExited="#handleMouseExit" style="-fx-background-color: #A8D6AA; -fx-background-radius: 10;" text="▼" textFill="white" />
+                            <TextField fx:id="priceField" editable="false" prefHeight="22.0" prefWidth="60.0"
+                                       text="1000"/>
+                            <Button fx:id="priceUpButton" mnemonicParsing="false" onAction="#increasePrice"
+                                    onMouseEntered="#handleMouseEnter" onMouseExited="#handleMouseExit"
+                                    style="-fx-background-color: #A8D6AA; -fx-background-radius: 10;" text="▲"
+                                    textFill="white"/>
+                            <Button fx:id="priceDownButton" mnemonicParsing="false" onAction="#decreasePrice"
+                                    onMouseEntered="#handleMouseEnter" onMouseExited="#handleMouseExit"
+                                    style="-fx-background-color: #A8D6AA; -fx-background-radius: 10;" text="▼"
+                                    textFill="white"/>
                         </HBox>
                     </VBox>
 
@@ -168,54 +214,63 @@
                     <VBox spacing="8">
                         <HBox alignment="CENTER_LEFT" spacing="10">
                             <ImageView fitHeight="20" fitWidth="20" preserveRatio="true">
-                                <Image url="@../../../../images/cafeImages/Phone.png" />
+                                <Image url="@../../../../images/cafeImages/Phone.png"/>
                             </ImageView>
-                            <Label style="-fx-font-weight: bold;" text="전화번호" />
+                            <Label style="-fx-font-weight: bold;" text="전화번호"/>
                         </HBox>
-                        <TextField fx:id="phoneField" maxWidth="300.0" onKeyTyped="#formatPhoneNumber" prefHeight="30.0" prefWidth="150.0" promptText="스터디 카페 전화번호를 작성해 주세요." />
+                        <TextField fx:id="phoneField" maxWidth="300.0" onKeyTyped="#formatPhoneNumber" prefHeight="30.0"
+                                   prefWidth="150.0" promptText="스터디 카페 전화번호를 작성해 주세요."/>
                     </VBox>
 
                     <!-- 대표 이미지 -->
                     <VBox spacing="8">
                         <HBox alignment="CENTER_LEFT" spacing="10">
                             <ImageView fitHeight="20" fitWidth="20" preserveRatio="true">
-                                <Image url="@../../../../images/cafeImages/Imagetool.png" />
+                                <Image url="@../../../../images/cafeImages/Imagetool.png"/>
                             </ImageView>
-                            <Label style="-fx-font-weight: bold;" text="대표 이미지" />
+                            <Label style="-fx-font-weight: bold;" text="대표 이미지"/>
                         </HBox>
-                        <TextField fx:id="imageUrlField" maxWidth="300.0" prefHeight="30.0" prefWidth="150.0" promptText="스터디 카페 대표이미지 URL을 작성해 주세요." />
+                        <TextField fx:id="imageUrlField" maxWidth="300.0" prefHeight="30.0" prefWidth="150.0"
+                                   promptText="스터디 카페 대표이미지 URL을 작성해 주세요."/>
                     </VBox>
 
                     <!-- 설명 -->
                     <VBox spacing="8">
                         <HBox alignment="CENTER_LEFT" spacing="10">
                             <ImageView fitHeight="20" fitWidth="20" preserveRatio="true">
-                                <Image url="@../../../../images/cafeImages/Pentool.png" />
+                                <Image url="@../../../../images/cafeImages/Pentool.png"/>
                             </ImageView>
-                            <Label style="-fx-font-weight: bold;" text="설명" />
+                            <Label style="-fx-font-weight: bold;" text="설명"/>
                         </HBox>
                         <VBox>
-                            <TextArea fx:id="descriptionArea" maxWidth="300.0" onKeyTyped="#limitDescription" prefHeight="90.0" prefRowCount="4" prefWidth="150.0" promptText="스터디 카페 설명을 작성해 주세요." />
-                            <Label fx:id="charCountLabel" alignment="CENTER_RIGHT" style="-fx-text-fill: #666666; -fx-font-size: 10px;" text="0/200" />
+                            <TextArea fx:id="descriptionArea" maxWidth="300.0" onKeyTyped="#limitDescription"
+                                      prefHeight="90.0" prefRowCount="4" prefWidth="150.0"
+                                      promptText="스터디 카페 설명을 작성해 주세요."/>
+                            <Label fx:id="charCountLabel" alignment="CENTER_RIGHT"
+                                   style="-fx-text-fill: #666666; -fx-font-size: 10px;" text="0/200"/>
                         </VBox>
                     </VBox>
                 </VBox>
             </HBox>
 
             <!-- 등록 버튼 -->
-            <Button fx:id="registerButton" minHeight="50.0" onAction="#registerCafe" onMouseEntered="#onRegisterButtonEnter" onMouseExited="#onRegisterButtonExit" prefHeight="50.0" prefWidth="100" style="-fx-background-color: white; -fx-font-weight: bold; -fx-background-radius: 10;" text="등록" textFill="#4caf4f">
+            <Button fx:id="registerButton" minHeight="50.0" onAction="#registerCafe"
+                    onMouseEntered="#onRegisterButtonEnter" onMouseExited="#onRegisterButtonExit" prefHeight="50.0"
+                    prefWidth="100"
+                    style="-fx-background-color: white; -fx-font-weight: bold; -fx-background-radius: 10;" text="등록"
+                    textFill="#4caf4f">
                 <VBox.margin>
-                    <Insets right="80.0" />
+                    <Insets right="80.0"/>
                 </VBox.margin>
                 <effect>
                     <DropShadow>
                         <color>
-                            <Color opacity="0.2779456377029419" />
+                            <Color opacity="0.2779456377029419"/>
                         </color>
                     </DropShadow>
                 </effect>
                 <font>
-                    <Font fx:id="registerButtonFont" size="14.0" />
+                    <Font fx:id="registerButtonFont" size="14.0"/>
                 </font>
             </Button>
         </VBox>

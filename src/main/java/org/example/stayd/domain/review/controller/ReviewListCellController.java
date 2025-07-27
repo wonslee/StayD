@@ -1,14 +1,13 @@
+// 작성자 : 이해든
 package org.example.stayd.domain.review.controller;
 
+import java.io.IOException;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.layout.HBox;
 import org.example.stayd.domain.review.dto.ReviewListDTO;
-
-import java.io.IOException;
-import java.time.format.DateTimeFormatter;
 
 /**
  * 리뷰 1건을 출력하는 셀 컨트롤러 (커스텀 셀)

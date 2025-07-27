@@ -1,9 +1,8 @@
+// 작성자 : 방대혁
 package org.example.stayd.domain.discount.service;
 
 import org.example.stayd.domain.discount.dao.DiscountDAO;
 import org.example.stayd.domain.discount.dto.DiscountDTO;
-
-import java.sql.Date;
 
 /**
  * 할인 설정을 처리하는 서비스 클래스
@@ -13,8 +12,7 @@ public class DiscountService {
     private final DiscountDAO discountDAO;
 
     /**
-     * DiscountService 생성자
-     * DiscountDAO 객체를 생성하여 데이터베이스 연동 준비
+     * DiscountService 생성자 DiscountDAO 객체를 생성하여 데이터베이스 연동 준비
      */
     public DiscountService() {
         this.discountDAO = new DiscountDAO();

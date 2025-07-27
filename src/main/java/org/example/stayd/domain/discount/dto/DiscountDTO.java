@@ -1,3 +1,4 @@
+// 작성자 : 방대혁
 package org.example.stayd.domain.discount.dto;
 
 import lombok.Data;
@@ -11,7 +12,7 @@ public class DiscountDTO {
     /**
      * 할인 설정을 위한 생성자
      *
-     * @param dayOfWeek    할인 적용 요일 (MON, TUE 등)
+     * @param dayOfWeek     할인 적용 요일 (MON, TUE 등)
      * @param discountStart 할인 시작 시간 (0~23)
      * @param discountEnd   할인 종료 시간 (0~23)
      * @param discountRate  할인율 (0~100)

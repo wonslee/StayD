@@ -1,16 +1,18 @@
+// 작성자 : 방대혁
 package org.example.stayd.domain.discount.dao;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import javafx.scene.control.Alert;
 import javafx.stage.Window;
 import org.example.stayd.common.DatabaseConnection;
-import org.example.stayd.common.FXUtils;
 import org.example.stayd.common.SessionManager;
 import org.example.stayd.domain.discount.dto.DiscountDTO;
 
-import java.sql.*;
-
 public class DiscountDAO {
-    private Connection connection;
+    private final Connection connection;
 
     public DiscountDAO() {
         this.connection = new DatabaseConnection().getConnection();

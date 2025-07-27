@@ -1,7 +1,12 @@
+// 작성자 : 최영준, 방대혁, 이원석
 package org.example.stayd.domain.cafe.controller;
 
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.ResourceBundle;
+import javafx.application.Platform;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -15,18 +20,8 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import javafx.application.Platform;
-import javafx.concurrent.Task;
-import lombok.Getter;
-import org.example.stayd.domain.cafe.dto.CafeDto;
 import org.example.stayd.domain.cafe.dto.CafeDto.DetailResponse;
 import org.example.stayd.domain.cafe.service.CafeService;
-import org.example.stayd.common.PerformanceMonitor;
-
-import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.ResourceBundle;
 import org.example.stayd.domain.reservation.controller.ReservationCreateController;
 import org.example.stayd.domain.review.controller.ReviewListController;
 
@@ -81,8 +76,7 @@ public class CafeDetailController implements Initializable {
     // 상태 변수들
     private boolean isFavorite = false;
     /**
-     * -- GETTER --
-     *  현재 표시된 탭 반환
+     * -- GETTER -- 현재 표시된 탭 반환
      */
 //    @Getter
     private String currentTab = "detail";
@@ -100,7 +94,7 @@ public class CafeDetailController implements Initializable {
     private String imageUrl;
     private double rating;
     /* … */
-    private CafeService cafeService;
+    private final CafeService cafeService;
 
     // 이미지 캐시 추가
     private final Map<String, Image> imageCache = new HashMap<>();
@@ -124,27 +118,26 @@ public class CafeDetailController implements Initializable {
     @FXML
     private void goBackToList(ActionEvent event) {
 //        PerformanceMonitor.measureTime("Navigation - Back to List", () -> {
-            try {
-                // 현재 Stage 가져오기
-                Stage currentStage = (Stage) backButton.getScene().getWindow();
+        try {
+            // 현재 Stage 가져오기
+            Stage currentStage = (Stage) backButton.getScene().getWindow();
 
-                // 목록 페이지 FXML 로드
-                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/org/example/stayd/cafe/cafeListView.fxml"));
-                Scene scene = new Scene(fxmlLoader.load(), 1024, 768);
+            // 목록 페이지 FXML 로드
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/org/example/stayd/cafe/cafeListView.fxml"));
+            Scene scene = new Scene(fxmlLoader.load(), 1024, 768);
 
-                // 목록 페이지로 화면 전환
-                currentStage.setTitle("StayD - Cafe List");
-                currentStage.setScene(scene);
+            // 목록 페이지로 화면 전환
+            currentStage.setTitle("StayD - Cafe List");
+            currentStage.setScene(scene);
 
-                System.out.println("Back to list completed successfully");
+            System.out.println("Back to list completed successfully");
 
-            } catch (Exception e) {
-                e.printStackTrace();
-                System.err.println("Error going back to list: " + e.getMessage());
-            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("Error going back to list: " + e.getMessage());
+        }
 //        });
     }
-
 
 
     /**
@@ -290,7 +283,8 @@ public class CafeDetailController implements Initializable {
 
             // 버튼 스타일 변경
             detailButton.setStyle("-fx-background-color: #A8D6AA; -fx-background-radius: 0; -fx-font-weight: bold;");
-            reservationButton.setStyle("-fx-background-color: #4CAF4F; -fx-background-radius: 0; -fx-font-weight: bold;");
+            reservationButton.setStyle(
+                    "-fx-background-color: #4CAF4F; -fx-background-radius: 0; -fx-font-weight: bold;");
             reviewButton.setStyle("-fx-background-color: #A8D6AA; -fx-background-radius: 0; -fx-font-weight: bold;");
 
             // 탭 컨텐츠 표시/숨김
@@ -325,6 +319,7 @@ public class CafeDetailController implements Initializable {
             }
         }
     }
+
     /**
      * 리뷰 탭 표시
      */
@@ -335,7 +330,8 @@ public class CafeDetailController implements Initializable {
 
             // 버튼 스타일 변경
             detailButton.setStyle("-fx-background-color: #A8D6AA; -fx-background-radius: 0; -fx-font-weight: bold;");
-            reservationButton.setStyle("-fx-background-color: #A8D6AA; -fx-background-radius: 0; -fx-font-weight: bold;");
+            reservationButton.setStyle(
+                    "-fx-background-color: #A8D6AA; -fx-background-radius: 0; -fx-font-weight: bold;");
             reviewButton.setStyle("-fx-background-color: #4CAF4F; -fx-background-radius: 0; -fx-font-weight: bold;");
 
             // 탭 컨텐츠 표시/숨김
@@ -352,7 +348,8 @@ public class CafeDetailController implements Initializable {
             if (!reviewLoaded) {
                 try {
                     // FXML 파일 로딩
-                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/stayd/review/review-list.fxml"));
+                    FXMLLoader loader = new FXMLLoader(
+                            getClass().getResource("/org/example/stayd/review/review-list.fxml"));
                     Node reviewView = loader.load();
 
                     // 컨트롤러 가져와서 cafeId 주입
@@ -369,29 +366,29 @@ public class CafeDetailController implements Initializable {
             }
         }
     }
+
     /**
-     * 외부에서 카페 데이터를 설정하는 메소드 (최적화됨)
-     * (다른 페이지에서 카페 상세 정보를 전달받을 때 사용)
+     * 외부에서 카페 데이터를 설정하는 메소드 (최적화됨) (다른 페이지에서 카페 상세 정보를 전달받을 때 사용)
      */
     public void setCafeData(int cafeId, String cafeName, String location, String businessDays,
                             String operatingHours, int hourlyPrice, String phoneNumber,
                             String description, String imageUrl, double rating) {
 
 //        PerformanceMonitor.measureTime("Detail - Set Cafe Data", () -> {
-            // 데이터 설정
-            this.cafeId = cafeId;
-            this.cafeName = cafeName;
-            this.location = location;
-            this.businessDays = businessDays;
-            this.operatingHours = operatingHours;
-            this.hourlyPrice = hourlyPrice;
-            this.phoneNumber = phoneNumber;
-            this.description = description;
-            this.imageUrl = imageUrl;
-            this.rating = rating;
+        // 데이터 설정
+        this.cafeId = cafeId;
+        this.cafeName = cafeName;
+        this.location = location;
+        this.businessDays = businessDays;
+        this.operatingHours = operatingHours;
+        this.hourlyPrice = hourlyPrice;
+        this.phoneNumber = phoneNumber;
+        this.description = description;
+        this.imageUrl = imageUrl;
+        this.rating = rating;
 
-            // 즉시 UI 업데이트 (DB 호출 없이)
-            updateUI();
+        // 즉시 UI 업데이트 (DB 호출 없이)
+        updateUI();
 //        });
     }
 
@@ -430,6 +427,7 @@ public class CafeDetailController implements Initializable {
 
     /**
      * 마우스가 버튼 위에 올라갔을 때 색상 변경
+     *
      * @param event MouseEvent
      */
     @FXML
@@ -441,6 +439,7 @@ public class CafeDetailController implements Initializable {
 
     /**
      * 마우스가 버튼을 벗어났을 때 원래 색상으로 복원
+     *
      * @param event MouseEvent
      */
     @FXML

@@ -1,22 +1,17 @@
+// 작성자 : 방대혁
 package org.example.stayd.common;
+
+import static org.example.stayd.common.FXUtils.navigateToPage;
 
 import javafx.fxml.FXML;
 import javafx.scene.Node;
-import javafx.scene.control.Alert;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 import org.example.stayd.config.SceneConfig;
 import org.example.stayd.domain.user.service.UserService;
 
-import java.io.IOException;
-
-import static org.example.stayd.common.FXUtils.*;
-
 /**
- * 헤더에 위치한 버튼 클릭 시 해당 페이지로 전환을 담당하는 컨트롤러 클래스입니다.
- * 주로 홈 페이지, 마이 페이지, 로그인 페이지로 이동하는 기능을 제공합니다.
+ * 헤더에 위치한 버튼 클릭 시 해당 페이지로 전환을 담당하는 컨트롤러 클래스입니다. 주로 홈 페이지, 마이 페이지, 로그인 페이지로 이동하는 기능을 제공합니다.
  */
 public class HeaderController {
 
@@ -25,6 +20,7 @@ public class HeaderController {
 
     /**
      * 홈 페이지로 이동하는 메서드
+     *
      * @param event MouseEvent
      */
     @FXML
@@ -34,8 +30,8 @@ public class HeaderController {
     }
 
     /**
-     * 유저 프로필 클릭 시 동작하는 메서드
-     * 로그인 여부에 따라 마이 페이지 또는 로그인 페이지로 이동
+     * 유저 프로필 클릭 시 동작하는 메서드 로그인 여부에 따라 마이 페이지 또는 로그인 페이지로 이동
+     *
      * @param event MouseEvent
      */
     @FXML

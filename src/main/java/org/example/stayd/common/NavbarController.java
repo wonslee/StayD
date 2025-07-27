@@ -1,5 +1,10 @@
+// 작성자 : 방대혁
 package org.example.stayd.common;
 
+import static org.example.stayd.common.FXUtils.navigateToPage;
+import static org.example.stayd.common.FXUtils.showAlert;
+
+import java.io.IOException;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -14,21 +19,18 @@ import org.example.stayd.config.SceneConfig;
 import org.example.stayd.domain.cafe.controller.CafeModifyDeleteController;
 import org.example.stayd.domain.cafe.service.CafeService;
 
-import java.io.IOException;
-
-import static org.example.stayd.common.FXUtils.*;
-
 /**
- * 네브바(Navigation Bar)에서 각 버튼을 클릭했을 때 화면 전환을 처리하는 컨트롤러 클래스입니다.
- * 각 버튼에 해당하는 화면으로 전환하는 기능을 제공합니다.
+ * 네브바(Navigation Bar)에서 각 버튼을 클릭했을 때 화면 전환을 처리하는 컨트롤러 클래스입니다. 각 버튼에 해당하는 화면으로 전환하는 기능을 제공합니다.
  */
 public class NavbarController {
 
     /**
      * 카페 생성 버튼 클릭 시 호출되는 메서드
+     *
      * @param event ActionEvent
      */
-    private CafeService cafeService = new CafeService();
+    private final CafeService cafeService = new CafeService();
+
     // 카페 생성 버튼 클릭 시
     @FXML
     private void goToCafeCreate(ActionEvent event) {
@@ -37,6 +39,7 @@ public class NavbarController {
 
     /**
      * 카페 수정 버튼 클릭 시 호출되는 메서드
+     *
      * @param event ActionEvent
      */
     @FXML
@@ -48,7 +51,7 @@ public class NavbarController {
 
             if (cafeId == null) {
                 showAlert(((Node) event.getSource()).getScene().getWindow(),
-                    Alert.AlertType.WARNING, "카페 없음", "등록된 카페가 없습니다. 먼저 카페를 생성해주세요.");
+                        Alert.AlertType.WARNING, "카페 없음", "등록된 카페가 없습니다. 먼저 카페를 생성해주세요.");
                 return;
             }
 
@@ -69,7 +72,7 @@ public class NavbarController {
         } catch (IOException e) {
             e.printStackTrace();
             showAlert(((Node) event.getSource()).getScene().getWindow(),
-                Alert.AlertType.ERROR, "화면 전환 오류", "오류가 발생했습니다.");
+                    Alert.AlertType.ERROR, "화면 전환 오류", "오류가 발생했습니다.");
         } catch (Exception e) {
             e.printStackTrace();
 
@@ -80,16 +83,17 @@ public class NavbarController {
                 System.out.println("실제 예외 메시지: " + cause.getMessage());
                 cause.printStackTrace();
                 showAlert(((Node) event.getSource()).getScene().getWindow(), Alert.AlertType.ERROR, "오류",
-                    "카페 정보를 불러오는 중 오류가 발생했습니다: " + cause.getMessage());
+                        "카페 정보를 불러오는 중 오류가 발생했습니다: " + cause.getMessage());
             } else {
                 showAlert(((Node) event.getSource()).getScene().getWindow(), Alert.AlertType.ERROR, "오류",
-                    "카페 정보를 불러오는 중 오류가 발생했습니다: " + e.getMessage());
+                        "카페 정보를 불러오는 중 오류가 발생했습니다: " + e.getMessage());
             }
         }
     }
 
     /**
      * 날짜별 현황 버튼 클릭 시 호출되는 메서드
+     *
      * @param event ActionEvent
      */
     @FXML
@@ -99,6 +103,7 @@ public class NavbarController {
 
     /**
      * 요일별 현황 버튼 클릭 시 호출되는 메서드
+     *
      * @param event ActionEvent
      */
     @FXML
@@ -108,6 +113,7 @@ public class NavbarController {
 
     /**
      * 할인 설정 버튼 클릭 시 호출되는 메서드
+     *
      * @param event ActionEvent
      */
     @FXML
@@ -117,21 +123,25 @@ public class NavbarController {
 
     /**
      * 마우스가 버튼 위에 올라갔을 때 언더바 생성, 글자 확대
+     *
      * @param event MouseEvent
      */
     @FXML
     private void handleMouseEnter(MouseEvent event) {
         Button button = (Button) event.getSource(); // 이벤트가 발생한 버튼 객체를 가져옴
-        button.setStyle("-fx-font-size: 15px; -fx-underline: true; -fx-text-fill: #4CAF4F; -fx-background-color: white;");
+        button.setStyle(
+                "-fx-font-size: 15px; -fx-underline: true; -fx-text-fill: #4CAF4F; -fx-background-color: white;");
     }
 
     /**
      * 마우스가 버튼을 벗어났을 때 원래 상태로 복원
+     *
      * @param event MouseEvent
      */
     @FXML
     private void handleMouseExit(MouseEvent event) {
         Button button = (Button) event.getSource(); // 이벤트가 발생한 버튼 객체를 가져옴
-        button.setStyle("-fx-font-size: 13px; -fx-underline: false; -fx-text-fill: #4CAF4F; -fx-background-color: white;");
+        button.setStyle(
+                "-fx-font-size: 13px; -fx-underline: false; -fx-text-fill: #4CAF4F; -fx-background-color: white;");
     }
 }

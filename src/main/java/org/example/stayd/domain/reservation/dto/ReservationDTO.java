@@ -1,3 +1,4 @@
+// 작성자 : 이원석
 package org.example.stayd.domain.reservation.dto;
 
 import java.time.LocalDate;
@@ -10,8 +11,7 @@ import org.example.stayd.domain.reservation.model.Reservation;
 /**
  * 예약 정보를 데이터 전송 객체(DTO)로 표현한 클래스입니다.
  * <p>
- * Controller-View, Service-DAO 계층 간 데이터 전달에 사용됩니다.
- * Reservation 모델과 유사하지만, 계층 간 변환 및 직렬화에 최적화되어 있습니다.
+ * Controller-View, Service-DAO 계층 간 데이터 전달에 사용됩니다. Reservation 모델과 유사하지만, 계층 간 변환 및 직렬화에 최적화되어 있습니다.
  * </p>
  */
 @Getter

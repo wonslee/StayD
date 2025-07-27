@@ -1,8 +1,16 @@
+// 작성자 : 방대혁
 package org.example.stayd.domain.user.controller;
 
+import static org.example.stayd.common.FXUtils.showAlert;
+
+import java.io.IOException;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.PasswordField;
+import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 import org.example.stayd.common.FXUtils;
@@ -10,10 +18,6 @@ import org.example.stayd.common.SessionManager;
 import org.example.stayd.config.SceneConfig;
 import org.example.stayd.domain.user.dto.UserDTO;
 import org.example.stayd.domain.user.service.UserService;
-
-import java.io.IOException;
-
-import static org.example.stayd.common.FXUtils.showAlert;
 
 public class LoginController {
 
@@ -35,8 +39,7 @@ public class LoginController {
     private final UserService userService = new UserService();  // 사용자 서비스 객체
 
     /**
-     * 화면 초기화 시 실행되는 메서드
-     * 입력란에 텍스트가 입력되면 유효성 검사 후 버튼 활성화 여부를 설정
+     * 화면 초기화 시 실행되는 메서드 입력란에 텍스트가 입력되면 유효성 검사 후 버튼 활성화 여부를 설정
      */
     @FXML
     public void initialize() {
@@ -75,9 +78,7 @@ public class LoginController {
     }
 
     /**
-     * 로그인 버튼 클릭 시 호출되는 메서드
-     * 1. 아이디와 비밀번호를 입력받고 유효성 검사
-     * 2. 사용자 인증을 비동기로 진행하여 UI를 차단하지 않음
+     * 로그인 버튼 클릭 시 호출되는 메서드 1. 아이디와 비밀번호를 입력받고 유효성 검사 2. 사용자 인증을 비동기로 진행하여 UI를 차단하지 않음
      */
     @FXML
     private void onLogin() {
@@ -122,6 +123,7 @@ public class LoginController {
 
     /**
      * 사용자 역할에 맞는 홈 화면으로 이동
+     *
      * @param user 로그인한 사용자 객체
      */
     private void goToHome(UserDTO user) {

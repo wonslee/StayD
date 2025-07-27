@@ -1,3 +1,4 @@
+// 작성자 : 방대혁
 package org.example.stayd.common;
 
 import java.io.FileInputStream;
@@ -7,23 +8,24 @@ import java.sql.DriverManager;
 import java.util.Properties;
 
 /**
- * 데이터베이스 연결을 관리하는 클래스.
- * {@code application.properties} 파일에서 데이터베이스 연결 정보를 로드하여 연결을 생성.
+ * 데이터베이스 연결을 관리하는 클래스. {@code application.properties} 파일에서 데이터베이스 연결 정보를 로드하여 연결을 생성.
  */
 public class DatabaseConnection {
 
-    /** 데이터베이스 연결 객체 */
+    /**
+     * 데이터베이스 연결 객체
+     */
     public Connection databaseLink;
 
     /**
      * {@code application.properties} 파일에서 연결 정보를 읽어 데이터베이스에 연결.
      *
      * @return {@code Connection} - 데이터베이스 연결 객체
-     * @throws IOException 파일 읽기 오류
+     * @throws IOException            파일 읽기 오류
      * @throws ClassNotFoundException 드라이버 클래스 로드 오류
-     * @throws java.sql.SQLException 연결 오류
+     * @throws java.sql.SQLException  연결 오류
      */
-    public Connection getConnection(){
+    public Connection getConnection() {
         String propertiesFile = "src/main/resources/application.properties";  // 프로퍼티 파일 경로
         Properties properties = new Properties();
 

@@ -1,3 +1,4 @@
+// 작성자 : 최영준, 방대혁, 이원석
 package org.example.stayd.domain.cafe.controller;
 
 import java.net.URL;
@@ -8,8 +9,6 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -72,7 +71,7 @@ public class CafeCreateController implements Initializable {
     private int currentPrice = 1000;
     private int startHour = 9;
     private int endHour = 18;
-    private List<String> selectedDays = new ArrayList<>();
+    private final List<String> selectedDays = new ArrayList<>();
 
     // 서비스 계층
     private final CafeService cafeService;
@@ -237,7 +236,7 @@ public class CafeCreateController implements Initializable {
             if (response.isSuccess()) {
                 // 성공 시
                 showAlert(Alert.AlertType.INFORMATION, "생성 성공",
-                    "카페 ID: " + response.getCafeId() + "\n" + response.getMessage());
+                        "카페 ID: " + response.getCafeId() + "\n" + response.getMessage());
                 clearForm();
 
             } else {
@@ -308,8 +307,8 @@ public class CafeCreateController implements Initializable {
      */
     private void resetDayButtons() {
         ToggleButton[] dayButtons = {
-            mondayButton, tuesdayButton, wednesdayButton, thursdayButton,
-            fridayButton, saturdayButton, sundayButton
+                mondayButton, tuesdayButton, wednesdayButton, thursdayButton,
+                fridayButton, saturdayButton, sundayButton
         };
 
         for (ToggleButton button : dayButtons) {
@@ -335,6 +334,7 @@ public class CafeCreateController implements Initializable {
 
     /**
      * 마우스가 버튼 위에 올라갔을 때 색상 변경
+     *
      * @param event MouseEvent
      */
     @FXML
@@ -344,6 +344,7 @@ public class CafeCreateController implements Initializable {
 
     /**
      * 마우스가 버튼을 벗어났을 때 원래 색상으로 복원
+     *
      * @param event MouseEvent
      */
     @FXML

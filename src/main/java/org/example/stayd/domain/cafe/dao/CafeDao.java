@@ -1,3 +1,4 @@
+// 작성자 : 최영준, 방대혁, 이원석
 package org.example.stayd.domain.cafe.dao;
 
 import java.sql.CallableStatement;
@@ -727,23 +728,25 @@ public class CafeDao {
             return result;
         }
     }
+
     /**
      * 특정 오너의 가장 최신 카페 ID 조회
+     *
      * @param ownerId 카페 오너 ID
      * @return 가장 최근에 생성된 카페 ID (없으면 null)
      * @throws SQLException SQL 예외
      */
     public Long findLatestCafeIdByOwnerId(Long ownerId) throws SQLException {
         String sql = """
-        SELECT CAFE_ID 
-        FROM (
-            SELECT CAFE_ID 
-            FROM CAFE 
-            WHERE OWNER_ID = ? 
-            ORDER BY CREATED_AT DESC
-        ) 
-        WHERE ROWNUM = 1
-        """;
+                SELECT CAFE_ID 
+                FROM (
+                    SELECT CAFE_ID 
+                    FROM CAFE 
+                    WHERE OWNER_ID = ? 
+                    ORDER BY CREATED_AT DESC
+                ) 
+                WHERE ROWNUM = 1
+                """;
 
         try (Connection conn = databaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {

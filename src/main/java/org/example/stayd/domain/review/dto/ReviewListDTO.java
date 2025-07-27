@@ -1,13 +1,10 @@
+// 작성자 : 이해든
 package org.example.stayd.domain.review.dto;
 
 import java.time.LocalDateTime;
 
 /**
- * 리뷰 목록 화면에 보여줄 리뷰 1건에 대한 정보 DTO
- * - 사용자 아이디 (login_id)
- * - 리뷰 내용
- * - 평점
- * - 작성일
+ * 리뷰 목록 화면에 보여줄 리뷰 1건에 대한 정보 DTO - 사용자 아이디 (login_id) - 리뷰 내용 - 평점 - 작성일
  */
 public class ReviewListDTO {
 
@@ -16,8 +13,10 @@ public class ReviewListDTO {
     private int rating;              // 평점 (1~5)
     private LocalDateTime createdAt; // 리뷰 작성일시
     private long userId;
+
     // 기본 생성자
-    public ReviewListDTO() {}
+    public ReviewListDTO() {
+    }
 
     // getter/setter
     public String getLoginId() {
@@ -51,6 +50,7 @@ public class ReviewListDTO {
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
+
     public void setUserId(long userId) {
         this.userId = userId;
     }

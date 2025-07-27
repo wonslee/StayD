@@ -1,10 +1,10 @@
+// 작성자 : 이해든, 이원석
 package org.example.stayd.domain.reservation.dto;
-
-import lombok.Builder;
-import lombok.Data;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import lombok.Builder;
+import lombok.Data;
 import org.example.stayd.domain.cafe.dto.CafeDto;
 
 @Data
@@ -33,16 +33,16 @@ public class ReservationWithCafeDTO {
 
     public CafeDto.DetailResponse toCafeDetailResponse() {
         return new CafeDto.DetailResponse(
-            this.cafeId,
-            this.cafeName,
-            address, // address는 ReservationWithCafeDTO에 없으므로 null
-            pricePerHour, // pricePerHour도 없으면 null
-            null, // description
-            phoneNumber, // phoneNumber
-            null, // imageUrl
-            null, // operatingDays
-            null, // operatingStartHour
-            null  // operatingEndHour
+                this.cafeId,
+                this.cafeName,
+                address, // address는 ReservationWithCafeDTO에 없으므로 null
+                pricePerHour, // pricePerHour도 없으면 null
+                null, // description
+                phoneNumber, // phoneNumber
+                null, // imageUrl
+                null, // operatingDays
+                null, // operatingStartHour
+                null  // operatingEndHour
         );
     }
 }

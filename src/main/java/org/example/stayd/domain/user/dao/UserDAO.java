@@ -1,14 +1,19 @@
+// 작성자 : 방대혁
 package org.example.stayd.domain.user.dao;
 
+import java.sql.CallableStatement;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Types;
+import java.util.Optional;
 import org.example.stayd.common.DatabaseConnection;
 import org.example.stayd.domain.user.dto.UserDTO;
 
-import java.sql.*;
-import java.util.Optional;
-
 public class UserDAO {
 
-    private Connection connection;
+    private final Connection connection;
 
     public UserDAO() {
         this.connection = new DatabaseConnection().getConnection();
@@ -168,6 +173,7 @@ public class UserDAO {
 
     /**
      * PL/SQL register_user 프로시저 호출
+     *
      * @return 상태 코드(0:성공,1:ID중복,2:Email중복,-1:오류)
      */
     public int registerUser(UserDTO user) throws SQLException {

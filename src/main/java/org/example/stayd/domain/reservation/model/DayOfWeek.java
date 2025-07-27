@@ -1,3 +1,4 @@
+// 작성자 : 방대혁
 package org.example.stayd.domain.reservation.model;
 
 public enum DayOfWeek {

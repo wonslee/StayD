@@ -1,3 +1,4 @@
+// 작성자 : 방대혁
 package org.example.stayd.domain.user.dto;
 
 import jakarta.validation.constraints.Email;
@@ -20,8 +21,7 @@ import lombok.NoArgsConstructor;
 public class PasswordResetDTO {
 
     /**
-     * 로그인 아이디
-     * 아이디는 비어 있으면 안되며, 유효한 아이디가 입력되어야 합니다.
+     * 로그인 아이디 아이디는 비어 있으면 안되며, 유효한 아이디가 입력되어야 합니다.
      */
     private int userId;
 
@@ -29,16 +29,14 @@ public class PasswordResetDTO {
     private String loginId;
 
     /**
-     * 이메일
-     * 이메일은 비어 있을 수 없으며, 유효한 이메일 형식이여야 합니다.
+     * 이메일 이메일은 비어 있을 수 없으며, 유효한 이메일 형식이여야 합니다.
      */
     @NotBlank(message = "이메일을 입력해주세요.")
     @Email(message = "유효한 이메일을 입력해주세요.")
     private String email;
 
     /**
-     * 새 비밀번호
-     * 새 비밀번호는 최소 8자 이상이어야 하며, 영문, 숫자, 특수문자를 포함해야 합니다.
+     * 새 비밀번호 새 비밀번호는 최소 8자 이상이어야 하며, 영문, 숫자, 특수문자를 포함해야 합니다.
      */
     @NotBlank(message = "새 비밀번호를 입력해주세요.")
     @Size(min = 8, message = "비밀번호는 최소 8자 이상이어야 합니다.")
@@ -55,7 +53,7 @@ public class PasswordResetDTO {
      * @param email   사용자 이메일
      */
     public PasswordResetDTO(String loginId, String email) {
-        this.loginId  = loginId;
-        this.email    = email;
+        this.loginId = loginId;
+        this.email = email;
     }
 }

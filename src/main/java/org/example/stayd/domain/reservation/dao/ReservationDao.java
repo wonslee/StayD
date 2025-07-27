@@ -1,26 +1,25 @@
+// 작성자 : 방대혁, 이원석
 package org.example.stayd.domain.reservation.dao;
 
+import java.sql.Connection;
+import java.sql.Date;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import org.example.stayd.common.DatabaseConnection;
 import org.example.stayd.common.SessionManager;
 import org.example.stayd.domain.reservation.dto.ReservationDTO;
-import org.example.stayd.domain.user.dto.UserDTO;
-
-import java.sql.*;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * 예약 관련 데이터베이스 접근을 담당하는 DAO 클래스입니다.
  * <p>
- * 예약 생성, 조회, 취소 등 예약 관련 모든 DB 작업을 수행합니다.
- * Oracle PL/SQL 프로시저 및 JDBC를 활용합니다.
+ * 예약 생성, 조회, 취소 등 예약 관련 모든 DB 작업을 수행합니다. Oracle PL/SQL 프로시저 및 JDBC를 활용합니다.
  * </p>
  */
 public class ReservationDao {
-    private Connection connection;
+    private final Connection connection;
 
     public ReservationDao() {
         this.connection = new DatabaseConnection().getConnection();

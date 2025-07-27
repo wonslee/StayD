@@ -1,17 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- 작성자 : 이원석, 방대혁 -->
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Separator?>
+<?import javafx.scene.effect.DropShadow?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
-<?import javafx.scene.text.Font?>
-
 <?import javafx.scene.paint.Color?>
-<?import javafx.scene.effect.DropShadow?>
 <VBox xmlns:fx="http://javafx.com/fxml"
       fx:controller="org.example.stayd.domain.reservation.controller.ReservationDetailController"
       spacing="24" alignment="TOP_CENTER">
@@ -20,15 +19,17 @@
     </padding>
 
     <!-- 제목 -->
-    <Label fx:id="titleLabel" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #4CAF4F;" text="예약 상세 정보" />
+    <Label fx:id="titleLabel" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #4CAF4F;"
+           text="예약 상세 정보"/>
 
     <!-- 예약 정보 카드 -->
-    <VBox spacing="20" style="-fx-border-color: #E0E0E0; -fx-border-radius: 10; -fx-background-radius: 10; -fx-padding: 25;">
+    <VBox spacing="20"
+          style="-fx-border-color: #E0E0E0; -fx-border-radius: 10; -fx-background-radius: 10; -fx-padding: 25;">
 
         <!-- 카페 정보 섹션 -->
         <VBox spacing="15">
-            <Label text="카페 정보" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #333333;" />
-            <Separator />
+            <Label text="카페 정보" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #333333;"/>
+            <Separator/>
 
             <GridPane hgap="20" vgap="12">
                 <columnConstraints>
@@ -39,7 +40,8 @@
                 </columnConstraints>
 
                 <Label text="카페명:" GridPane.rowIndex="0" GridPane.columnIndex="0" style="-fx-font-weight: bold;"/>
-                <Label fx:id="cafeNameLabel" GridPane.rowIndex="0" GridPane.columnIndex="1" style="-fx-text-fill: #4CAF4F;"/>
+                <Label fx:id="cafeNameLabel" GridPane.rowIndex="0" GridPane.columnIndex="1"
+                       style="-fx-text-fill: #4CAF4F;"/>
 
                 <Label text="주소:" GridPane.rowIndex="0" GridPane.columnIndex="2" style="-fx-font-weight: bold;"/>
                 <Label fx:id="cafeAddressLabel" GridPane.rowIndex="0" GridPane.columnIndex="3"/>
@@ -48,14 +50,15 @@
                 <Label fx:id="cafePhoneLabel" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
 
                 <Label text="시간당 요금:" GridPane.rowIndex="1" GridPane.columnIndex="2" style="-fx-font-weight: bold;"/>
-                <Label fx:id="cafePriceLabel" GridPane.rowIndex="1" GridPane.columnIndex="3" style="-fx-text-fill: #009688;"/>
+                <Label fx:id="cafePriceLabel" GridPane.rowIndex="1" GridPane.columnIndex="3"
+                       style="-fx-text-fill: #009688;"/>
             </GridPane>
         </VBox>
 
         <!-- 예약 정보 섹션 -->
         <VBox spacing="15">
-            <Label text="예약 정보" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #333333;" />
-            <Separator />
+            <Label text="예약 정보" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #333333;"/>
+            <Separator/>
 
             <GridPane hgap="20" vgap="12">
                 <columnConstraints>
@@ -66,7 +69,8 @@
                 </columnConstraints>
 
                 <Label text="예약 번호:" GridPane.rowIndex="0" GridPane.columnIndex="0" style="-fx-font-weight: bold;"/>
-                <Label fx:id="reservationIdLabel" GridPane.rowIndex="0" GridPane.columnIndex="1" style="-fx-text-fill: #2196F3;"/>
+                <Label fx:id="reservationIdLabel" GridPane.rowIndex="0" GridPane.columnIndex="1"
+                       style="-fx-text-fill: #2196F3;"/>
 
                 <Label text="예약자 ID:" GridPane.rowIndex="0" GridPane.columnIndex="2" style="-fx-font-weight: bold;"/>
                 <Label fx:id="userIdLabel" GridPane.rowIndex="0" GridPane.columnIndex="3"/>
@@ -87,8 +91,8 @@
 
         <!-- 결제 정보 섹션 -->
         <VBox spacing="15">
-            <Label text="결제 정보" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #333333;" />
-            <Separator />
+            <Label text="결제 정보" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #333333;"/>
+            <Separator/>
 
             <GridPane hgap="20" vgap="12">
                 <columnConstraints>
@@ -102,10 +106,13 @@
                 <Label fx:id="originalPriceLabel" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
 
                 <Label text="할인 금액:" GridPane.rowIndex="0" GridPane.columnIndex="2" style="-fx-font-weight: bold;"/>
-                <Label fx:id="discountPriceLabel" GridPane.rowIndex="0" GridPane.columnIndex="3" style="-fx-text-fill: #FF5722;"/>
+                <Label fx:id="discountPriceLabel" GridPane.rowIndex="0" GridPane.columnIndex="3"
+                       style="-fx-text-fill: #FF5722;"/>
 
-                <Label text="최종 결제금액:" GridPane.rowIndex="1" GridPane.columnIndex="0" style="-fx-font-weight: bold; -fx-font-size: 14px;"/>
-                <Label fx:id="finalPriceLabel" GridPane.rowIndex="1" GridPane.columnIndex="1" style="-fx-text-fill: #009688; -fx-font-size: 16px; -fx-font-weight: bold;"/>
+                <Label text="최종 결제금액:" GridPane.rowIndex="1" GridPane.columnIndex="0"
+                       style="-fx-font-weight: bold; -fx-font-size: 14px;"/>
+                <Label fx:id="finalPriceLabel" GridPane.rowIndex="1" GridPane.columnIndex="1"
+                       style="-fx-text-fill: #009688; -fx-font-size: 16px; -fx-font-weight: bold;"/>
 
                 <Label text="예약 상태:" GridPane.rowIndex="1" GridPane.columnIndex="2" style="-fx-font-weight: bold;"/>
                 <Label fx:id="canceledLabel" GridPane.rowIndex="1" GridPane.columnIndex="3"/>
@@ -114,8 +121,8 @@
 
         <!-- 리뷰 정보 섹션 (있는 경우에만 표시) -->
         <VBox fx:id="reviewSection" spacing="15" visible="false" managed="false">
-            <Label text="리뷰 정보" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #333333;" />
-            <Separator />
+            <Label text="리뷰 정보" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #333333;"/>
+            <Separator/>
 
             <GridPane hgap="20" vgap="12">
                 <columnConstraints>
@@ -126,13 +133,16 @@
                 </columnConstraints>
 
                 <Label text="별점:" GridPane.rowIndex="0" GridPane.columnIndex="0" style="-fx-font-weight: bold;"/>
-                <Label fx:id="ratingLabel" GridPane.rowIndex="0" GridPane.columnIndex="1" style="-fx-text-fill: #FFC107;"/>
+                <Label fx:id="ratingLabel" GridPane.rowIndex="0" GridPane.columnIndex="1"
+                       style="-fx-text-fill: #FFC107;"/>
 
                 <Label text="리뷰 작성일:" GridPane.rowIndex="0" GridPane.columnIndex="2" style="-fx-font-weight: bold;"/>
                 <Label fx:id="reviewCreatedAtLabel" GridPane.rowIndex="0" GridPane.columnIndex="3"/>
 
                 <Label text="리뷰 내용:" GridPane.rowIndex="1" GridPane.columnIndex="0" style="-fx-font-weight: bold;"/>
-                <Label fx:id="reviewContentLabel" GridPane.rowIndex="1" GridPane.columnIndex="1" GridPane.columnSpan="3" wrapText="true" style="-fx-background-color: #F5F5F5; -fx-padding: 10; -fx-background-radius: 5;"/>
+                <Label fx:id="reviewContentLabel" GridPane.rowIndex="1" GridPane.columnIndex="1" GridPane.columnSpan="3"
+                       wrapText="true"
+                       style="-fx-background-color: #F5F5F5; -fx-padding: 10; -fx-background-radius: 5;"/>
             </GridPane>
         </VBox>
     </VBox>
@@ -141,25 +151,27 @@
     <HBox spacing="20" alignment="CENTER">
         <Button fx:id="backButton" text="목록으로" prefWidth="120" prefHeight="40"
                 style="-fx-background-color: white; -fx-font-weight: bold; -fx-background-radius: 10;"
-                onAction="#handleBack" textFill="#4caf4f" onMouseEntered="#onModifyButtonEnter" onMouseExited="#onModifyButtonExit">
-        <effect>
-            <DropShadow>
-                <color>
-                    <Color opacity="0.2779456377029419"/>
-                </color>
-            </DropShadow>
-        </effect>
+                onAction="#handleBack" textFill="#4caf4f" onMouseEntered="#onModifyButtonEnter"
+                onMouseExited="#onModifyButtonExit">
+            <effect>
+                <DropShadow>
+                    <color>
+                        <Color opacity="0.2779456377029419"/>
+                    </color>
+                </DropShadow>
+            </effect>
         </Button>
         <Button fx:id="cancelReservationButton" text="예약 취소" prefWidth="120" prefHeight="40"
                 style="-fx-background-color: white; -fx-font-weight: bold; -fx-background-radius: 10;"
-                onAction="#handleCancelReservation" textFill="#ff6b6b" onMouseEntered="#onDeleteButtonEnter" onMouseExited="#onDeleteButtonExit">
-        <effect>
-            <DropShadow>
-                <color>
-                    <Color opacity="0.2779456377029419"/>
-                </color>
-            </DropShadow>
-        </effect>
+                onAction="#handleCancelReservation" textFill="#ff6b6b" onMouseEntered="#onDeleteButtonEnter"
+                onMouseExited="#onDeleteButtonExit">
+            <effect>
+                <DropShadow>
+                    <color>
+                        <Color opacity="0.2779456377029419"/>
+                    </color>
+                </DropShadow>
+            </effect>
         </Button>
     </HBox>
 

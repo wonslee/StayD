@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- 작성자 : 최영준, 방대혁 -->
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
@@ -16,7 +17,6 @@
 <?import javafx.scene.paint.Color?>
 <?import javafx.scene.shape.Line?>
 <?import javafx.scene.text.Font?>
-
 <BorderPane maxHeight="768.0" maxWidth="1028.0" prefHeight="768.0" prefWidth="1028.0" style="-fx-background-color:white"
             xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="org.example.stayd.domain.cafe.controller.CafeModifyDeleteController">

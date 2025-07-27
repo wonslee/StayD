@@ -1,3 +1,4 @@
+// 작성자 : 최영준, 방대혁, 이해든, 이원석
 plugins {
   id 'java'
   id 'application'

@@ -1,5 +1,12 @@
+// 작성자 : 이해든, 방대혁, 이원석
 package org.example.stayd.domain.mypage;
 
+import java.io.IOException;
+import java.net.URL;
+import java.sql.Connection;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -22,29 +29,27 @@ import org.example.stayd.domain.reservation.dao.ReservationWDAO;
 import org.example.stayd.domain.reservation.dto.ReservationWithCafeDTO;
 import org.example.stayd.domain.review.controller.ReviewController;
 import org.example.stayd.domain.review.controller.ReviewItemCellController;
+import org.example.stayd.domain.review.dao.ReviewListDAO;
 import org.example.stayd.domain.review.dto.ReviewDTO;
 import org.example.stayd.domain.user.controller.ResetPwController;
 import org.example.stayd.domain.user.dto.PasswordResetDTO;
 import org.example.stayd.domain.user.dto.UserDTO;
-import org.example.stayd.domain.review.dao.ReviewListDAO;
-
-
-import java.io.IOException;
-import java.net.URL;
-import java.sql.Connection;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ResourceBundle;
 
 public class MypageController implements Initializable {
 
-    @FXML private AnchorPane headerPlaceholder;
+    @FXML
+    private AnchorPane headerPlaceholder;
 
-    @FXML private ListView<ReservationWithCafeDTO> reservationListView;
-    @FXML private ListView<ReviewDTO> reviewListView;
-    @FXML private Label nicknameLabel;
-    @FXML private Label emailLabel;
-    @FXML private Button changePwButton;
+    @FXML
+    private ListView<ReservationWithCafeDTO> reservationListView;
+    @FXML
+    private ListView<ReviewDTO> reviewListView;
+    @FXML
+    private Label nicknameLabel;
+    @FXML
+    private Label emailLabel;
+    @FXML
+    private Button changePwButton;
 
     private final ReservationWDAO reservationWDAO = new ReservationWDAO();
     private final ReviewListDAO reviewListDao = new ReviewListDAO();
@@ -103,7 +108,8 @@ public class MypageController implements Initializable {
                         setGraphic(null);
                     } else {
                         try {
-                            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/stayd/mypage/reservationCell.fxml"));
+                            FXMLLoader loader = new FXMLLoader(
+                                    getClass().getResource("/org/example/stayd/mypage/reservationCell.fxml"));
                             Parent cellRoot = loader.load();
 
                             ReservationItemCellController controller = loader.getController();
@@ -189,6 +195,7 @@ public class MypageController implements Initializable {
             e.printStackTrace();
         }
     }
+
     @FXML
     private void handleChangePw(ActionEvent event) {
         try {
@@ -219,6 +226,7 @@ public class MypageController implements Initializable {
 
     /**
      * 마우스가 버튼 위에 올라갔을 때 색상 변경
+     *
      * @param event MouseEvent
      */
     @FXML
@@ -230,6 +238,7 @@ public class MypageController implements Initializable {
 
     /**
      * 마우스가 버튼을 벗어났을 때 원래 색상으로 복원
+     *
      * @param event MouseEvent
      */
     @FXML

@@ -1,68 +1,89 @@
+// 작성자 : 이원석, 방대혁
 package org.example.stayd.domain.reservation.controller;
 
-import javafx.fxml.FXML;
-import javafx.scene.control.Label;
-import javafx.scene.control.Button;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.VBox;
+import java.time.format.DateTimeFormatter;
+import java.util.function.Consumer;
 import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
+import org.example.stayd.common.FXUtils;
+import org.example.stayd.common.SessionManager;
 import org.example.stayd.domain.cafe.dto.CafeDto;
 import org.example.stayd.domain.reservation.dto.ReservationDTO;
 import org.example.stayd.domain.reservation.service.ReservationService;
 
-import java.time.format.DateTimeFormatter;
-import java.util.function.Consumer;
-import javafx.stage.Stage;
-import javafx.scene.Node;
-import org.example.stayd.common.FXUtils;
-import org.example.stayd.common.SessionManager;
-
 /**
  * 예약 상세 조회 화면의 JavaFX 컨트롤러 클래스입니다.
  * <p>
- * 예약 상세 정보 표시, 예약 취소, 리뷰 작성 등
- * 예약 관련 상세 기능을 담당합니다.
+ * 예약 상세 정보 표시, 예약 취소, 리뷰 작성 등 예약 관련 상세 기능을 담당합니다.
  * </p>
  */
 public class ReservationDetailController {
 
     // FXML 필드들
-    @FXML private Label titleLabel;
+    @FXML
+    private Label titleLabel;
 
     // 카페 정보
-    @FXML private Label cafeNameLabel;
-    @FXML private Label cafeAddressLabel;
-    @FXML private Label cafePhoneLabel;
-    @FXML private Label cafePriceLabel;
+    @FXML
+    private Label cafeNameLabel;
+    @FXML
+    private Label cafeAddressLabel;
+    @FXML
+    private Label cafePhoneLabel;
+    @FXML
+    private Label cafePriceLabel;
 
     // 예약 정보
-    @FXML private Label reservationIdLabel;
-    @FXML private Label userIdLabel;
-    @FXML private Label reservationDateLabel;
-    @FXML private Label usageTimeLabel;
-    @FXML private Label dayOfWeekLabel;
-    @FXML private Label createdAtLabel;
+    @FXML
+    private Label reservationIdLabel;
+    @FXML
+    private Label userIdLabel;
+    @FXML
+    private Label reservationDateLabel;
+    @FXML
+    private Label usageTimeLabel;
+    @FXML
+    private Label dayOfWeekLabel;
+    @FXML
+    private Label createdAtLabel;
 
     // 결제 정보
-    @FXML private Label originalPriceLabel;
-    @FXML private Label discountPriceLabel;
-    @FXML private Label finalPriceLabel;
-    @FXML private Label canceledLabel;
+    @FXML
+    private Label originalPriceLabel;
+    @FXML
+    private Label discountPriceLabel;
+    @FXML
+    private Label finalPriceLabel;
+    @FXML
+    private Label canceledLabel;
 
     // 리뷰 정보
-    @FXML private VBox reviewSection;
-    @FXML private Label ratingLabel;
-    @FXML private Label reviewCreatedAtLabel;
-    @FXML private Label reviewContentLabel;
+    @FXML
+    private VBox reviewSection;
+    @FXML
+    private Label ratingLabel;
+    @FXML
+    private Label reviewCreatedAtLabel;
+    @FXML
+    private Label reviewContentLabel;
 
     // 버튼들
-    @FXML private Button backButton;
-    @FXML private Button cancelReservationButton;
+    @FXML
+    private Button backButton;
+    @FXML
+    private Button cancelReservationButton;
 
     // 상태 메시지
-    @FXML private Label statusLabel;
+    @FXML
+    private Label statusLabel;
 
     // 데이터 필드들
     private CafeDto.DetailResponse cafe;
@@ -85,6 +106,7 @@ public class ReservationDetailController {
      * <p>
      * 예약 상세 정보와 함께 사용됩니다.
      * </p>
+     *
      * @param cafe 카페 상세 정보 DTO
      */
     public void setCafe(CafeDto.DetailResponse cafe) {
@@ -96,6 +118,7 @@ public class ReservationDetailController {
      * <p>
      * 예약 상세 정보 표시 및 UI 갱신에 사용됩니다.
      * </p>
+     *
      * @param reservation 예약 DTO
      */
     public void setReservation(ReservationDTO reservation) {
@@ -238,6 +261,7 @@ public class ReservationDetailController {
 
     /**
      * 요일 문자열을 한글 요일명으로 변환합니다.
+     *
      * @param dayOfWeek 요일 문자열 (MON~SUN)
      * @return 한글 요일명
      */
@@ -259,6 +283,7 @@ public class ReservationDetailController {
      * <p>
      * 현재 Stage를 mypage.fxml로 전환합니다.
      * </p>
+     *
      * @param event 버튼 클릭 이벤트
      */
     @FXML
@@ -271,9 +296,9 @@ public class ReservationDetailController {
     /**
      * 예약 취소 버튼 클릭 시 호출되는 이벤트 핸들러입니다.
      * <p>
-     * 예약 취소 확인 다이얼로그를 띄우고, 확인 시 실제 예약 취소를 처리합니다.
-     * 취소 성공 시 마이페이지로 이동합니다.
+     * 예약 취소 확인 다이얼로그를 띄우고, 확인 시 실제 예약 취소를 처리합니다. 취소 성공 시 마이페이지로 이동합니다.
      * </p>
+     *
      * @param event 버튼 클릭 이벤트
      */
     @FXML
@@ -308,7 +333,8 @@ public class ReservationDetailController {
 
     /**
      * 사용자에게 알림 다이얼로그를 표시합니다.
-     * @param message 알림 메시지
+     *
+     * @param message   알림 메시지
      * @param alertType 알림 타입
      */
     private void showAlert(String message, AlertType alertType) {
@@ -321,6 +347,7 @@ public class ReservationDetailController {
 
     /**
      * 에러 메시지를 상태 라벨에 표시합니다.
+     *
      * @param message 에러 메시지
      */
     private void showError(String message) {

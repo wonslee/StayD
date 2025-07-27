@@ -1,23 +1,17 @@
+// 작성자 : 방대혁
 package org.example.stayd.domain.user.service;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
-import javafx.scene.control.Alert;
-import javafx.stage.Stage;
-import org.example.stayd.common.FXUtils;
-import org.example.stayd.common.SessionManager;
-import org.example.stayd.config.SceneConfig;
-import org.example.stayd.domain.user.dao.UserDAO;
-import org.example.stayd.domain.user.dto.PasswordResetDTO;
-import org.example.stayd.domain.user.dto.UserDTO;
-import org.mindrot.jbcrypt.BCrypt;
-
-import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Optional;
 import java.util.Set;
+import org.example.stayd.common.SessionManager;
+import org.example.stayd.domain.user.dao.UserDAO;
+import org.example.stayd.domain.user.dto.UserDTO;
+import org.mindrot.jbcrypt.BCrypt;
 
 public class UserService {
     private final Validator validator;
@@ -36,12 +30,8 @@ public class UserService {
     }
 
     /**
-     * 회원가입 처리
-     * - Bean Validation
-     * - 비밀번호 일치 확인
-     * - 비밀번호 암호화
-     * - PL/SQL 프로시 호출 (register_user)
-     *     - p_status: 0=성공, 1=ID중복, 2=Email중복, 3=역할오류, -1=기타오류
+     * 회원가입 처리 - Bean Validation - 비밀번호 일치 확인 - 비밀번호 암호화 - PL/SQL 프로시 호출 (register_user) - p_status: 0=성공, 1=ID중복,
+     * 2=Email중복, 3=역할오류, -1=기타오류
      */
     public void register(UserDTO dto) throws ValidationException {
         // 1) Bean Validation
@@ -158,8 +148,7 @@ public class UserService {
     }
 
     /**
-     * 회원가입 전 이메일 인증 전 단계의 검증
-     * Bean Validation, 비밀번호 일치, 아이디/이메일 중복 검사 수행
+     * 회원가입 전 이메일 인증 전 단계의 검증 Bean Validation, 비밀번호 일치, 아이디/이메일 중복 검사 수행
      */
     public void validateForPending(UserDTO dto) throws ValidationException {
         // Bean Validation

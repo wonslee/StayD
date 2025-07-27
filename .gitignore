@@ -1,3 +1,4 @@
+# 작성자 : 방대혁, 이원석, 이해든, 최영준
 .gradle
 build/
 !gradle/wrapper/gradle-wrapper.jar

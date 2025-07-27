@@ -1,3 +1,4 @@
+// 작성자 : 이원석, 방대혁
 package org.example.stayd.domain.reservation.service;
 
 
@@ -10,10 +11,9 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 import org.example.stayd.common.DatabaseConnection;
-import org.example.stayd.domain.reservation.dao.ReservationWDAO;
 import org.example.stayd.domain.reservation.dao.ReservationDao;
+import org.example.stayd.domain.reservation.dao.ReservationWDAO;
 import org.example.stayd.domain.reservation.dao.SeatDAO;
-import org.example.stayd.domain.reservation.dto.ReservationDTO;
 import org.example.stayd.domain.reservation.dto.ReservationDTO;
 import org.example.stayd.domain.reservation.model.Reservation;
 import org.example.stayd.domain.reservation.model.Seat;
@@ -21,8 +21,7 @@ import org.example.stayd.domain.reservation.model.Seat;
 /**
  * 예약 관련 비즈니스 로직을 담당하는 서비스 클래스입니다.
  * <p>
- * 예약 생성, 예약 현황 조회, 예약 취소 등
- * 도메인 규칙 및 검증, 트랜잭션 관리, 예외 처리 등 핵심 로직을 구현합니다.
+ * 예약 생성, 예약 현황 조회, 예약 취소 등 도메인 규칙 및 검증, 트랜잭션 관리, 예외 처리 등 핵심 로직을 구현합니다.
  * </p>
  */
 public class ReservationService {
@@ -65,20 +64,17 @@ public class ReservationService {
     /**
      * 예약을 생성합니다.
      * <p>
-     * 1. 예약 정보 유효성 검증 (Bean Validation, 커스텀 검증)
-     * 2. 좌석 가용성 확인 및 락킹
-     * 3. 좌석 상태 업데이트
-     * 4. 예약 정보 DB 저장
+     * 1. 예약 정보 유효성 검증 (Bean Validation, 커스텀 검증) 2. 좌석 가용성 확인 및 락킹 3. 좌석 상태 업데이트 4. 예약 정보 DB 저장
      * </p>
      *
-     * @param cafeId 카페 ID
-     * @param seatId 좌석 ID
-     * @param userId 사용자 ID
+     * @param cafeId         카페 ID
+     * @param seatId         좌석 ID
+     * @param userId         사용자 ID
      * @param reservationDTO 예약 정보 DTO
      * @return 생성된 예약 정보
-     * @throws SQLException 데이터베이스 접근 중 오류 발생 시
+     * @throws SQLException                 데이터베이스 접근 중 오류 발생 시
      * @throws ConstraintViolationException 예약 정보 유효성 검증 실패 시
-     * @throws IllegalStateException 좌석이 이미 예약된 경우 등 비즈니스 로직 위반 시
+     * @throws IllegalStateException        좌석이 이미 예약된 경우 등 비즈니스 로직 위반 시
      */
     public Reservation createReservation(
             ReservationDTO reservationDTO,
@@ -140,7 +136,9 @@ public class ReservationService {
      */
     public ReservationDTO getReservationDetail(long reservationId) throws SQLException {
         Optional<Reservation> reservationOpt = reservationDAO.findById(reservationId);
-        if (reservationOpt.isEmpty()) return null;
+        if (reservationOpt.isEmpty()) {
+            return null;
+        }
         return ReservationDTO.of(reservationOpt.get());
     }
 
