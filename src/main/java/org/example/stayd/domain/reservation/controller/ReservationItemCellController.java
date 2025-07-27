@@ -117,4 +117,19 @@ public class ReservationItemCellController {
         alert.setContentText(msg);
         alert.showAndWait();
     }
+
+    // 버튼 호버 효과들
+    @FXML
+    private void writeReviewButtonEnter(MouseEvent event) {
+        writeReviewButton.setStyle(
+                "-fx-background-color: #4caf4f; -fx-font-weight: bold; -fx-background-radius: 10;");
+        writeReviewButton.setTextFill(javafx.scene.paint.Color.WHITE);
+    }
+
+    @FXML
+    private void writeReviewButtonExit(MouseEvent event) {
+        writeReviewButton.setStyle(
+                "-fx-background-color: white; -fx-font-weight: bold; -fx-background-radius: 10;");
+        writeReviewButton.setTextFill(javafx.scene.paint.Color.web("#4caf4f"));
+    }
 }

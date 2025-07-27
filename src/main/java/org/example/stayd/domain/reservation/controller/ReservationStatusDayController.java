@@ -13,11 +13,13 @@ import javafx.scene.chart.XYChart;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import org.example.stayd.common.FXUtils;
 import org.example.stayd.config.SceneConfig;
 import org.example.stayd.domain.reservation.dto.ReservationDTO;
 import org.example.stayd.domain.reservation.service.ReservationService;
@@ -162,7 +164,7 @@ public class ReservationStatusDayController {
      * 예약 건수에 따라 색상을 다르게 표시 (예: 예약 건수가 많으면 빨간색, 적으면 대표 색)
      */
     private Color getColorBasedOnCount(int count) {
-        if (count > 5) {
+        if (count > 10) {
             return Color.web("#4CAF4F"); // 예약 건수 5건 이상 빨간색
         } else {
             return Color.web("#A8D6AA"); // 평소엔 stayD 대표색
@@ -176,5 +178,23 @@ public class ReservationStatusDayController {
      */
     private String colorToHex(Color color) {
         return String.format("#%02X%02X%02X", (int) (color.getRed() * 255), (int) (color.getGreen() * 255), (int) (color.getBlue() * 255));
+    }
+
+    /**
+     * 마우스가 버튼 위에 올라갔을 때 색상 변경
+     * @param event MouseEvent
+     */
+    @FXML
+    private void handleMouseEnter(MouseEvent event) {
+        FXUtils.handleMouseEnter(event); // FXUtils에서 처리
+    }
+
+    /**
+     * 마우스가 버튼을 벗어났을 때 원래 색상으로 복원
+     * @param event MouseEvent
+     */
+    @FXML
+    private void handleMouseExit(MouseEvent event) {
+        FXUtils.handleMouseExit(event); // FXUtils에서 처리
     }
 }

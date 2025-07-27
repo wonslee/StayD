@@ -24,7 +24,7 @@
     </top>
 
     <center>
-        <VBox spacing="30.0">
+        <VBox spacing="20.0">
             <padding>
                 <Insets left="50.0" right="50.0" />
             </padding>
@@ -37,13 +37,7 @@
                 <!-- 검색창 -->
                 <HBox alignment="CENTER_LEFT" spacing="10.0" HBox.hgrow="ALWAYS">
                     <TextField fx:id="searchField" onKeyPressed="#handleSearchKeyPress" prefHeight="40.0" prefWidth="500.0" promptText="스터디카페 명을 검색하세요" style="-fx-background-radius: 20; -fx-border-radius: 20; -fx-border-color: #E0E0E0; -fx-padding: 0 15 0 15;" />
-                    <Button fx:id="searchButton" onAction="#searchCafes" style="-fx-background-color: #A8D6AA; -fx-background-radius: 10; -fx-text-fill: white; -fx-font-weight: bold;">
-                        <graphic>
-                            <ImageView fitHeight="20" fitWidth="20" preserveRatio="true">
-                                <Image url="https://cdn-icons-png.flaticon.com/512/622/622669.png" />
-                            </ImageView>
-                        </graphic>
-                    </Button>
+                    <Button fx:id="searchButton" onAction="#searchCafes" style="-fx-background-color: white; -fx-border-color: #4CAF4F; -fx-border-radius: 5; -fx-background-radius: 5; -fx-font-weight: bold;" text="🔍"/>
                 </HBox>
 
                 <!-- 정렬 버튼 -->

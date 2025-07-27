@@ -15,7 +15,6 @@ public class MainApplication extends Application {
 //      FXMLLoader fxmlLoader = new FXMLLoader(MainApplication.class.getResource("/org/example/stayd/reservation/reservationStatus.fxml"));
         Scene scene = new Scene(fxmlLoader.load(), 1024, 768);
         stage.setTitle("stayD");
-        stage.setTitle("cafeCreateView!");
         stage.setScene(scene);
         stage.show();
     }
