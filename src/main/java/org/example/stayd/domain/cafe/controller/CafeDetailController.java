@@ -12,6 +12,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.application.Platform;
@@ -425,5 +426,27 @@ public class CafeDetailController implements Initializable {
         if (this.isFavorite != favorite) {
             toggleFavorite(null);
         }
+    }
+
+    /**
+     * 마우스가 버튼 위에 올라갔을 때 색상 변경
+     * @param event MouseEvent
+     */
+    @FXML
+    private void handleMouseEnter(MouseEvent event) {
+        backButton.setStyle(
+                "-fx-background-color: #4caf4f; -fx-font-weight: bold; -fx-background-radius: 10;");
+        backButton.setTextFill(javafx.scene.paint.Color.WHITE);
+    }
+
+    /**
+     * 마우스가 버튼을 벗어났을 때 원래 색상으로 복원
+     * @param event MouseEvent
+     */
+    @FXML
+    private void handleMouseExit(MouseEvent event) {
+        backButton.setStyle(
+                "-fx-background-color: white; -fx-font-weight: bold; -fx-background-radius: 10;");
+        backButton.setTextFill(javafx.scene.paint.Color.web("#4caf4f"));
     }
 }

@@ -3,6 +3,7 @@ package org.example.stayd.domain.reservation.controller;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.Button;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Alert;
@@ -327,4 +328,37 @@ public class ReservationDetailController {
         statusLabel.setVisible(true);
     }
 
+    // 콜백 설정 메서드
+    public void setOnReservationCanceledCallback(Consumer<Void> callback) {
+        this.onReservationCanceledCallback = callback;
+    }
+
+    // 버튼 호버 효과들
+    @FXML
+    private void onModifyButtonEnter(MouseEvent event) {
+        backButton.setStyle(
+                "-fx-background-color: #4caf4f; -fx-font-weight: bold; -fx-background-radius: 10;");
+        backButton.setTextFill(javafx.scene.paint.Color.WHITE);
+    }
+
+    @FXML
+    private void onModifyButtonExit(MouseEvent event) {
+        backButton.setStyle(
+                "-fx-background-color: white; -fx-font-weight: bold; -fx-background-radius: 10;");
+        backButton.setTextFill(javafx.scene.paint.Color.web("#4caf4f"));
+    }
+
+    @FXML
+    private void onDeleteButtonEnter(MouseEvent event) {
+        cancelReservationButton.setStyle(
+                "-fx-background-color: #ff6b6b; -fx-font-weight: bold; -fx-background-radius: 10; ");
+        cancelReservationButton.setTextFill(javafx.scene.paint.Color.WHITE);
+    }
+
+    @FXML
+    private void onDeleteButtonExit(MouseEvent event) {
+        cancelReservationButton.setStyle(
+                "-fx-background-color: white; -fx-font-weight: bold; -fx-background-radius: 10;");
+        cancelReservationButton.setTextFill(javafx.scene.paint.Color.web("#ff6b6b"));
+    }
 }

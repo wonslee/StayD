@@ -35,6 +35,28 @@ public class LoginController {
     private final UserService userService = new UserService();  // 사용자 서비스 객체
 
     /**
+     * 화면 초기화 시 실행되는 메서드
+     * 입력란에 텍스트가 입력되면 유효성 검사 후 버튼 활성화 여부를 설정
+     */
+    @FXML
+    public void initialize() {
+        loginIdField.setText("");  // 초기 라벨 텍스트 비우기
+        passwordField.setText("");  // 초기 라벨 텍스트 비우기
+        loginButton.setDisable(true);  // 버튼 비활성화
+
+        // 입력란에 텍스트가 변경되면 유효성 검사 및 버튼 활성화 여부 설정
+        loginIdField.textProperty().addListener((obs, oldV, newV) -> {
+            messageLabel.setText("");  // 유효성 검사 라벨 초기화
+            loginButton.setDisable(loginIdField.getText().trim().isEmpty() || passwordField.getText().trim().isEmpty());
+        });
+
+        passwordField.textProperty().addListener((obs, oldV, newV) -> {
+            messageLabel.setText("");  // 유효성 검사 라벨 초기화
+            loginButton.setDisable(loginIdField.getText().trim().isEmpty() || passwordField.getText().trim().isEmpty());
+        });
+    }
+
+    /**
      * 링크에 마우스 오버 시 스타일 변경
      */
     @FXML

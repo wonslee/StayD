@@ -39,53 +39,47 @@ public class UserService {
      * 회원가입 처리
      * - Bean Validation
      * - 비밀번호 일치 확인
-     * - 아이디/이메일 중복 검사
      * - 비밀번호 암호화
-     * - DB 저장
+     * - PL/SQL 프로시 호출 (register_user)
+     *     - p_status: 0=성공, 1=ID중복, 2=Email중복, 3=역할오류, -1=기타오류
      */
     public void register(UserDTO dto) throws ValidationException {
-        // Bean Validation
+        // 1) Bean Validation
         Set<ConstraintViolation<UserDTO>> errs = validator.validate(dto);
         if (!errs.isEmpty()) {
             String msg = errs.stream()
                     .map(ConstraintViolation::getMessage)
                     .distinct()
-                    .reduce((a,b) -> a + "; " + b)
+                    .reduce((a, b) -> a + "; " + b)
                     .orElse("검증 오류 발생");
             throw new ValidationException(msg);
         }
 
-        // 비밀번호 일치 검사
+        // 2) 비밀번호 일치 검사
         if (!dto.getPassword().equals(dto.getPasswordCheck())) {
             throw new ValidationException("비밀번호가 일치하지 않습니다.");
         }
 
-        // 역할 기본값
-        String role = dto.getRole();
-        if (role == null || role.isBlank()) {
-            role = "USER";  // 기본값
-        }
-        if (!Set.of("USER", "CAFE_OWNER", "ADMIN").contains(role)) {
-            throw new ValidationException("유효하지 않은 역할 값입니다.");
-        }
-        dto.setRole(role);
+        // 3) 비밀번호 해시 암호화
+        String hashed = BCrypt.hashpw(dto.getPassword(), BCrypt.gensalt());
+        dto.setPassword(hashed);
 
+        // 4) PL/SQL 프로시저 호출
         try {
-            // 중복 검사
-            if (userDao.existsById(dto.getLogin_id())) {
-                throw new ValidationException("이미 사용 중인 아이디입니다.");
+            int status = userDao.registerUser(dto);
+            switch (status) {
+                case 0:
+                    // 정상 가입
+                    return;
+                case 1:
+                    throw new ValidationException("이미 사용 중인 아이디입니다.");
+                case 2:
+                    throw new ValidationException("이미 사용 중인 이메일입니다.");
+                case 3:
+                    throw new ValidationException("유효하지 않은 역할 값입니다.");
+                default:
+                    throw new ValidationException("회원가입 처리 중 알 수 없는 오류가 발생했습니다.");
             }
-            if (userDao.existsByEmail(dto.getEmail())) {
-                throw new ValidationException("이미 사용 중인 이메일입니다.");
-            }
-
-            // 비밀번호 해시 암호화
-            String hashed = BCrypt.hashpw(dto.getPassword(), BCrypt.gensalt());
-            dto.setPassword(hashed);
-
-            // DB 저장
-            userDao.insertUser(dto);
-
         } catch (SQLException e) {
             throw new ValidationException("DB 오류 발생");
         }
@@ -93,6 +87,7 @@ public class UserService {
 
     /**
      * 아이디 사용 가능 여부 확인
+     *
      * @param loginId 검사할 아이디
      * @return true = 사용 가능, false = 이미 존재
      */
@@ -106,6 +101,7 @@ public class UserService {
 
     /**
      * 이메일 사용 가능 여부 확인
+     *
      * @param email 검사할 아이디
      * @return true = 사용 가능, false = 이미 존재
      */
@@ -117,7 +113,9 @@ public class UserService {
         }
     }
 
-    /** 유효성 검사 실패 예외 */
+    /**
+     * 유효성 검사 실패 예외
+     */
     public static class ValidationException extends Exception {
         public ValidationException(String message) {
             super(message);
@@ -127,7 +125,7 @@ public class UserService {
     /**
      * 로그인 인증 처리
      *
-     * @param loginId    아이디
+     * @param loginId     아이디
      * @param rawPassword 평문 비밀번호
      * @return 인증된 UserDTO (비밀번호 해시 제거 후 반환)
      * @throws AuthenticationException 인증 실패 시
@@ -195,6 +193,7 @@ public class UserService {
 
     /**
      * 아이디 찾기
+     *
      * @param email 조회할 이메일
      * @return loginId (없으면 null)
      * @throws ValidationException 조회 오류 시

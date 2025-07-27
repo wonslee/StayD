@@ -1,13 +1,11 @@
 package org.example.stayd.domain.cafe.controller;
 
-import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -210,14 +208,16 @@ public class CafeCreateController implements Initializable {
     @FXML
     private void onRegisterButtonEnter(MouseEvent event) {
         registerButton.setStyle(
-            "-fx-background-color: white; -fx-font-weight: bold; -fx-background-radius: 10; -fx-font-size: 16px;");
+                "-fx-background-color: #4caf4f; -fx-font-weight: bold; -fx-background-radius: 10;");
+        registerButton.setTextFill(javafx.scene.paint.Color.WHITE);
     }
 
     // 등록 버튼 마우스 나가기
     @FXML
     private void onRegisterButtonExit(MouseEvent event) {
         registerButton.setStyle(
-            "-fx-background-color: white; -fx-font-weight: bold; -fx-background-radius: 10; -fx-font-size: 14px;");
+                "-fx-background-color: white; -fx-font-weight: bold; -fx-background-radius: 10;");
+        registerButton.setTextFill(javafx.scene.paint.Color.web("#4caf4f"));
     }
 
     // 카페 생성 버튼 클릭 (백엔드 연동)
@@ -331,5 +331,23 @@ public class CafeCreateController implements Initializable {
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
+    }
+
+    /**
+     * 마우스가 버튼 위에 올라갔을 때 색상 변경
+     * @param event MouseEvent
+     */
+    @FXML
+    private void handleMouseEnter(MouseEvent event) {
+        FXUtils.handleMouseEnter(event); // FXUtils에서 처리
+    }
+
+    /**
+     * 마우스가 버튼을 벗어났을 때 원래 색상으로 복원
+     * @param event MouseEvent
+     */
+    @FXML
+    private void handleMouseExit(MouseEvent event) {
+        FXUtils.handleMouseExit(event); // FXUtils에서 처리
     }
 }

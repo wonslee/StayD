@@ -6,9 +6,11 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.stage.Modality;
@@ -42,6 +44,7 @@ public class MypageController implements Initializable {
     @FXML private ListView<ReviewDTO> reviewListView;
     @FXML private Label nicknameLabel;
     @FXML private Label emailLabel;
+    @FXML private Button changePwButton;
 
     private final ReservationWDAO reservationWDAO = new ReservationWDAO();
     private final ReviewListDAO reviewListDao = new ReviewListDAO();
@@ -214,5 +217,25 @@ public class MypageController implements Initializable {
         }
     }
 
+    /**
+     * 마우스가 버튼 위에 올라갔을 때 색상 변경
+     * @param event MouseEvent
+     */
+    @FXML
+    private void handleMouseEnter(MouseEvent event) {
+        changePwButton.setStyle(
+                "-fx-background-color: #4caf4f; -fx-font-weight: bold; -fx-background-radius: 10;");
+        changePwButton.setTextFill(javafx.scene.paint.Color.WHITE);
+    }
 
+    /**
+     * 마우스가 버튼을 벗어났을 때 원래 색상으로 복원
+     * @param event MouseEvent
+     */
+    @FXML
+    private void handleMouseExit(MouseEvent event) {
+        changePwButton.setStyle(
+                "-fx-background-color: white; -fx-font-weight: bold; -fx-background-radius: 10;");
+        changePwButton.setTextFill(javafx.scene.paint.Color.web("#4caf4f"));
+    }
 }

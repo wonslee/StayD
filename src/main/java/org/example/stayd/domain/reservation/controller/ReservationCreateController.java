@@ -127,7 +127,7 @@ public class ReservationCreateController {
                 reserveBtn.setDisable(false);
                 startCombo.setStyle("");
                 endCombo.setStyle("");
-                reserveBtn.setText("select");
+                reserveBtn.setText("예약");
                 reserveBtn.setStyle("");
             } else {
                 startCombo.getItems().clear();
@@ -444,5 +444,20 @@ public class ReservationCreateController {
             // 비전상 케이스 - 유저가 로그인 되어있지 않으면 로그인 페이지로 이동
             FXUtils.navigateToPage(stage, SceneConfig.LOGIN_FXML, "로그인 화면으로 이동하는 중 오류가 발생했습니다.");
         }
+    }
+
+    // 버튼 호버 효과들
+    @FXML
+    private void onModifyButtonEnter(MouseEvent event) {
+        reserveBtn.setStyle(
+                "-fx-background-color: #4caf4f; -fx-font-weight: bold; -fx-background-radius: 10;");
+        reserveBtn.setTextFill(javafx.scene.paint.Color.WHITE);
+    }
+
+    @FXML
+    private void onModifyButtonExit(MouseEvent event) {
+        reserveBtn.setStyle(
+                "-fx-background-color: white; -fx-font-weight: bold; -fx-background-radius: 10;");
+        reserveBtn.setTextFill(javafx.scene.paint.Color.web("#4caf4f"));
     }
 }

@@ -37,13 +37,15 @@
         <Button fx:id="cancelButton"
                 text="취소"
                 onAction="#handleCancel"
-                prefWidth="100"
-                style="-fx-background-color: #ccc; -fx-text-fill: #333; -fx-background-radius: 8;" />
+                onMouseEntered="#onDeleteButtonEnter" onMouseExited="#onDeleteButtonExit"
+                prefWidth="100" textFill="#ff6b6b"
+                style="-fx-background-color: white; -fx-font-weight: bold; -fx-background-radius: 10;" />
         <Button fx:id="saveButton"
                 text="저장"
                 onAction="#handleSave"
-                prefWidth="100"
-                style="-fx-background-color: #2ecc71; -fx-text-fill: white; -fx-background-radius: 8;" />
+                onMouseEntered="#onModifyButtonEnter" onMouseExited="#onModifyButtonExit"
+                prefWidth="100" textFill="#4caf4f"
+                style="-fx-background-color: white; -fx-font-weight: bold; -fx-background-radius: 10;" />
     </HBox>
 
     <!-- 별점 공통 스타일 -->
